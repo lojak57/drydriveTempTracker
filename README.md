@@ -64,6 +64,55 @@ npm run dev
 open http://localhost:5173
 ```
 
+## 🚀 Deployment
+
+### Deploy to Vercel (Recommended)
+
+The easiest way to deploy your Oil Field Temperature Tracker:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/lojak57/drydriveTempTracker)
+
+#### Manual Vercel Deployment
+
+1. **Install Vercel CLI** (if not already installed):
+```bash
+npm i -g vercel
+```
+
+2. **Login to Vercel**:
+```bash
+vercel login
+```
+
+3. **Deploy from your local machine**:
+```bash
+npm run build  # Test build locally first
+vercel        # Deploy to Vercel
+```
+
+4. **Set Environment Variables** in Vercel Dashboard:
+   - Go to your project settings
+   - Add environment variables as needed
+   - Redeploy if environment variables are critical
+
+#### Alternative Deployment Options
+
+- **Netlify**: Works with SvelteKit adapter-netlify
+- **Railway**: Perfect for full-stack applications
+- **DigitalOcean App Platform**: Great for scalable deployments
+- **AWS Amplify**: Enterprise-grade hosting
+
+### Environment Variables for Production
+
+Set these in your deployment platform:
+
+```env
+NODE_ENV=production
+VITE_UPDATE_INTERVAL=3000
+VITE_TEMPERATURE_SIMULATION=true
+# Add your API endpoints when backend is ready
+```
+
 ### Available Scripts
 
 ```bash
