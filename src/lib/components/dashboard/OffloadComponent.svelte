@@ -52,8 +52,9 @@
 			<h3 class="text-lg font-semibold text-oil-black mb-4">Destination Site</h3>
 			
 			<div>
-				<label class="block text-sm font-semibold text-oil-black mb-2">Offload Location</label>
+				<label for="offload-location" class="block text-sm font-semibold text-oil-black mb-2">Offload Location</label>
 				<select 
+					id="offload-location"
 					bind:value={selectedOffloadSite}
 					class="w-full p-3 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
 				>
@@ -71,8 +72,9 @@
 			
 			<div class="space-y-4">
 				<div>
-					<label class="block text-sm font-semibold text-oil-black mb-2">Final Volume (gallons)</label>
+					<label for="final-volume" class="block text-sm font-semibold text-oil-black mb-2">Final Volume (gallons)</label>
 					<input 
+						id="final-volume"
 						type="number"
 						bind:value={finalVolume}
 						min="0"

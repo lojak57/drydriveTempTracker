@@ -23,8 +23,9 @@
 <div class="glass-card p-6 space-y-6">
 	<!-- Site Selection -->
 	<div>
-		<label class="block text-sm font-semibold text-oil-black mb-2">Loading Site</label>
+		<label for="loading-site" class="block text-sm font-semibold text-oil-black mb-2">Loading Site</label>
 		<select 
+			id="loading-site"
 			bind:value={selectedSite}
 			class="w-full p-3 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
 		>
@@ -37,8 +38,9 @@
 	
 	<!-- Driver Selection -->
 	<div>
-		<label class="block text-sm font-semibold text-oil-black mb-2">Driver</label>
+		<label for="driver-select" class="block text-sm font-semibold text-oil-black mb-2">Driver</label>
 		<select 
+			id="driver-select"
 			bind:value={selectedDriver}
 			class="w-full p-3 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
 		>
@@ -51,8 +53,9 @@
 	
 	<!-- Truck Selection -->
 	<div>
-		<label class="block text-sm font-semibold text-oil-black mb-2">Truck</label>
+		<label for="truck-select" class="block text-sm font-semibold text-oil-black mb-2">Truck</label>
 		<select 
+			id="truck-select"
 			bind:value={selectedTruck}
 			class="w-full p-3 rounded-xl border border-slate-200 bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
 		>
@@ -65,8 +68,9 @@
 	
 	<!-- Initial Volume -->
 	<div>
-		<label class="block text-sm font-semibold text-oil-black mb-2">Initial Volume (gallons)</label>
+		<label for="initial-volume" class="block text-sm font-semibold text-oil-black mb-2">Initial Volume (gallons)</label>
 		<input 
+			id="initial-volume"
 			type="number"
 			bind:value={initialVolume}
 			min="0"
