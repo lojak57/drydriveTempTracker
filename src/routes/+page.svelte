@@ -75,6 +75,30 @@
 			</div>
 		</div>
 
+		<!-- Primary Navigation Actions -->
+		<div class="glass-card p-6 sm:p-8 text-center mb-6 sm:mb-8">
+			<h3 class="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-oil-black mb-4 sm:mb-6">Dashboard Navigation</h3>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+				<a 
+					href="/haul" 
+					class="block p-4 sm:p-6 bg-gradient-to-br from-oil-orange to-amber-500 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 touch-manipulation"
+				>
+					<div class="text-2xl sm:text-3xl mb-2">🚛</div>
+					<div class="font-semibold text-base sm:text-lg mb-1">Live Haul Monitoring</div>
+					<div class="text-white/80 text-xs sm:text-sm">Monitor active hauls and real-time data</div>
+				</a>
+				
+				<a 
+					href="/admin" 
+					class="block p-4 sm:p-6 bg-gradient-to-br from-oil-blue to-blue-600 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 touch-manipulation"
+				>
+					<div class="text-2xl sm:text-3xl mb-2">📊</div>
+					<div class="font-semibold text-base sm:text-lg mb-1">Analytics Dashboard</div>
+					<div class="text-white/80 text-xs sm:text-sm">View historical data and performance metrics</div>
+				</a>
+			</div>
+		</div>
+
 		<!-- Real-time Metrics -->
 		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
 			<MetricCard
@@ -205,28 +229,6 @@
 			</div>
 		</div>
 
-		<!-- Quick Actions -->
-		<div class="glass-card p-6 sm:p-8 text-center">
-			<h3 class="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-oil-black mb-4 sm:mb-6">Dashboard Navigation</h3>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-				<a 
-					href="/haul" 
-					class="block p-4 sm:p-6 bg-gradient-to-br from-oil-orange to-amber-500 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 touch-manipulation"
-				>
-					<div class="text-2xl sm:text-3xl mb-2">🚛</div>
-					<div class="font-semibold text-base sm:text-lg mb-1">Live Haul Monitoring</div>
-					<div class="text-white/80 text-xs sm:text-sm">Monitor active hauls and real-time data</div>
-				</a>
-				
-				<a 
-					href="/admin" 
-					class="block p-4 sm:p-6 bg-gradient-to-br from-oil-blue to-blue-600 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 touch-manipulation"
-				>
-					<div class="text-2xl sm:text-3xl mb-2">📊</div>
-					<div class="font-semibold text-base sm:text-lg mb-1">Analytics Dashboard</div>
-					<div class="text-white/80 text-xs sm:text-sm">View historical data and performance metrics</div>
-				</a>
-			</div>
-		</div>
+
 	</main>
 </div>
