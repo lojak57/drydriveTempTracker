@@ -160,3 +160,62 @@ body {
 	@apply bg-white/70 backdrop-blur-xl border-b border-white/20;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+	.glass-card {
+		@apply rounded-xl;
+		margin-bottom: 1rem;
+	}
+	
+	.metric-display {
+		@apply text-2xl;
+	}
+	
+	.btn-primary, .btn-secondary {
+		@apply py-4 px-6 text-base;
+		min-height: 48px; /* Touch target size */
+	}
+	
+	/* Larger touch targets */
+	button, a[href] {
+		min-height: 44px;
+		min-width: 44px;
+	}
+	
+	/* Better spacing for mobile */
+	.space-y-4 > * + * {
+		margin-top: 0.75rem;
+	}
+	
+	.space-y-6 > * + * {
+		margin-top: 1rem;
+	}
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+	.glass-card {
+		@apply rounded-xl;
+	}
+}
+
+/* Enhanced touch targets */
+.touch-manipulation {
+	touch-action: manipulation;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+/* Mobile-first typography */
+@media (max-width: 640px) {
+	body {
+		font-size: 14px;
+		line-height: 1.5;
+	}
+	
+	h1, h2, h3 {
+		line-height: 1.3;
+	}
+}

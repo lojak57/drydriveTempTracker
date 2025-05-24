@@ -72,15 +72,15 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
 	<Navigation />
 	
-	<main class="max-w-7xl mx-auto px-6 py-8">
+	<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 		<!-- Header -->
-		<div class="text-center mb-8">
-			<h1 class="display-large text-oil-black mb-2">Analytics Dashboard</h1>
-			<p class="text-oil-gray">Performance insights and operational intelligence</p>
+		<div class="text-center mb-6 sm:mb-8">
+			<h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-oil-black mb-2">Analytics Dashboard</h1>
+			<p class="text-sm sm:text-base text-oil-gray">Performance insights and operational intelligence</p>
 		</div>
 
 		<!-- Key Metrics Row -->
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
 			<AnalyticsCard 
 				title="Total Volume Transported"
 				value={totalVolume.toLocaleString()}
@@ -128,13 +128,13 @@
 		</div>
 
 		<!-- Driver & Truck Analytics -->
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
 			<DriverLeaderboard drivers={$driverStats} />
 			<TruckEfficiency trucks={$trucks} hauls={allHauls} />
 		</div>
 
 		<!-- Loss Analysis & Route Performance -->
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-6 sm:mb-8">
 			<LossAnalysis hauls={completedHaulsWithData} />
 			
 			<!-- Route Performance -->
@@ -161,7 +161,7 @@
 		</div>
 
 		<!-- Real-time Alerts & Insights -->
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
 			<!-- Active Alerts -->
 			<div class="glass-card p-6">
 				<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">

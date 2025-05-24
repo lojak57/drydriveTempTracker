@@ -50,19 +50,19 @@
 	}
 </script>
 
-<div class="glass-card p-6 fade-in">
+<div class="glass-card p-4 sm:p-6 fade-in">
 	<!-- Header -->
-	<div class="flex items-center justify-between mb-4">
-		<div class="flex items-center space-x-3">
+	<div class="flex items-center justify-between mb-3 sm:mb-4">
+		<div class="flex items-center space-x-2 sm:space-x-3">
 			{#if icon}
-				<div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-					<span class="text-xl">{icon}</span>
+				<div class="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+					<span class="text-lg sm:text-xl">{icon}</span>
 				</div>
 			{/if}
 			<div>
-				<h3 class="text-lg font-semibold text-oil-black">{title}</h3>
+				<h3 class="text-base sm:text-lg font-semibold text-oil-black leading-tight">{title}</h3>
 				{#if subtitle}
-					<p class="text-sm text-oil-gray">{subtitle}</p>
+					<p class="text-xs sm:text-sm text-oil-gray">{subtitle}</p>
 				{/if}
 			</div>
 		</div>

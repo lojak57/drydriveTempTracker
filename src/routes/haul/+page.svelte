@@ -96,21 +96,21 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
 	<Navigation />
 	
-	<main class="max-w-7xl mx-auto px-6 py-8">
+	<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
 		<!-- Header -->
-		<div class="flex items-center justify-between mb-8">
+		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
 			<div>
-				<h1 class="display-large text-oil-black">Live Haul Monitoring</h1>
-				<p class="text-oil-gray mt-2">Real-time SCADA data from field operations</p>
+				<h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-oil-black">Live Haul Monitoring</h1>
+				<p class="text-sm sm:text-base text-oil-gray mt-2">Real-time SCADA data from field operations</p>
 			</div>
-			<div class="text-right">
+			<div class="text-left sm:text-right">
 				<div class="text-sm text-oil-gray">Last Update</div>
-				<div class="font-mono text-oil-black">{lastUpdate.toLocaleTimeString()}</div>
+				<div class="font-mono text-oil-black text-sm">{lastUpdate.toLocaleTimeString()}</div>
 			</div>
 		</div>
 
 		<!-- System Status Row -->
-		<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
 			<SystemStatusCard />
 			<LiveDataFeed />
 			<div class="glass-card p-6">
@@ -132,7 +132,7 @@
 		</div>
 
 		<!-- Active Hauls Grid -->
-		<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 			{#each $activeHauls as haul (haul.id)}
 				<HaulCard 
 					{haul} 
