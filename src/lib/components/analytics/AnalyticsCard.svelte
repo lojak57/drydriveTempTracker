@@ -44,9 +44,9 @@
 	}
 </script>
 
-<div class="glass-card p-6 bg-gradient-to-br {getCardTheme(color)} border">
-	<div class="flex items-start justify-between mb-4">
-		<div class="text-2xl">{icon}</div>
+<div class="glass-card p-4 sm:p-6 bg-gradient-to-br {getCardTheme(color)} border">
+	<div class="flex items-start justify-between mb-3 sm:mb-4">
+		<div class="text-lg sm:text-2xl">{icon}</div>
 		{#if trendValue}
 			<div class="flex items-center gap-1 text-xs {getTrendColor(trend)}">
 				<span>{getTrendIcon(trend)}</span>
@@ -55,14 +55,14 @@
 		{/if}
 	</div>
 	
-	<div class="space-y-2">
-		<h3 class="text-sm font-medium text-oil-black">{title}</h3>
-		<div class="flex items-baseline gap-2">
-			<div class="metric-display text-3xl {getValueColor(color)}">
+	<div class="space-y-1 sm:space-y-2">
+		<h3 class="text-xs sm:text-sm font-medium text-oil-black leading-tight">{title}</h3>
+		<div class="flex items-baseline gap-1 sm:gap-2">
+			<div class="metric-display text-xl sm:text-3xl {getValueColor(color)} leading-tight">
 				{typeof value === 'number' ? value.toFixed(1) : value}
 			</div>
 			{#if unit}
-				<span class="text-sm {getValueColor(color)} opacity-70">{unit}</span>
+				<span class="text-xs sm:text-sm {getValueColor(color)} opacity-70">{unit}</span>
 			{/if}
 		</div>
 	</div>

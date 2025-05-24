@@ -73,27 +73,27 @@
 	}
 </script>
 
-<div class="glass-card p-6">
-	<h3 class="font-semibold text-oil-black mb-6 flex items-center gap-2">
-		<span class="text-lg">🚛</span>
-		Truck Efficiency Analysis
+<div class="glass-card p-4 sm:p-6">
+	<h3 class="font-semibold text-oil-black mb-4 sm:mb-6 flex items-center gap-2">
+		<span class="text-base sm:text-lg">🚛</span>
+		<span class="text-sm sm:text-base">Truck Efficiency Analysis</span>
 	</h3>
 	
-	<div class="space-y-4">
+	<div class="space-y-3 sm:space-y-4">
 		{#each sortedTrucks as truck}
-			<div class="p-4 bg-white/50 rounded-xl border border-slate-200 hover:bg-white/70 transition-colors">
-				<div class="flex items-start justify-between mb-3">
-					<div class="flex items-center gap-3">
-						<div class="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center shadow-md">
-							<span class="text-white text-lg">🚛</span>
+			<div class="p-3 sm:p-4 bg-white/50 rounded-xl border border-slate-200 hover:bg-white/70 transition-colors">
+				<div class="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-3">
+					<div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+						<div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+							<span class="text-white text-sm sm:text-lg">🚛</span>
 						</div>
-						<div>
-							<div class="font-semibold text-oil-black">{truck.model}</div>
-							<div class="text-xs text-oil-gray font-mono">{truck.plateNumber}</div>
+						<div class="min-w-0 flex-1">
+							<div class="font-semibold text-oil-black text-sm sm:text-base leading-tight truncate">{truck.model}</div>
+							<div class="text-xs text-oil-gray font-mono truncate">{truck.plateNumber}</div>
 						</div>
 					</div>
 					
-					<div class="flex items-center gap-3">
+					<div class="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 flex-shrink-0">
 						<!-- Trend -->
 						<div class="text-center">
 							<div class="text-xs text-oil-gray mb-1">Trend</div>
@@ -106,16 +106,16 @@
 						</div>
 
 						<!-- Status -->
-						<div class="px-3 py-2 rounded-lg border {getStatusColor(truck.status)}">
+						<div class="px-2 sm:px-3 py-1 sm:py-2 rounded-lg border {getStatusColor(truck.status)}">
 							<div class="flex items-center gap-1 text-xs font-medium">
 								<span>{getStatusIcon(truck.status)}</span>
-								<span class="capitalize">{truck.status}</span>
+								<span class="capitalize hidden sm:inline">{truck.status}</span>
 							</div>
 						</div>
 
 						<!-- Efficiency -->
 						<div class="text-right">
-							<div class="metric-display text-xl {truck.currentEfficiency >= 98 ? 'text-emerald-600' : truck.currentEfficiency >= 96 ? 'text-blue-600' : 'text-amber-600'}">
+							<div class="metric-display text-lg sm:text-xl {truck.currentEfficiency >= 98 ? 'text-emerald-600' : truck.currentEfficiency >= 96 ? 'text-blue-600' : 'text-amber-600'} leading-tight">
 								{truck.currentEfficiency.toFixed(1)}%
 							</div>
 							<div class="text-xs text-oil-gray">efficiency</div>
@@ -124,28 +124,28 @@
 				</div>
 
 				<!-- Details -->
-				<div class="grid grid-cols-4 gap-4 pt-3 border-t border-slate-200">
+				<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 pt-3 border-t border-slate-200">
 					<div class="text-center">
 						<div class="text-xs text-oil-gray">Capacity</div>
-						<div class="text-sm font-semibold text-oil-black">{truck.capacity.toLocaleString()}</div>
+						<div class="text-xs sm:text-sm font-semibold text-oil-black leading-tight">{truck.capacity.toLocaleString()}</div>
 						<div class="text-xs text-oil-gray">gallons</div>
 					</div>
 					
 					<div class="text-center">
 						<div class="text-xs text-oil-gray">Total Hauls</div>
-						<div class="text-sm font-semibold text-oil-black">{truck.totalHauls}</div>
+						<div class="text-xs sm:text-sm font-semibold text-oil-black leading-tight">{truck.totalHauls}</div>
 						<div class="text-xs text-oil-gray">completed</div>
 					</div>
 					
 					<div class="text-center">
 						<div class="text-xs text-oil-gray">Volume</div>
-						<div class="text-sm font-semibold text-oil-black">{(truck.totalVolume / 1000).toFixed(0)}k</div>
+						<div class="text-xs sm:text-sm font-semibold text-oil-black leading-tight">{(truck.totalVolume / 1000).toFixed(0)}k</div>
 						<div class="text-xs text-oil-gray">gallons</div>
 					</div>
 					
 					<div class="text-center">
 						<div class="text-xs text-oil-gray">Utilization</div>
-						<div class="text-sm font-semibold text-oil-black">
+						<div class="text-xs sm:text-sm font-semibold text-oil-black leading-tight">
 							{truck.totalVolume > 0 ? ((truck.totalVolume / truck.totalHauls / truck.capacity) * 100).toFixed(0) : 0}%
 						</div>
 						<div class="text-xs text-oil-gray">avg load</div>
@@ -156,30 +156,30 @@
 	</div>
 
 	<!-- Fleet Summary -->
-	<div class="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-200">
+	<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-slate-200">
 		<div class="text-center p-3 bg-blue-50 rounded-xl border border-blue-200">
-			<div class="metric-display text-blue-700 text-lg mb-1">
+			<div class="metric-display text-blue-700 text-base sm:text-lg mb-1 leading-tight">
 				{trucks.length}
 			</div>
 			<div class="text-xs text-blue-600">Total Trucks</div>
 		</div>
 		
 		<div class="text-center p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-			<div class="metric-display text-emerald-700 text-lg mb-1">
+			<div class="metric-display text-emerald-700 text-base sm:text-lg mb-1 leading-tight">
 				{(truckPerformance.reduce((sum, t) => sum + t.currentEfficiency, 0) / truckPerformance.length).toFixed(1)}%
 			</div>
 			<div class="text-xs text-emerald-600">Fleet Avg</div>
 		</div>
 		
 		<div class="text-center p-3 bg-amber-50 rounded-xl border border-amber-200">
-			<div class="metric-display text-amber-700 text-lg mb-1">
+			<div class="metric-display text-amber-700 text-base sm:text-lg mb-1 leading-tight">
 				{truckPerformance.filter(t => t.status === 'warning' || t.status === 'maintenance').length}
 			</div>
 			<div class="text-xs text-amber-600">Need Attention</div>
 		</div>
 		
 		<div class="text-center p-3 bg-slate-50 rounded-xl border border-slate-200">
-			<div class="metric-display text-slate-700 text-lg mb-1">
+			<div class="metric-display text-slate-700 text-base sm:text-lg mb-1 leading-tight">
 				{((truckPerformance.reduce((sum, t) => sum + t.totalVolume, 0)) / 1000).toFixed(0)}k
 			</div>
 			<div class="text-xs text-slate-600">Total Volume</div>

@@ -57,26 +57,36 @@
 
 		<div class="p-6 space-y-8">
 			<!-- Route Overview -->
-			<div class="glass-card p-6">
+			<div class="glass-card p-4 sm:p-6">
 				<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
 					<span class="text-lg">🛣️</span>
 					Route Information
 				</h3>
-				<div class="flex items-center gap-4">
-					<div class="flex-1 text-center p-4 bg-emerald-50 rounded-xl border border-emerald-200">
-						<div class="text-2xl mb-2">📍</div>
-						<div class="font-semibold text-emerald-700">{haul.onloadSite.name}</div>
-						<div class="text-sm text-emerald-600">Origin</div>
+				<!-- Mobile: Stack vertically, Desktop: Horizontal with arrow -->
+				<div class="flex flex-col sm:flex-row items-center gap-4">
+					<div class="w-full sm:flex-1 text-center p-3 sm:p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+						<div class="text-xl sm:text-2xl mb-2">📍</div>
+						<div class="font-semibold text-emerald-700 text-sm sm:text-base leading-tight">{haul.onloadSite.name}</div>
+						<div class="text-xs sm:text-sm text-emerald-600">Origin</div>
 					</div>
-					<div class="flex items-center gap-2">
-						<div class="w-12 h-1 bg-gradient-to-r from-emerald-400 to-oil-blue rounded"></div>
-						<span class="text-2xl">→</span>
-						<div class="w-12 h-1 bg-gradient-to-r from-oil-blue to-orange-400 rounded"></div>
+					
+					<!-- Arrow - Hidden on mobile, shown on larger screens -->
+					<div class="hidden sm:flex items-center gap-2">
+						<div class="w-8 sm:w-12 h-1 bg-gradient-to-r from-emerald-400 to-oil-blue rounded"></div>
+						<span class="text-xl sm:text-2xl">→</span>
+						<div class="w-8 sm:w-12 h-1 bg-gradient-to-r from-oil-blue to-orange-400 rounded"></div>
 					</div>
-					<div class="flex-1 text-center p-4 bg-orange-50 rounded-xl border border-orange-200">
-						<div class="text-2xl mb-2">🏭</div>
-						<div class="font-semibold text-orange-700">{haul.offloadSite.name}</div>
-						<div class="text-sm text-orange-600">Destination</div>
+					
+					<!-- Mobile: Show vertical arrow -->
+					<div class="sm:hidden flex flex-col items-center gap-1">
+						<div class="h-8 w-1 bg-gradient-to-b from-emerald-400 to-orange-400 rounded"></div>
+						<span class="text-lg">↓</span>
+					</div>
+					
+					<div class="w-full sm:flex-1 text-center p-3 sm:p-4 bg-orange-50 rounded-xl border border-orange-200">
+						<div class="text-xl sm:text-2xl mb-2">🏭</div>
+						<div class="font-semibold text-orange-700 text-sm sm:text-base leading-tight">{haul.offloadSite.name}</div>
+						<div class="text-xs sm:text-sm text-orange-600">Destination</div>
 					</div>
 				</div>
 			</div>
@@ -85,50 +95,50 @@
 			<div class="space-y-6">
 				<!-- Step 1: Initial Load -->
 				<div class="relative">
-					<div class="flex items-start gap-6">
-						<div class="flex flex-col items-center">
-							<div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
-								<span class="text-white font-bold">1</span>
+					<div class="flex items-start gap-3 sm:gap-6">
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
+								<span class="text-white font-bold text-sm sm:text-base">1</span>
 							</div>
-							<div class="w-1 h-16 bg-emerald-300 mt-2"></div>
+							<div class="w-1 h-12 sm:h-16 bg-emerald-300 mt-2"></div>
 						</div>
-						<div class="flex-1 glass-card p-6">
+						<div class="flex-1 min-w-0 glass-card p-4 sm:p-6">
 							<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
-								<span class="text-lg">📦</span>
-								Initial Load
+								<span class="text-base sm:text-lg">📦</span>
+								<span class="text-sm sm:text-base">Initial Load</span>
 							</h3>
-							<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+							<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
 								<!-- Volume Card -->
-								<div class="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200 shadow-sm">
-									<div class="text-2xl mb-2">🛢️</div>
-									<div class="metric-display text-oil-orange text-2xl mb-2">{haul.initialVolume.toLocaleString()}</div>
-									<div class="text-sm text-orange-700 font-medium">Gallons Loaded</div>
+								<div class="text-center p-3 sm:p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200 shadow-sm">
+									<div class="text-xl sm:text-2xl mb-2">🛢️</div>
+									<div class="metric-display text-oil-orange text-lg sm:text-2xl mb-2 leading-tight">{haul.initialVolume.toLocaleString()}</div>
+									<div class="text-xs sm:text-sm text-orange-700 font-medium">Gallons Loaded</div>
 								</div>
 
 								<!-- Driver Card -->
-								<div class="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 shadow-sm">
-									<div class="flex items-center gap-3">
-										<div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-md">
-											<span class="text-white text-sm font-bold">{driver.name.split(' ').map(n => n[0]).join('')}</span>
+								<div class="p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 shadow-sm">
+									<div class="flex items-center gap-2 sm:gap-3">
+										<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
+											<span class="text-white text-xs sm:text-sm font-bold">{driver.name.split(' ').map(n => n[0]).join('')}</span>
 										</div>
-										<div class="flex-1">
-											<div class="font-semibold text-blue-800 text-lg leading-tight">{driver.name}</div>
-											<div class="text-sm text-blue-600">{driver.experience} years experience</div>
-											<div class="text-xs text-blue-500">{driver.totalHauls.toLocaleString()} total hauls</div>
+										<div class="flex-1 min-w-0">
+											<div class="font-semibold text-blue-800 text-sm sm:text-lg leading-tight truncate">{driver.name}</div>
+											<div class="text-xs sm:text-sm text-blue-600 truncate">{driver.experience} years exp</div>
+											<div class="text-xs text-blue-500 truncate">{driver.totalHauls.toLocaleString()} hauls</div>
 										</div>
 									</div>
 								</div>
 
 								<!-- Truck Card -->
-								<div class="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 shadow-sm">
-									<div class="flex items-center gap-3">
-										<div class="w-12 h-12 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center shadow-md">
-											<span class="text-white text-lg">🚛</span>
+								<div class="p-3 sm:p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 shadow-sm">
+									<div class="flex items-center gap-2 sm:gap-3">
+										<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+											<span class="text-white text-base sm:text-lg">🚛</span>
 										</div>
-										<div class="flex-1">
-											<div class="font-semibold text-slate-800 text-lg leading-tight">{truck.model}</div>
-											<div class="text-sm text-slate-600 font-mono">{truck.plateNumber}</div>
-											<div class="text-xs text-slate-500">Capacity: {truck.capacity.toLocaleString()} gal</div>
+										<div class="flex-1 min-w-0">
+											<div class="font-semibold text-slate-800 text-sm sm:text-lg leading-tight truncate">{truck.model}</div>
+											<div class="text-xs sm:text-sm text-slate-600 font-mono truncate">{truck.plateNumber}</div>
+											<div class="text-xs text-slate-500 truncate">Cap: {truck.capacity.toLocaleString()} gal</div>
 										</div>
 									</div>
 								</div>
@@ -139,57 +149,57 @@
 
 				<!-- Step 2: Transit -->
 				<div class="relative">
-					<div class="flex items-start gap-6">
-						<div class="flex flex-col items-center">
-							<div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-								<span class="text-white font-bold">2</span>
+					<div class="flex items-start gap-3 sm:gap-6">
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+								<span class="text-white font-bold text-sm sm:text-base">2</span>
 							</div>
-							<div class="w-1 h-24 bg-blue-300 mt-2"></div>
+							<div class="w-1 h-20 sm:h-24 bg-blue-300 mt-2"></div>
 						</div>
-						<div class="flex-1 glass-card p-6">
+						<div class="flex-1 min-w-0 glass-card p-4 sm:p-6">
 							<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
-								<span class="text-lg">🚛</span>
-								Transit Monitoring
+								<span class="text-base sm:text-lg">🚛</span>
+								<span class="text-sm sm:text-base">Transit Monitoring</span>
 							</h3>
 							
 							<!-- Progress Bar -->
-							<div class="mb-6">
-								<div class="flex justify-between text-sm text-oil-gray mb-2">
+							<div class="mb-4 sm:mb-6">
+								<div class="flex justify-between text-xs sm:text-sm text-oil-gray mb-2">
 									<span>Transit Progress</span>
 									<span>{haul.transitProgress.toFixed(1)}%</span>
 								</div>
-								<div class="w-full bg-slate-200 rounded-full h-3">
+								<div class="w-full bg-slate-200 rounded-full h-2 sm:h-3">
 									<div 
-										class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 relative"
+										class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 sm:h-3 rounded-full transition-all duration-500 relative"
 										style="width: {haul.transitProgress}%"
 									>
-										<div class="absolute right-0 top-0 w-3 h-3 bg-white rounded-full shadow-md transform translate-x-1/2"></div>
+										<div class="absolute right-0 top-0 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full shadow-md transform translate-x-1/2"></div>
 									</div>
 								</div>
 								{#if haul.status === 'transit'}
-									<div class="text-sm text-oil-gray mt-2">ETA: {formatTime(haul.estimatedTimeRemaining)}</div>
+									<div class="text-xs sm:text-sm text-oil-gray mt-2">ETA: {formatTime(haul.estimatedTimeRemaining)}</div>
 								{:else if haul.status === 'completed'}
-									<div class="text-sm text-emerald-600 mt-2">✅ Transit Completed</div>
+									<div class="text-xs sm:text-sm text-emerald-600 mt-2">✅ Transit Completed</div>
 								{/if}
 							</div>
 
 							<!-- Temperature Readings -->
 							{#if latestReading}
-								<div class="grid grid-cols-2 gap-4">
-									<div class="text-center p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200">
-										<div class="flex items-center justify-center gap-2 mb-2">
-											<span class="text-2xl">🌡️</span>
-											<span class="font-semibold text-amber-700">Internal</span>
+								<div class="grid grid-cols-2 gap-3 sm:gap-4">
+									<div class="text-center p-3 sm:p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200">
+										<div class="flex items-center justify-center gap-1 sm:gap-2 mb-2">
+											<span class="text-lg sm:text-2xl">🌡️</span>
+											<span class="font-semibold text-amber-700 text-xs sm:text-sm">Internal</span>
 										</div>
-										<div class="metric-display text-amber-700 text-xl">{latestReading.internal.toFixed(1)}°F</div>
+										<div class="metric-display text-amber-700 text-base sm:text-xl leading-tight">{latestReading.internal.toFixed(1)}°F</div>
 										<div class="text-xs text-amber-600 mt-1">Oil Temperature</div>
 									</div>
-									<div class="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
-										<div class="flex items-center justify-center gap-2 mb-2">
-											<span class="text-2xl">☀️</span>
-											<span class="font-semibold text-orange-700">Ambient</span>
+									<div class="text-center p-3 sm:p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
+										<div class="flex items-center justify-center gap-1 sm:gap-2 mb-2">
+											<span class="text-lg sm:text-2xl">☀️</span>
+											<span class="font-semibold text-orange-700 text-xs sm:text-sm">Ambient</span>
 										</div>
-										<div class="metric-display text-orange-700 text-xl">{latestReading.ambient.toFixed(1)}°F</div>
+										<div class="metric-display text-orange-700 text-base sm:text-xl leading-tight">{latestReading.ambient.toFixed(1)}°F</div>
 										<div class="text-xs text-orange-600 mt-1">External Temperature</div>
 									</div>
 								</div>
@@ -200,27 +210,27 @@
 
 				<!-- Step 3: Expected Loss Calculation -->
 				<div class="relative">
-					<div class="flex items-start gap-6">
-						<div class="flex flex-col items-center">
-							<div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-lg">
-								<span class="text-white font-bold">3</span>
+					<div class="flex items-start gap-3 sm:gap-6">
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-lg">
+								<span class="text-white font-bold text-sm sm:text-base">3</span>
 							</div>
-							<div class="w-1 h-16 bg-amber-300 mt-2"></div>
+							<div class="w-1 h-12 sm:h-16 bg-amber-300 mt-2"></div>
 						</div>
-						<div class="flex-1 glass-card p-6">
+						<div class="flex-1 min-w-0 glass-card p-4 sm:p-6">
 							<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
-								<span class="text-lg">🧮</span>
-								Expected Loss Calculation
+								<span class="text-base sm:text-lg">🧮</span>
+								<span class="text-sm sm:text-base">Expected Loss Calculation</span>
 							</h3>
-							<div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+							<div class="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-4">
 								<div class="text-center">
-									<div class="metric-display text-amber-700 text-3xl mb-2">{haul.expectedLoss.toFixed(1)}</div>
-									<div class="text-amber-600 font-semibold">Gallons Expected Loss</div>
-									<div class="text-xs text-amber-600 mt-2">Calculated using thermal expansion coefficients and temperature differential</div>
+									<div class="metric-display text-amber-700 text-2xl sm:text-3xl mb-2 leading-tight">{haul.expectedLoss.toFixed(1)}</div>
+									<div class="text-amber-600 font-semibold text-sm sm:text-base">Gallons Expected Loss</div>
+									<div class="text-xs text-amber-600 mt-2 leading-relaxed">Calculated using thermal expansion coefficients and temperature differential</div>
 									{#if haul.status === 'transit' || haul.status === 'loading'}
 										<div class="flex items-center justify-center gap-2 mt-3 p-2 bg-amber-100 rounded-lg">
-											<div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-											<span class="text-xs text-amber-700 font-medium">Real-time calculation updates based on live SCADA telemetry</span>
+											<div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse flex-shrink-0"></div>
+											<span class="text-xs text-amber-700 font-medium leading-relaxed">Real-time calculation updates based on live SCADA telemetry</span>
 										</div>
 									{:else}
 										<div class="text-xs text-amber-600 mt-3 opacity-70">Final calculation based on completed transit data</div>
@@ -233,39 +243,39 @@
 
 				<!-- Step 4: Actual Results & Variance -->
 				<div class="relative">
-					<div class="flex items-start gap-6">
-						<div class="flex flex-col items-center">
-							<div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
-								<span class="text-white font-bold">4</span>
+					<div class="flex items-start gap-3 sm:gap-6">
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
+								<span class="text-white font-bold text-sm sm:text-base">4</span>
 							</div>
 						</div>
-						<div class="flex-1 glass-card p-6">
+						<div class="flex-1 min-w-0 glass-card p-4 sm:p-6">
 							<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
-								<span class="text-lg">📊</span>
-								Offload Results & Variance Analysis
+								<span class="text-base sm:text-lg">📊</span>
+								<span class="text-sm sm:text-base">Offload Results & Variance Analysis</span>
 							</h3>
 							
 							{#if isCompleted && haul.finalVolume && haul.actualLoss !== undefined}
-								<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-									<div class="text-center p-4 bg-blue-50 rounded-xl border border-blue-200">
-										<div class="metric-display text-blue-700 text-2xl mb-2">{haul.finalVolume.toLocaleString()}</div>
-										<div class="text-sm text-blue-600">Gallons Offloaded</div>
+								<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+									<div class="text-center p-3 sm:p-4 bg-blue-50 rounded-xl border border-blue-200">
+										<div class="metric-display text-blue-700 text-lg sm:text-2xl mb-2 leading-tight">{haul.finalVolume.toLocaleString()}</div>
+										<div class="text-xs sm:text-sm text-blue-600">Gallons Offloaded</div>
 									</div>
-									<div class="text-center p-4 bg-red-50 rounded-xl border border-red-200">
-										<div class="metric-display text-red-700 text-2xl mb-2">{haul.actualLoss.toFixed(1)}</div>
-										<div class="text-sm text-red-600">Actual Loss</div>
+									<div class="text-center p-3 sm:p-4 bg-red-50 rounded-xl border border-red-200">
+										<div class="metric-display text-red-700 text-lg sm:text-2xl mb-2 leading-tight">{haul.actualLoss.toFixed(1)}</div>
+										<div class="text-xs sm:text-sm text-red-600">Actual Loss</div>
 									</div>
-									<div class="text-center p-4 bg-slate-50 rounded-xl border border-slate-200">
-										<div class="metric-display text-slate-700 text-2xl mb-2">{Math.abs(haul.actualLoss - haul.expectedLoss).toFixed(1)}</div>
-										<div class="text-sm text-slate-600">Variance</div>
+									<div class="text-center p-3 sm:p-4 bg-slate-50 rounded-xl border border-slate-200">
+										<div class="metric-display text-slate-700 text-lg sm:text-2xl mb-2 leading-tight">{Math.abs(haul.actualLoss - haul.expectedLoss).toFixed(1)}</div>
+										<div class="text-xs sm:text-sm text-slate-600">Variance</div>
 									</div>
 								</div>
 
 								<!-- Variance Status -->
-								<div class="text-center p-6 {varianceStatus.color} rounded-xl border-2">
-									<div class="text-4xl mb-3">{varianceStatus.icon}</div>
-									<div class="text-2xl font-bold mb-2">{varianceStatus.label}</div>
-									<div class="text-sm opacity-80">
+								<div class="text-center p-4 sm:p-6 {varianceStatus.color} rounded-xl border-2">
+									<div class="text-3xl sm:text-4xl mb-3">{varianceStatus.icon}</div>
+									<div class="text-xl sm:text-2xl font-bold mb-2">{varianceStatus.label}</div>
+									<div class="text-xs sm:text-sm opacity-80 leading-relaxed">
 										{#if varianceStatus.label === 'Good'}
 											Variance within acceptable range (≤5%)
 										{:else if varianceStatus.label === 'Low Variance'}
@@ -281,7 +291,7 @@
 									{/if}
 								</div>
 							{:else}
-								<div class="text-center p-8 bg-slate-50 rounded-xl border border-slate-200">
+								<div class="text-center p-6 sm:p-8 bg-slate-50 rounded-xl border border-slate-200">
 									<div class="text-4xl mb-3">⏳</div>
 									<div class="text-xl font-semibold text-slate-700 mb-2">Awaiting Offload</div>
 									<div class="text-sm text-slate-600">
