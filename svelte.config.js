@@ -9,14 +9,7 @@ const config = {
 
 	kit: {
 		// Vercel adapter for seamless deployment
-		adapter: adapter({
-			// Enable Edge Runtime for better performance
-			runtime: 'nodejs18.x',
-			// Configure regions for global distribution
-			regions: ['iad1', 'cle1', 'pdx1'],
-			// Memory allocation for serverless functions
-			memory: 1024
-		})
+		adapter: adapter()
 	}
 };
 
