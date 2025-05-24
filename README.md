@@ -1,159 +1,219 @@
 # 🛢️ Oil Field Temperature Tracker
 
-A modern, real-time temperature monitoring dashboard built specifically for oil field operations. This application provides critical infrastructure monitoring with beautiful, responsive design and real-time data visualization.
+A professional SCADA-style web application for monitoring oil transport temperature variations and calculating expected vs actual volume loss during truck hauls.
+
+## 🚀 Live Demo
+
+- **Main Dashboard**: [http://localhost:5180/](http://localhost:5180/) - SCADA monitoring interface
+- **Analytics Dashboard**: [http://localhost:5180/admin](http://localhost:5180/admin) - Performance insights and operational intelligence
 
 ## ✨ Features
 
-- **Real-time Temperature Monitoring**: Live updates from multiple sensor locations
-- **Critical System Metrics**: Monitor pressure, flow rates, and system status
-- **Responsive Dashboard**: Beautiful UI that works on desktop, tablet, and mobile
-- **Status Indicators**: Visual alerts for normal, warning, and critical conditions
-- **Modern Design**: Built with Tailwind CSS and oil field-specific color schemes
-- **TypeScript Support**: Full type safety for robust development
+### 📡 Real-Time SCADA Monitoring
+- **Live temperature tracking** with 3-second update intervals
+- **Multi-site operations** (Permian Basin, Eagle Ford, Houston Refinery, Corpus Christi)
+- **Real-time transit progress** with GPS location simulation
+- **Coriolis meter integration** for accurate volume measurements
 
-## 🚀 Technology Stack
+### 🧮 Advanced Loss Calculations
+- **Thermal expansion modeling** based on temperature differentials
+- **Expected vs actual loss analysis** with variance detection
+- **Professional variance categorization** (Good ≤5%, Moderate 5-15%, High >15%)
+- **Financial impact tracking** with real oil price calculations
 
-- **Frontend**: SvelteKit 5 with TypeScript
-- **Styling**: Tailwind CSS with custom oil field theme
-- **Build Tool**: Vite
-- **Icons**: Emoji-based for universal compatibility
+### 📊 Analytics Dashboard
+- **Driver performance leaderboard** with efficiency rankings
+- **Truck fleet analysis** with maintenance alerts
+- **Route optimization insights** for maximum efficiency
+- **Predictive analytics** with weather impact forecasting
+- **Financial KPIs** showing cost savings and losses
 
-## 🎨 Design Philosophy
+### 🎨 Professional Design
+- **Apple-inspired glassmorphism UI** with industrial automation feel
+- **SCADA-style color coding** and professional terminology
+- **Responsive design** optimized for all devices
+- **Real-time animations** and smooth transitions
 
-This application is designed specifically for oil field environments with:
+## 🛠️ Technology Stack
 
-- **High contrast colors** for visibility in bright outdoor conditions
-- **Large, readable fonts** for easy viewing from a distance
-- **Status indicators** that are colorblind-friendly
-- **Professional color scheme** using industry-standard oranges and blues
-- **Responsive design** that works on rugged tablets and mobile devices
+- **Frontend**: SvelteKit with TypeScript for type safety
+- **Styling**: Tailwind CSS 4.0 with custom oil field color scheme
+- **Architecture**: Component-based with reactive stores
+- **Real-time**: Live data simulation with WebSocket-ready architecture
 
-## 📊 Dashboard Features
-
-### Key Metrics Cards
-- **Current Temperature**: Real-time temperature with target comparison
-- **System Pressure**: Live pressure readings in PSI
-- **Flow Rate**: Current flow rate in barrels per minute
-- **System Status**: Overall operational status
-
-### Sensor Readings Table
-- Multiple sensor locations (Well Heads, Pipeline Sections, Storage Tanks, etc.)
-- Real-time temperature updates
-- Color-coded status indicators
-- Quick action buttons for detailed views
-
-### Quick Actions
-- View Reports
-- System Settings
-- Alert Management
-
-## 🛠️ Development
+## 📦 Installation
 
 ### Prerequisites
 - Node.js 18+ 
 - npm or yarn
 
-### Installation
+### Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/lojak57/drydriveTempTracker.git
+cd drydriveTempTracker
+
 # Install dependencies
 npm install
 
 # Start development server
 npm run dev
 
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+# Open browser
+open http://localhost:5173
 ```
 
-### Project Structure
+### Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run check        # Run Svelte check
+npm run check:watch  # Run Svelte check in watch mode
+npm run lint         # Run ESLint
+npm run format       # Format code with Prettier
+```
+
+## 🏗️ Project Structure
 
 ```
 src/
-├── routes/
-│   ├── +layout.svelte    # Main application layout
-│   └── +page.svelte      # Dashboard page
-├── app.css               # Global styles and Tailwind CSS
-├── app.html              # HTML template
-└── app.d.ts              # TypeScript declarations
+├── lib/
+│   ├── components/
+│   │   ├── analytics/          # Analytics dashboard components
+│   │   │   ├── AnalyticsCard.svelte
+│   │   │   ├── DriverLeaderboard.svelte
+│   │   │   ├── LossAnalysis.svelte
+│   │   │   ├── PerformanceChart.svelte
+│   │   │   └── TruckEfficiency.svelte
+│   │   ├── dashboard/          # Main SCADA components
+│   │   │   ├── HaulCard.svelte
+│   │   │   ├── HaulDetailView.svelte
+│   │   │   ├── LiveDataFeed.svelte
+│   │   │   └── SystemStatusCard.svelte
+│   │   └── ui/                 # Reusable UI components
+│   │       ├── MetricCard.svelte
+│   │       └── Navigation.svelte
+│   └── stores/
+│       └── haulStore.ts        # Reactive data management
+└── routes/
+    ├── +page.svelte           # Main SCADA dashboard
+    ├── admin/+page.svelte     # Analytics dashboard
+    └── haul/+page.svelte      # Individual haul monitoring
 ```
 
-## 🎨 Custom Theme
+## 🔧 Configuration
 
-The application includes a custom Tailwind CSS theme with oil field-specific colors:
+### Environment Variables
+Create a `.env` file in the root directory:
 
-- **Oil Black**: `#1a1a1a` - Primary dark color
-- **Oil Orange**: `#ff6b35` - Primary brand color
-- **Oil Blue**: `#2563eb` - Secondary brand color
-- **Success Green**: `#10b981` - Normal status
-- **Warning Yellow**: `#f59e0b` - Warning status
-- **Danger Red**: `#ef4444` - Critical status
+```env
+# API Configuration (for future backend integration)
+VITE_API_BASE_URL=http://localhost:3000/api
+VITE_WEBSOCKET_URL=ws://localhost:3000/ws
 
-## 📱 Responsive Design
-
-The dashboard is fully responsive and optimized for:
-- **Desktop**: Full dashboard with all features
-- **Tablet**: Optimized layout for touch interaction
-- **Mobile**: Stacked layout with essential information
-
-## 🔧 Customization
-
-### Adding New Sensors
-Update the `sensorReadings` array in `src/routes/+page.svelte`:
-
-```javascript
-let sensorReadings = $state([
-  { id: 1, location: "Your Location", temp: 70.0, status: "normal" },
-  // Add more sensors...
-]);
+# SCADA Configuration
+VITE_UPDATE_INTERVAL=3000
+VITE_OIL_PRICE_API=your-oil-price-api-key
 ```
 
-### Modifying Colors
-Update the theme in `tailwind.config.js`:
+### Tailwind Customization
+The app uses a custom color scheme defined in `tailwind.config.js`:
 
-```javascript
+```js
 colors: {
-  'your-color': '#hexcode',
-  // Add custom colors...
+  oil: {
+    orange: '#ff6b35',
+    blue: '#004e89',
+    black: '#1a1a1a',
+    gray: '#6b7280'
+  }
 }
 ```
 
-## 🚀 Deployment
+## 📈 Data Model
 
-This application can be deployed to any static hosting service:
+### Core Interfaces
 
-```bash
-npm run build
+```typescript
+interface Haul {
+  id: string;
+  truckId: string;
+  driverId: string;
+  onloadSite: Site;
+  offloadSite: Site;
+  initialVolume: number;
+  finalVolume?: number;
+  expectedLoss: number;
+  actualLoss?: number;
+  status: 'loading' | 'transit' | 'offloading' | 'completed';
+  temperatureReadings: TemperatureReading[];
+  transitProgress: number;
+}
+
+interface TemperatureReading {
+  timestamp: Date;
+  ambient: number;
+  internal: number;
+}
 ```
 
-The built files will be in the `build/` directory.
+## 🎯 Usage
+
+### Main Dashboard
+Navigate to the main dashboard to:
+- Monitor active hauls in real-time
+- View live temperature readings
+- Track transit progress
+- Review SCADA system status
+
+### Analytics Dashboard  
+Access `/admin` to:
+- Analyze driver and truck performance
+- Review loss variance patterns
+- Monitor financial impact
+- View predictive insights
+
+### Haul Details
+Click any haul card to see:
+- Complete 4-step workflow visualization
+- Real-time temperature monitoring
+- Expected loss calculations
+- Variance analysis results
+
+## 🔮 Future Enhancements
+
+- [ ] **Backend Integration** with real SCADA hardware
+- [ ] **WebSocket real-time updates** for live data streaming
+- [ ] **Advanced ML predictions** for loss optimization
+- [ ] **Mobile app** for field operations
+- [ ] **Historical data analysis** with trend forecasting
+- [ ] **Alert system** with SMS/email notifications
+- [ ] **Multi-tenant support** for different oil companies
 
 ## 🤝 Contributing
 
-This project is designed for oil field operations. When contributing:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-1. Maintain the professional, industrial design aesthetic
-2. Ensure all features work in harsh environmental conditions
-3. Test on various screen sizes and devices
-4. Follow accessibility guidelines for outdoor visibility
+## 📄 License
 
-## 📈 Future Enhancements
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- [ ] Historical data visualization with charts
-- [ ] Alert notification system
-- [ ] Multi-site support
-- [ ] Data export functionality
-- [ ] Mobile app version
-- [ ] Integration with IoT sensors
-- [ ] Advanced analytics and reporting
+## 🙏 Acknowledgments
 
-## 📞 Support
-
-For oil field-specific requirements or customizations, please reach out with your specific monitoring needs.
+- **Oil Industry Standards** for thermal expansion calculations
+- **SCADA Best Practices** for industrial monitoring interfaces
+- **Apple Design System** for UI/UX inspiration
+- **SvelteKit Community** for excellent documentation and support
 
 ---
 
-Built with ❤️ for the oil and gas industry
+**Built with ❤️ for the oil & gas industry**
+
+For questions or support, please open an issue or contact the development team.
