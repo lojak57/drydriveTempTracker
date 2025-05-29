@@ -1,4 +1,5 @@
 import { writable, derived } from 'svelte/store';
+import { browser } from '$app/environment';
 
 // Enhanced temperature readings
 export interface TemperatureReading {
@@ -128,6 +129,18 @@ export interface Truck {
 	averageEfficiency: number;
 }
 
+// Helper function to create consistent timestamps
+function getStaticTimestamp(offsetMinutes: number = 0): Date {
+	// Use a fixed base timestamp for SSR consistency
+	const baseTime = 1735064220000; // Fixed timestamp
+	return new Date(baseTime + (offsetMinutes * 60 * 1000));
+}
+
+// Helper function to get current time only on client
+function getCurrentTime(): Date {
+	return browser ? new Date() : getStaticTimestamp();
+}
+
 // Current active haul
 export const currentHaul = writable<Haul | null>(null);
 
@@ -236,24 +249,24 @@ export const activeHauls = writable<Haul[]>([
 		initialVolume: 7850,
 		expectedLoss: 12.4,
 		status: 'transit',
-		startTime: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
+		startTime: getStaticTimestamp(-45), // 45 minutes ago
 		temperatureReadings: [
-			{ timestamp: new Date(), ambient: 98.2, internal: 76.1, tankerTemp: 78.5, oilTemp: 76.8 }
+			{ timestamp: getStaticTimestamp(), ambient: 98.2, internal: 76.1, tankerTemp: 78.5, oilTemp: 76.8 }
 		],
 		coriolisReadings: [
-			{ timestamp: new Date(), netVolume: 172.5, massFlowRate: 3.2, apiGravity: 42.1, waterCut: 0.8, oilTemp: 76.8, entrainedGas: 0.2 }
+			{ timestamp: getStaticTimestamp(), netVolume: 172.5, massFlowRate: 3.2, apiGravity: 42.1, waterCut: 0.8, oilTemp: 76.8, entrainedGas: 0.2 }
 		],
 		pressureReadings: [
-			{ timestamp: new Date(), tankerOnLoad: 145.2, tankerOffLoad: -12.3, tankerInternal: 14.7, tankVentLine: 2.1 }
+			{ timestamp: getStaticTimestamp(), tankerOnLoad: 145.2, tankerOffLoad: -12.3, tankerInternal: 14.7, tankVentLine: 2.1 }
 		],
 		gasDetections: [
-			{ timestamp: new Date(), h2sExternal: 0.5, h2sInternal: 0.2, coExternal: 2.1, coInternal: 1.8, lelExternal: 0.0, lelInternal: 0.0, o2External: 20.9 }
+			{ timestamp: getStaticTimestamp(), h2sExternal: 0.5, h2sInternal: 0.2, coExternal: 2.1, coInternal: 1.8, lelExternal: 0.0, lelInternal: 0.0, o2External: 20.9 }
 		],
 		scadaReadings: [
-			{ timestamp: new Date(), tankLevel: 18.2, oilTemp: 76.8, flowRate: 3.2, systemPressure: 145.2, gasDetection: false }
+			{ timestamp: getStaticTimestamp(), tankLevel: 18.2, oilTemp: 76.8, flowRate: 3.2, systemPressure: 145.2, gasDetection: false }
 		],
 		dryDriveData: [
-			{ timestamp: new Date(), pumpRpm: 1750, pumpTemp: 185.3, inverterVoltage: 480.2, inverterTemp: 142.1, motorTemp: 156.7, rectifierTemp: 138.9, generatorTemp: 162.4, totalPumpTime: 42 }
+			{ timestamp: getStaticTimestamp(), pumpRpm: 1750, pumpTemp: 185.3, inverterVoltage: 480.2, inverterTemp: 142.1, motorTemp: 156.7, rectifierTemp: 138.9, generatorTemp: 162.4, totalPumpTime: 42 }
 		],
 		currentLocation: { lat: 30.5, lng: -99.2 },
 		transitProgress: 67,
@@ -278,24 +291,24 @@ export const activeHauls = writable<Haul[]>([
 		initialVolume: 9200,
 		expectedLoss: 8.7,
 		status: 'loading',
-		startTime: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
+		startTime: getStaticTimestamp(-15), // 15 minutes ago
 		temperatureReadings: [
-			{ timestamp: new Date(), ambient: 92.4, internal: 74.3, tankerTemp: 75.1, oilTemp: 74.8 }
+			{ timestamp: getStaticTimestamp(), ambient: 92.4, internal: 74.3, tankerTemp: 75.1, oilTemp: 74.8 }
 		],
 		coriolisReadings: [
-			{ timestamp: new Date(), netVolume: 202.4, massFlowRate: 4.1, apiGravity: 38.7, waterCut: 1.2, oilTemp: 74.8, entrainedGas: 0.1 }
+			{ timestamp: getStaticTimestamp(), netVolume: 202.4, massFlowRate: 4.1, apiGravity: 38.7, waterCut: 1.2, oilTemp: 74.8, entrainedGas: 0.1 }
 		],
 		pressureReadings: [
-			{ timestamp: new Date(), tankerOnLoad: 152.8, tankerOffLoad: -8.9, tankerInternal: 16.2, tankVentLine: 1.8 }
+			{ timestamp: getStaticTimestamp(), tankerOnLoad: 152.8, tankerOffLoad: -8.9, tankerInternal: 16.2, tankVentLine: 1.8 }
 		],
 		gasDetections: [
-			{ timestamp: new Date(), h2sExternal: 0.3, h2sInternal: 0.1, coExternal: 1.8, coInternal: 1.5, lelExternal: 0.0, lelInternal: 0.0, o2External: 20.8 }
+			{ timestamp: getStaticTimestamp(), h2sExternal: 0.3, h2sInternal: 0.1, coExternal: 1.8, coInternal: 1.5, lelExternal: 0.0, lelInternal: 0.0, o2External: 20.8 }
 		],
 		scadaReadings: [
-			{ timestamp: new Date(), tankLevel: 22.1, oilTemp: 74.8, flowRate: 4.1, systemPressure: 152.8, gasDetection: false }
+			{ timestamp: getStaticTimestamp(), tankLevel: 22.1, oilTemp: 74.8, flowRate: 4.1, systemPressure: 152.8, gasDetection: false }
 		],
 		dryDriveData: [
-			{ timestamp: new Date(), pumpRpm: 1820, pumpTemp: 178.9, inverterVoltage: 478.5, inverterTemp: 139.7, motorTemp: 151.2, rectifierTemp: 135.4, generatorTemp: 158.1, totalPumpTime: 12 }
+			{ timestamp: getStaticTimestamp(), pumpRpm: 1820, pumpTemp: 178.9, inverterVoltage: 478.5, inverterTemp: 139.7, motorTemp: 151.2, rectifierTemp: 135.4, generatorTemp: 158.1, totalPumpTime: 12 }
 		],
 		currentLocation: { lat: 28.8644, lng: -97.9222 },
 		transitProgress: 0,
@@ -322,24 +335,24 @@ export const activeHauls = writable<Haul[]>([
 		expectedLoss: 14.2,
 		actualLoss: 12.7,
 		status: 'offloading',
-		startTime: new Date(Date.now() - 125 * 60 * 1000), // 2 hours 5 minutes ago
+		startTime: getStaticTimestamp(-125), // 2 hours 5 minutes ago
 		temperatureReadings: [
-			{ timestamp: new Date(), ambient: 89.1, internal: 78.9, tankerTemp: 79.2, oilTemp: 79.0 }
+			{ timestamp: getStaticTimestamp(), ambient: 89.1, internal: 78.9, tankerTemp: 79.2, oilTemp: 79.0 }
 		],
 		coriolisReadings: [
-			{ timestamp: new Date(), netVolume: 177.8, massFlowRate: 2.8, apiGravity: 41.3, waterCut: 0.6, oilTemp: 79.0, entrainedGas: 0.3 }
+			{ timestamp: getStaticTimestamp(), netVolume: 177.8, massFlowRate: 2.8, apiGravity: 41.3, waterCut: 0.6, oilTemp: 79.0, entrainedGas: 0.3 }
 		],
 		pressureReadings: [
-			{ timestamp: new Date(), tankerOnLoad: 148.7, tankerOffLoad: -15.2, tankerInternal: 13.9, tankVentLine: 2.3 }
+			{ timestamp: getStaticTimestamp(), tankerOnLoad: 148.7, tankerOffLoad: -15.2, tankerInternal: 13.9, tankVentLine: 2.3 }
 		],
 		gasDetections: [
-			{ timestamp: new Date(), h2sExternal: 0.7, h2sInternal: 0.4, coExternal: 2.3, coInternal: 2.0, lelExternal: 0.0, lelInternal: 0.0, o2External: 20.7 }
+			{ timestamp: getStaticTimestamp(), h2sExternal: 0.7, h2sInternal: 0.4, coExternal: 2.3, coInternal: 2.0, lelExternal: 0.0, lelInternal: 0.0, o2External: 20.7 }
 		],
 		scadaReadings: [
-			{ timestamp: new Date(), tankLevel: 19.5, oilTemp: 79.0, flowRate: 2.8, systemPressure: 148.7, gasDetection: false }
+			{ timestamp: getStaticTimestamp(), tankLevel: 19.5, oilTemp: 79.0, flowRate: 2.8, systemPressure: 148.7, gasDetection: false }
 		],
 		dryDriveData: [
-			{ timestamp: new Date(), pumpRpm: 1680, pumpTemp: 192.1, inverterVoltage: 481.7, inverterTemp: 145.8, motorTemp: 162.3, rectifierTemp: 142.1, generatorTemp: 167.9, totalPumpTime: 118 }
+			{ timestamp: getStaticTimestamp(), pumpRpm: 1680, pumpTemp: 192.1, inverterVoltage: 481.7, inverterTemp: 145.8, motorTemp: 162.3, rectifierTemp: 142.1, generatorTemp: 167.9, totalPumpTime: 118 }
 		],
 		currentLocation: { lat: 29.7604, lng: -95.3698 },
 		transitProgress: 100,
@@ -370,8 +383,8 @@ export const completedHauls = writable<Haul[]>([
 		expectedLoss: 9.2,
 		actualLoss: 6.9,
 		status: 'completed',
-		startTime: new Date(Date.now() - 180 * 60 * 1000),
-		endTime: new Date(Date.now() - 60 * 60 * 1000),
+		startTime: getStaticTimestamp(-180),
+		endTime: getStaticTimestamp(-60),
 		temperatureReadings: [],
 		coriolisReadings: [],
 		pressureReadings: [],
@@ -424,7 +437,7 @@ export function calculateExpectedLoss(
 // SCADA system status
 export const scadaStatus = writable<ScadaStatus>({
 	systemOnline: true,
-	lastUpdate: new Date(),
+	lastUpdate: getStaticTimestamp(),
 	connectedDevices: 15,
 	dataLatency: 1.2, // seconds
 	networkHealth: 98.7, // percentage
@@ -433,4 +446,46 @@ export const scadaStatus = writable<ScadaStatus>({
 	pressureSensorsOnline: true,
 	temperatureSensorsOnline: true,
 	dryDriveOnline: true
-}); 
+});
+
+// Initialize real-time updates only on client side
+if (browser) {
+	// Update timestamps to current time once hydrated
+	setTimeout(() => {
+		scadaStatus.update(status => ({
+			...status,
+			lastUpdate: new Date()
+		}));
+		
+		// Update active hauls with current timestamps
+		activeHauls.update(hauls => 
+			hauls.map(haul => ({
+				...haul,
+				temperatureReadings: haul.temperatureReadings.map(reading => ({
+					...reading,
+					timestamp: new Date()
+				})),
+				coriolisReadings: haul.coriolisReadings.map(reading => ({
+					...reading,
+					timestamp: new Date()
+				})),
+				pressureReadings: haul.pressureReadings.map(reading => ({
+					...reading,
+					timestamp: new Date()
+				})),
+				gasDetections: haul.gasDetections.map(reading => ({
+					...reading,
+					timestamp: new Date()
+				})),
+				scadaReadings: haul.scadaReadings.map(reading => ({
+					...reading,
+					timestamp: new Date()
+				})),
+				dryDriveData: haul.dryDriveData.map(reading => ({
+					...reading,
+					timestamp: new Date()
+				}))
+			}))
+		);
+	}, 100); // Small delay to ensure hydration is complete
+} 

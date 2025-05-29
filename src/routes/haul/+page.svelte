@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { activeHauls, drivers, trucks, scadaStatus, currentHaul, type Haul, type Driver, type Truck } from '$lib/stores/haulStore';
 	import HaulCard from '$lib/components/dashboard/HaulCard.svelte';
@@ -8,12 +9,15 @@
 	import LiveDataFeed from '$lib/components/dashboard/LiveDataFeed.svelte';
 
 	let dataUpdateInterval: number;
-	let lastUpdate = new Date();
+	let lastUpdate = new Date(1735064220000); // Static timestamp for SSR consistency
 	let selectedHaul: Haul | null = null;
 	let haulId: string | null = null;
 
 	// Simulate live SCADA data updates
 	onMount(() => {
+		// Update to current time once mounted
+		lastUpdate = new Date();
+		
 		dataUpdateInterval = setInterval(() => {
 			// Update SCADA system status
 			scadaStatus.update(status => ({
@@ -30,7 +34,9 @@
 						const newReading = {
 							timestamp: new Date(),
 							ambient: 88 + Math.random() * 15, // 88-103°F
-							internal: 70 + Math.random() * 10  // 70-80°F
+							internal: 70 + Math.random() * 10,  // 70-80°F
+							tankerTemp: 75 + Math.random() * 8, // 75-83°F
+							oilTemp: 72 + Math.random() * 6 // 72-78°F
 						};
 						
 						// Update transit progress for hauls in transit
@@ -88,7 +94,9 @@
 	function closeHaulDetail() {
 		selectedHaul = null;
 		// Navigate back to fleet or hauls page
-		window.history.back();
+		if (browser) {
+			window.history.back();
+		}
 	}
 
 	// Get driver and truck info

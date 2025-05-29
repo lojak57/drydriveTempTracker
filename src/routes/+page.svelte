@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import RealtimeChart from '$lib/components/charts/RealtimeChart.svelte';
 	import GaugeChart from '$lib/components/charts/GaugeChart.svelte';
@@ -70,11 +71,11 @@
 	// Derived metrics
 	$: totalActiveVolume = $activeHauls.reduce((sum, haul) => sum + haul.initialVolume, 0);
 	$: totalExpectedLoss = $activeHauls.reduce((sum, haul) => sum + haul.expectedLoss, 0);
-	$: completedToday = $completedHauls.filter(haul => {
+	$: completedToday = browser ? $completedHauls.filter(haul => {
 		const today = new Date();
 		const haulDate = haul.endTime || haul.startTime;
 		return haulDate.toDateString() === today.toDateString();
-	}).length;
+	}).length : 0;
 	
 	$: haulsByStatus = $activeHauls.reduce((counts, haul) => {
 		counts[haul.status] = (counts[haul.status] || 0) + 1;
