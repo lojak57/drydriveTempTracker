@@ -6,9 +6,17 @@ export default {
       colors: {
         'oil': {
           'black': '#1a1a1a',
-          'orange': '#ff6b35',
-          'blue': '#2563eb',
+          'orange': '#7CB342',
+          'blue': '#558B2F',
           'gray': '#4b5563',
+        },
+        'drydrive': {
+          'green': '#7CB342',
+          'light-green': '#9CCC65',
+          'dark-green': '#558B2F',
+          'accent': '#CDDC39',
+          'black': '#1A1A1A',
+          'gray': '#6B7280',
         },
         'danger': {
           'red': '#ef4444',

@@ -1,94 +1,285 @@
 <script lang="ts">
-	export let data: Array<{
-		week: string;
-		efficiency: number;
-		volume: number;
-		loss: number;
-	}>;
-
-	$: maxVolume = Math.max(...data.map(d => d.volume));
-	$: maxEfficiency = Math.max(...data.map(d => d.efficiency));
+	import Chart from '$lib/components/charts/Chart.svelte';
+	import { onMount } from 'svelte';
+	
+	export let title: string = 'Performance Trends';
+	export let timeframe: '7d' | '30d' | '90d' = '30d';
+	export let height: number = 400;
+	
+	let chartData: any;
+	
+	// Generate realistic performance data
+	const generatePerformanceData = () => {
+		const days = timeframe === '7d' ? 7 : timeframe === '30d' ? 30 : 90;
+		const labels = [];
+		const efficiencyData = [];
+		const volumeData = [];
+		const temperatureData = [];
+		const lossData = [];
+		
+		const now = new Date();
+		
+		for (let i = days - 1; i >= 0; i--) {
+			const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+			labels.push(date.toLocaleDateString('en-US', { 
+				month: 'short', 
+				day: 'numeric' 
+			}));
+			
+			// Generate realistic oil field performance metrics
+			const baseEfficiency = 92 + Math.sin(i * 0.1) * 3; // 89-95% efficiency
+			const efficiency = baseEfficiency + (Math.random() - 0.5) * 4;
+			efficiencyData.push(Math.round(efficiency * 100) / 100);
+			
+			const baseVolume = 2500 + Math.sin(i * 0.15) * 300; // 2200-2800 barrels
+			const volume = baseVolume + (Math.random() - 0.5) * 200;
+			volumeData.push(Math.round(volume));
+			
+			const baseTemp = 85 + Math.sin(i * 0.2) * 8; // 77-93°F
+			const temperature = baseTemp + (Math.random() - 0.5) * 6;
+			temperatureData.push(Math.round(temperature * 10) / 10);
+			
+			const baseLoss = 2.1 + Math.sin(i * 0.12) * 0.8; // 1.3-2.9% loss
+			const loss = baseLoss + (Math.random() - 0.5) * 0.6;
+			lossData.push(Math.round(loss * 100) / 100);
+		}
+		
+		return {
+			labels,
+			datasets: [
+				{
+					label: 'Fleet Efficiency (%)',
+					data: efficiencyData,
+					borderColor: '#10b981',
+					backgroundColor: 'rgba(16, 185, 129, 0.1)',
+					borderWidth: 2,
+					fill: false,
+					tension: 0.4,
+					yAxisID: 'y'
+				},
+				{
+					label: 'Daily Volume (bbls)',
+					data: volumeData,
+					borderColor: '#004E89',
+					backgroundColor: 'rgba(0, 78, 137, 0.1)',
+					borderWidth: 2,
+					fill: false,
+					tension: 0.4,
+					yAxisID: 'y1'
+				},
+				{
+					label: 'Avg Temperature (°F)',
+					data: temperatureData,
+					borderColor: '#FF6B35',
+					backgroundColor: 'rgba(255, 107, 53, 0.1)',
+					borderWidth: 2,
+					fill: false,
+					tension: 0.4,
+					yAxisID: 'y2'
+				},
+				{
+					label: 'Volume Loss (%)',
+					data: lossData,
+					borderColor: '#ef4444',
+					backgroundColor: 'rgba(239, 68, 68, 0.1)',
+					borderWidth: 2,
+					fill: false,
+					tension: 0.4,
+					yAxisID: 'y3'
+				}
+			]
+		};
+	};
+	
+	onMount(() => {
+		chartData = generatePerformanceData();
+	});
+	
+	// Update chart when timeframe changes
+	$: if (timeframe) {
+		chartData = generatePerformanceData();
+	}
 </script>
 
-<div class="glass-card p-4 sm:p-6">
-	<h3 class="font-semibold text-oil-black mb-4 sm:mb-6 flex items-center gap-2">
-		<span class="text-base sm:text-lg">📈</span>
-		<span class="text-sm sm:text-base">Performance Trends</span>
-	</h3>
+<div class="performance-chart">
+	<div class="chart-header">
+		<h3 class="chart-title">{title}</h3>
+		<div class="timeframe-selector">
+			<button 
+				class="timeframe-btn {timeframe === '7d' ? 'active' : ''}"
+				on:click={() => timeframe = '7d'}
+			>
+				7D
+			</button>
+			<button 
+				class="timeframe-btn {timeframe === '30d' ? 'active' : ''}"
+				on:click={() => timeframe = '30d'}
+			>
+				30D
+			</button>
+			<button 
+				class="timeframe-btn {timeframe === '90d' ? 'active' : ''}"
+				on:click={() => timeframe = '90d'}
+			>
+				90D
+			</button>
+		</div>
+	</div>
 	
-	<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-		<!-- Efficiency Trend -->
-		<div>
-			<h4 class="text-xs sm:text-sm font-medium text-oil-black mb-3 sm:mb-4">Volume Efficiency (%)</h4>
-			<div class="space-y-2 sm:space-y-3">
-				{#each data as point, index}
-					<div class="flex items-center gap-2 sm:gap-4">
-						<div class="w-12 sm:w-16 text-xs text-oil-gray font-medium leading-tight">{point.week}</div>
-						<div class="flex-1 relative min-w-0">
-							<div class="w-full bg-slate-200 rounded-full h-2 sm:h-3">
-								<div 
-									class="bg-gradient-to-r from-emerald-500 to-emerald-600 h-2 sm:h-3 rounded-full transition-all duration-700 relative"
-									style="width: {(point.efficiency / 100) * 100}%"
-								>
-									<div class="absolute right-0 top-0 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full shadow-sm transform translate-x-1/2"></div>
-								</div>
-							</div>
-						</div>
-						<div class="w-10 sm:w-12 text-xs font-mono {point.efficiency >= 97 ? 'text-emerald-600' : point.efficiency >= 95 ? 'text-amber-600' : 'text-red-600'} text-right">
-							{point.efficiency.toFixed(1)}%
-						</div>
-					</div>
-				{/each}
-			</div>
-		</div>
+	{#if chartData}
+		<Chart 
+			type="line" 
+			data={chartData}
+			{height}
+			options={{
+				responsive: true,
+				maintainAspectRatio: false,
+				interaction: {
+					mode: 'index',
+					intersect: false
+				},
+				plugins: {
+					legend: {
+						position: 'top',
+						labels: {
+							usePointStyle: true,
+							padding: 20,
+							font: {
+								size: 12,
+								weight: '500'
+							}
+						}
+					},
+					tooltip: {
+						mode: 'index',
+						intersect: false,
+						callbacks: {
+							label: function(context: any) {
+								const label = context.dataset.label || '';
+								const value = context.parsed.y;
+								
+								if (label.includes('Efficiency')) {
+									return `${label}: ${value}%`;
+								} else if (label.includes('Volume')) {
+									return `${label}: ${value.toLocaleString()} bbls`;
+								} else if (label.includes('Temperature')) {
+									return `${label}: ${value}°F`;
+								} else if (label.includes('Loss')) {
+									return `${label}: ${value}%`;
+								}
+								return `${label}: ${value}`;
+							}
+						}
+					}
+				},
+				scales: {
+					x: {
+						display: true,
+						grid: {
+							color: 'rgba(0, 78, 137, 0.1)'
+						},
+						ticks: {
+							color: '#6b7280'
+						}
+					},
+					y: {
+						type: 'linear',
+						display: true,
+						position: 'left',
+						title: {
+							display: true,
+							text: 'Efficiency (%)',
+							color: '#10b981'
+						},
+						grid: {
+							color: 'rgba(0, 78, 137, 0.1)'
+						},
+						ticks: {
+							color: '#10b981'
+						}
+					},
+					y1: {
+						type: 'linear',
+						display: false,
+						position: 'right',
+						grid: {
+							drawOnChartArea: false
+						}
+					},
+					y2: {
+						type: 'linear',
+						display: false,
+						position: 'right',
+						grid: {
+							drawOnChartArea: false
+						}
+					},
+					y3: {
+						type: 'linear',
+						display: false,
+						position: 'right',
+						grid: {
+							drawOnChartArea: false
+						}
+					}
+				}
+			}}
+		/>
+	{/if}
+</div>
 
-		<!-- Volume Trend -->
-		<div>
-			<h4 class="text-xs sm:text-sm font-medium text-oil-black mb-3 sm:mb-4">Volume Transported (gallons)</h4>
-			<div class="space-y-2 sm:space-y-3">
-				{#each data as point, index}
-					<div class="flex items-center gap-2 sm:gap-4">
-						<div class="w-12 sm:w-16 text-xs text-oil-gray font-medium leading-tight">{point.week}</div>
-						<div class="flex-1 relative min-w-0">
-							<div class="w-full bg-slate-200 rounded-full h-2 sm:h-3">
-								<div 
-									class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 sm:h-3 rounded-full transition-all duration-700 relative"
-									style="width: {(point.volume / maxVolume) * 100}%"
-								>
-									<div class="absolute right-0 top-0 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full shadow-sm transform translate-x-1/2"></div>
-								</div>
-							</div>
-						</div>
-						<div class="w-12 sm:w-16 text-xs font-mono text-blue-600 text-right">
-							{(point.volume / 1000).toFixed(0)}k
-						</div>
-					</div>
-				{/each}
-			</div>
-		</div>
-	</div>
-
-	<!-- Summary Stats -->
-	<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-200">
-		<div class="text-center p-3 sm:p-4 bg-emerald-50 rounded-xl border border-emerald-200">
-			<div class="metric-display text-emerald-700 text-lg sm:text-xl mb-1 leading-tight">
-				{data[data.length - 1]?.efficiency.toFixed(1)}%
-			</div>
-			<div class="text-xs text-emerald-600">Current Efficiency</div>
-		</div>
-		
-		<div class="text-center p-3 sm:p-4 bg-blue-50 rounded-xl border border-blue-200">
-			<div class="metric-display text-blue-700 text-lg sm:text-xl mb-1 leading-tight">
-				{((data.reduce((sum, d) => sum + d.volume, 0)) / 1000).toFixed(0)}k
-			</div>
-			<div class="text-xs text-blue-600">Total Volume</div>
-		</div>
-		
-		<div class="text-center p-3 sm:p-4 bg-amber-50 rounded-xl border border-amber-200">
-			<div class="metric-display text-amber-700 text-lg sm:text-xl mb-1 leading-tight">
-				{data.reduce((sum, d) => sum + d.loss, 0).toFixed(0)}
-			</div>
-			<div class="text-xs text-amber-600">Total Loss (gal)</div>
-		</div>
-	</div>
-</div> 
+<style>
+	.performance-chart {
+		background: rgba(255, 255, 255, 0.25);
+		backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 20px;
+		padding: 24px;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+	}
+	
+	.chart-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 24px;
+	}
+	
+	.chart-title {
+		font-size: 20px;
+		font-weight: 600;
+		color: #1a1a1a;
+		margin: 0;
+	}
+	
+	.timeframe-selector {
+		display: flex;
+		background: rgba(255, 255, 255, 0.3);
+		border-radius: 12px;
+		padding: 4px;
+		gap: 4px;
+	}
+	
+	.timeframe-btn {
+		padding: 8px 16px;
+		border: none;
+		background: transparent;
+		border-radius: 8px;
+		color: #6b7280;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	
+	.timeframe-btn:hover {
+		background: rgba(255, 255, 255, 0.5);
+		color: #1a1a1a;
+	}
+	
+	.timeframe-btn.active {
+		background: #004E89;
+		color: white;
+		box-shadow: 0 4px 12px rgba(0, 78, 137, 0.3);
+	}
+</style> 

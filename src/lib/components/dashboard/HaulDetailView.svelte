@@ -1,12 +1,24 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import type { Haul, Driver, Truck } from '$lib/stores/haulStore';
+	import RealtimeChart from '$lib/components/charts/RealtimeChart.svelte';
 
 	export let haul: Haul;
 	export let driver: Driver;
 	export let truck: Truck;
 
 	const dispatch = createEventDispatcher();
+
+	// Tab management
+	let activeTab = 'overview';
+	const tabs = [
+		{ id: 'overview', label: 'Overview', icon: '📊' },
+		{ id: 'coriolis', label: 'Coriolis', icon: '🛢️' },
+		{ id: 'temperature', label: 'Temperature', icon: '🌡️' },
+		{ id: 'pressure', label: 'Pressure', icon: '⚡' },
+		{ id: 'safety', label: 'Safety', icon: '🛡️' },
+		{ id: 'drydrive', label: 'DryDrive', icon: '⚙️' }
+	];
 
 	function getVarianceStatus(expectedLoss: number, actualLoss?: number) {
 		if (!actualLoss) return { label: 'In Progress', color: 'bg-blue-100 text-blue-700', icon: '⏳' };
@@ -32,19 +44,30 @@
 		return `${mins}m`;
 	}
 
+	function getSafetyStatus(value: number, thresholds: { warning: number; critical: number }) {
+		if (value >= thresholds.critical) return 'critical';
+		if (value >= thresholds.warning) return 'warning';
+		return 'normal';
+	}
+
 	$: latestReading = haul.temperatureReadings[haul.temperatureReadings.length - 1];
+	$: latestCoriolis = haul.coriolisReadings[haul.coriolisReadings.length - 1];
+	$: latestPressure = haul.pressureReadings[haul.pressureReadings.length - 1];
+	$: latestGas = haul.gasDetections[haul.gasDetections.length - 1];
+	$: latestScada = haul.scadaReadings[haul.scadaReadings.length - 1];
+	$: latestDryDrive = haul.dryDriveData[haul.dryDriveData.length - 1];
 	$: varianceStatus = getVarianceStatus(haul.expectedLoss, haul.actualLoss);
 	$: isCompleted = haul.status === 'completed' || haul.status === 'offloading';
 </script>
 
 <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-	<div class="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+	<div class="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
 		<!-- Header -->
-		<div class="sticky top-0 bg-white/90 backdrop-blur-md rounded-t-3xl border-b border-slate-200/50 p-6">
-			<div class="flex items-center justify-between">
+		<div class="bg-white/90 backdrop-blur-md rounded-t-3xl border-b border-slate-200/50 p-6 flex-shrink-0">
+			<div class="flex items-center justify-between mb-4">
 				<div>
 					<h2 class="display-medium text-oil-black">Haul Details</h2>
-					<p class="text-oil-gray">ID: {haul.id.slice(-8)} • {truck.plateNumber}</p>
+					<p class="text-oil-gray">ID: {haul.id.slice(-8)} • {truck.plateNumber} • {driver.name}</p>
 				</div>
 				<button 
 					on:click={() => dispatch('close')}
@@ -53,291 +76,519 @@
 					<span class="text-slate-600">✕</span>
 				</button>
 			</div>
+
+			<!-- Tab Navigation -->
+			<div class="flex space-x-1 bg-slate-100 rounded-xl p-1">
+				{#each tabs as tab}
+					<button
+						class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 {activeTab === tab.id ? 'bg-white text-oil-black shadow-sm' : 'text-oil-gray hover:text-oil-black'}"
+						on:click={() => activeTab = tab.id}
+					>
+						<span class="text-base">{tab.icon}</span>
+						<span class="hidden sm:inline">{tab.label}</span>
+					</button>
+				{/each}
+			</div>
 		</div>
 
-		<div class="p-6 space-y-8">
-			<!-- Route Overview -->
-			<div class="glass-card p-4 sm:p-6">
-				<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
-					<span class="text-lg">🛣️</span>
-					Route Information
-				</h3>
-				<!-- Mobile: Stack vertically, Desktop: Horizontal with arrow -->
-				<div class="flex flex-col sm:flex-row items-center gap-4">
-					<div class="w-full sm:flex-1 text-center p-3 sm:p-4 bg-emerald-50 rounded-xl border border-emerald-200">
-						<div class="text-xl sm:text-2xl mb-2">📍</div>
-						<div class="font-semibold text-emerald-700 text-sm sm:text-base leading-tight">{haul.onloadSite.name}</div>
-						<div class="text-xs sm:text-sm text-emerald-600">Origin</div>
-					</div>
-					
-					<!-- Arrow - Hidden on mobile, shown on larger screens -->
-					<div class="hidden sm:flex items-center gap-2">
-						<div class="w-8 sm:w-12 h-1 bg-gradient-to-r from-emerald-400 to-oil-blue rounded"></div>
-						<span class="text-xl sm:text-2xl">→</span>
-						<div class="w-8 sm:w-12 h-1 bg-gradient-to-r from-oil-blue to-orange-400 rounded"></div>
-					</div>
-					
-					<!-- Mobile: Show vertical arrow -->
-					<div class="sm:hidden flex flex-col items-center gap-1">
-						<div class="h-8 w-1 bg-gradient-to-b from-emerald-400 to-orange-400 rounded"></div>
-						<span class="text-lg">↓</span>
-					</div>
-					
-					<div class="w-full sm:flex-1 text-center p-3 sm:p-4 bg-orange-50 rounded-xl border border-orange-200">
-						<div class="text-xl sm:text-2xl mb-2">🏭</div>
-						<div class="font-semibold text-orange-700 text-sm sm:text-base leading-tight">{haul.offloadSite.name}</div>
-						<div class="text-xs sm:text-sm text-orange-600">Destination</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- Flow Timeline -->
-			<div class="space-y-6">
-				<!-- Step 1: Initial Load -->
-				<div class="relative">
-					<div class="flex items-start gap-3 sm:gap-6">
-						<div class="flex flex-col items-center flex-shrink-0">
-							<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
-								<span class="text-white font-bold text-sm sm:text-base">1</span>
+		<!-- Tab Content -->
+		<div class="flex-1 overflow-y-auto p-6">
+			{#if activeTab === 'overview'}
+				<!-- Overview Tab - Enhanced version of original content -->
+				<div class="space-y-6">
+					<!-- Route Overview -->
+					<div class="glass-card p-6">
+						<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
+							<span class="text-lg">🛣️</span>
+							Route Information
+						</h3>
+						<div class="flex flex-col sm:flex-row items-center gap-4">
+							<div class="w-full sm:flex-1 text-center p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+								<div class="text-2xl mb-2">📍</div>
+								<div class="font-semibold text-emerald-700">{haul.onloadSite.name}</div>
+								<div class="text-sm text-emerald-600">Origin</div>
 							</div>
-							<div class="w-1 h-12 sm:h-16 bg-emerald-300 mt-2"></div>
-						</div>
-						<div class="flex-1 min-w-0 glass-card p-4 sm:p-6">
-							<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
-								<span class="text-base sm:text-lg">📦</span>
-								<span class="text-sm sm:text-base">Initial Load</span>
-							</h3>
-							<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-								<!-- Volume Card -->
-								<div class="text-center p-3 sm:p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200 shadow-sm">
-									<div class="text-xl sm:text-2xl mb-2">🛢️</div>
-									<div class="metric-display text-oil-orange text-lg sm:text-2xl mb-2 leading-tight">{haul.initialVolume.toLocaleString()}</div>
-									<div class="text-xs sm:text-sm text-orange-700 font-medium">Gallons Loaded</div>
-								</div>
-
-								<!-- Driver Card -->
-								<div class="p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200 shadow-sm">
-									<div class="flex items-center gap-2 sm:gap-3">
-										<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center shadow-md flex-shrink-0">
-											<span class="text-white text-xs sm:text-sm font-bold">{driver.name.split(' ').map(n => n[0]).join('')}</span>
-										</div>
-										<div class="flex-1 min-w-0">
-											<div class="font-semibold text-blue-800 text-sm sm:text-lg leading-tight truncate">{driver.name}</div>
-											<div class="text-xs sm:text-sm text-blue-600 truncate">{driver.experience} years exp</div>
-											<div class="text-xs text-blue-500 truncate">{driver.totalHauls.toLocaleString()} hauls</div>
-										</div>
-									</div>
-								</div>
-
-								<!-- Truck Card -->
-								<div class="p-3 sm:p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 shadow-sm">
-									<div class="flex items-center gap-2 sm:gap-3">
-										<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-slate-600 to-slate-700 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-											<span class="text-white text-base sm:text-lg">🚛</span>
-										</div>
-										<div class="flex-1 min-w-0">
-											<div class="font-semibold text-slate-800 text-sm sm:text-lg leading-tight truncate">{truck.model}</div>
-											<div class="text-xs sm:text-sm text-slate-600 font-mono truncate">{truck.plateNumber}</div>
-											<div class="text-xs text-slate-500 truncate">Cap: {truck.capacity.toLocaleString()} gal</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Step 2: Transit -->
-				<div class="relative">
-					<div class="flex items-start gap-3 sm:gap-6">
-						<div class="flex flex-col items-center flex-shrink-0">
-							<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
-								<span class="text-white font-bold text-sm sm:text-base">2</span>
-							</div>
-							<div class="w-1 h-20 sm:h-24 bg-blue-300 mt-2"></div>
-						</div>
-						<div class="flex-1 min-w-0 glass-card p-4 sm:p-6">
-							<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
-								<span class="text-base sm:text-lg">🚛</span>
-								<span class="text-sm sm:text-base">Transit Monitoring</span>
-							</h3>
 							
-							<!-- Progress Bar -->
-							<div class="mb-4 sm:mb-6">
-								<div class="flex justify-between text-xs sm:text-sm text-oil-gray mb-2">
-									<span>Transit Progress</span>
-									<span>{haul.transitProgress.toFixed(1)}%</span>
-								</div>
-								<div class="w-full bg-slate-200 rounded-full h-2 sm:h-3">
-									<div 
-										class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 sm:h-3 rounded-full transition-all duration-500 relative"
-										style="width: {haul.transitProgress}%"
-									>
-										<div class="absolute right-0 top-0 w-2 h-2 sm:w-3 sm:h-3 bg-white rounded-full shadow-md transform translate-x-1/2"></div>
-									</div>
-								</div>
-								{#if haul.status === 'transit'}
-									<div class="text-xs sm:text-sm text-oil-gray mt-2">ETA: {formatTime(haul.estimatedTimeRemaining)}</div>
-								{:else if haul.status === 'completed'}
-									<div class="text-xs sm:text-sm text-emerald-600 mt-2">✅ Transit Completed</div>
-								{/if}
+							<div class="hidden sm:flex items-center gap-2">
+								<div class="w-12 h-1 bg-gradient-to-r from-emerald-400 to-oil-blue rounded"></div>
+								<span class="text-2xl">→</span>
+								<div class="w-12 h-1 bg-gradient-to-r from-oil-blue to-orange-400 rounded"></div>
 							</div>
-
-							<!-- Temperature Readings -->
-							{#if latestReading}
-								<div class="grid grid-cols-2 gap-3 sm:gap-4">
-									<div class="text-center p-3 sm:p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200">
-										<div class="flex items-center justify-center gap-1 sm:gap-2 mb-2">
-											<span class="text-lg sm:text-2xl">🌡️</span>
-											<span class="font-semibold text-amber-700 text-xs sm:text-sm">Internal</span>
-										</div>
-										<div class="metric-display text-amber-700 text-base sm:text-xl leading-tight">{latestReading.internal.toFixed(1)}°F</div>
-										<div class="text-xs text-amber-600 mt-1">Oil Temperature</div>
-									</div>
-									<div class="text-center p-3 sm:p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
-										<div class="flex items-center justify-center gap-1 sm:gap-2 mb-2">
-											<span class="text-lg sm:text-2xl">☀️</span>
-											<span class="font-semibold text-orange-700 text-xs sm:text-sm">Ambient</span>
-										</div>
-										<div class="metric-display text-orange-700 text-base sm:text-xl leading-tight">{latestReading.ambient.toFixed(1)}°F</div>
-										<div class="text-xs text-orange-600 mt-1">External Temperature</div>
-									</div>
-								</div>
-							{/if}
-						</div>
-					</div>
-				</div>
-
-				<!-- Step 3: Expected Loss Calculation -->
-				<div class="relative">
-					<div class="flex items-start gap-3 sm:gap-6">
-						<div class="flex flex-col items-center flex-shrink-0">
-							<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center shadow-lg">
-								<span class="text-white font-bold text-sm sm:text-base">3</span>
-							</div>
-							<div class="w-1 h-12 sm:h-16 bg-amber-300 mt-2"></div>
-						</div>
-						<div class="flex-1 min-w-0 glass-card p-4 sm:p-6">
-							<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
-								<span class="text-base sm:text-lg">🧮</span>
-								<span class="text-sm sm:text-base">Expected Loss Calculation</span>
-							</h3>
-							<div class="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-4">
-								<div class="text-center">
-									<div class="metric-display text-amber-700 text-2xl sm:text-3xl mb-2 leading-tight">{haul.expectedLoss.toFixed(1)}</div>
-									<div class="text-amber-600 font-semibold text-sm sm:text-base">Gallons Expected Loss</div>
-									<div class="text-xs text-amber-600 mt-2 leading-relaxed">Calculated using thermal expansion coefficients and temperature differential</div>
-									{#if haul.status === 'transit' || haul.status === 'loading'}
-										<div class="flex items-center justify-center gap-2 mt-3 p-2 bg-amber-100 rounded-lg">
-											<div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse flex-shrink-0"></div>
-											<span class="text-xs text-amber-700 font-medium leading-relaxed">Real-time calculation updates based on live SCADA telemetry</span>
-										</div>
-									{:else}
-										<div class="text-xs text-amber-600 mt-3 opacity-70">Final calculation based on completed transit data</div>
-									{/if}
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Step 4: Actual Results & Variance -->
-				<div class="relative">
-					<div class="flex items-start gap-3 sm:gap-6">
-						<div class="flex flex-col items-center flex-shrink-0">
-							<div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
-								<span class="text-white font-bold text-sm sm:text-base">4</span>
-							</div>
-						</div>
-						<div class="flex-1 min-w-0 glass-card p-4 sm:p-6">
-							<h3 class="font-semibold text-oil-black mb-4 flex items-center gap-2">
-								<span class="text-base sm:text-lg">📊</span>
-								<span class="text-sm sm:text-base">Offload Results & Variance Analysis</span>
-							</h3>
 							
-							{#if isCompleted && haul.finalVolume && haul.actualLoss !== undefined}
-								<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
-									<div class="text-center p-3 sm:p-4 bg-blue-50 rounded-xl border border-blue-200">
-										<div class="metric-display text-blue-700 text-lg sm:text-2xl mb-2 leading-tight">{haul.finalVolume.toLocaleString()}</div>
-										<div class="text-xs sm:text-sm text-blue-600">Gallons Offloaded</div>
-									</div>
-									<div class="text-center p-3 sm:p-4 bg-red-50 rounded-xl border border-red-200">
-										<div class="metric-display text-red-700 text-lg sm:text-2xl mb-2 leading-tight">{haul.actualLoss.toFixed(1)}</div>
-										<div class="text-xs sm:text-sm text-red-600">Actual Loss</div>
-									</div>
-									<div class="text-center p-3 sm:p-4 bg-slate-50 rounded-xl border border-slate-200">
-										<div class="metric-display text-slate-700 text-lg sm:text-2xl mb-2 leading-tight">{Math.abs(haul.actualLoss - haul.expectedLoss).toFixed(1)}</div>
-										<div class="text-xs sm:text-sm text-slate-600">Variance</div>
-									</div>
-								</div>
+							<div class="w-full sm:flex-1 text-center p-4 bg-orange-50 rounded-xl border border-orange-200">
+								<div class="text-2xl mb-2">🏭</div>
+								<div class="font-semibold text-orange-700">{haul.offloadSite.name}</div>
+								<div class="text-sm text-orange-600">Destination</div>
+							</div>
+						</div>
+					</div>
 
-								<!-- Variance Status -->
-								<div class="text-center p-4 sm:p-6 {varianceStatus.color} rounded-xl border-2">
-									<div class="text-3xl sm:text-4xl mb-3">{varianceStatus.icon}</div>
-									<div class="text-xl sm:text-2xl font-bold mb-2">{varianceStatus.label}</div>
-									<div class="text-xs sm:text-sm opacity-80 leading-relaxed">
-										{#if varianceStatus.label === 'Good'}
-											Variance within acceptable range (≤5%)
-										{:else if varianceStatus.label === 'Low Variance'}
-											Moderate variance detected (5-15%)
-										{:else if varianceStatus.label === 'High Variance'}
-											High variance requires investigation (>15%)
-										{/if}
-									</div>
-									{#if haul.actualLoss !== undefined}
-										<div class="mt-3 text-xs opacity-70">
-											Variance: {(Math.abs(haul.actualLoss - haul.expectedLoss) / haul.expectedLoss * 100).toFixed(1)}%
-										</div>
-									{/if}
-								</div>
-							{:else}
-								<div class="text-center p-6 sm:p-8 bg-slate-50 rounded-xl border border-slate-200">
-									<div class="text-4xl mb-3">⏳</div>
-									<div class="text-xl font-semibold text-slate-700 mb-2">Awaiting Offload</div>
-									<div class="text-sm text-slate-600">
-										{#if haul.status === 'loading'}
-											Truck is currently loading at origin
-										{:else if haul.status === 'transit'}
-											Truck is in transit to destination
-										{:else if haul.status === 'offloading'}
-											Offload in progress...
-										{/if}
-									</div>
-								</div>
-							{/if}
+					<!-- Key Metrics Grid -->
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+						<div class="glass-card p-4 text-center">
+							<div class="text-2xl mb-2">🛢️</div>
+							<div class="metric-display text-oil-orange text-2xl mb-1">{haul.initialVolume.toLocaleString()}</div>
+							<div class="text-sm text-oil-gray">Initial Volume (gal)</div>
+						</div>
+						<div class="glass-card p-4 text-center">
+							<div class="text-2xl mb-2">📊</div>
+							<div class="metric-display text-oil-blue text-2xl mb-1">{haul.transitProgress}%</div>
+							<div class="text-sm text-oil-gray">Transit Progress</div>
+						</div>
+						<div class="glass-card p-4 text-center">
+							<div class="text-2xl mb-2">⏱️</div>
+							<div class="metric-display text-amber-600 text-2xl mb-1">{haul.estimatedTimeRemaining}</div>
+							<div class="text-sm text-oil-gray">Minutes Remaining</div>
+						</div>
+						<div class="glass-card p-4 text-center">
+							<div class="text-2xl mb-2">🎯</div>
+							<div class="metric-display text-emerald-600 text-2xl mb-1">{haul.expectedLoss.toFixed(1)}</div>
+							<div class="text-sm text-oil-gray">Expected Loss (gal)</div>
+						</div>
+					</div>
+
+					<!-- Status Summary -->
+					<div class="glass-card p-6">
+						<h3 class="font-semibold text-oil-black mb-4">Current Status</h3>
+						<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+							<div class="text-center p-4 bg-blue-50 rounded-xl">
+								<div class="text-xl mb-2">🚛</div>
+								<div class="font-semibold text-blue-700 capitalize">{haul.status}</div>
+								<div class="text-sm text-blue-600">Haul Status</div>
+							</div>
+							<div class="text-center p-4 bg-emerald-50 rounded-xl">
+								<div class="text-xl mb-2">👨‍💼</div>
+								<div class="font-semibold text-emerald-700">{driver.averageEfficiency.toFixed(1)}%</div>
+								<div class="text-sm text-emerald-600">Driver Efficiency</div>
+							</div>
+							<div class="text-center p-4 bg-amber-50 rounded-xl">
+								<div class="text-xl mb-2">🚚</div>
+								<div class="font-semibold text-amber-700">{truck.averageEfficiency.toFixed(1)}%</div>
+								<div class="text-sm text-amber-600">Truck Efficiency</div>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
 
-			<!-- Summary Card -->
-			<div class="glass-card p-6 bg-gradient-to-br from-slate-50 to-slate-100">
-				<h3 class="font-semibold text-oil-black mb-4">Summary</h3>
-				<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-					<div>
-						<div class="text-sm text-oil-gray">Start Time</div>
-						<div class="font-mono text-oil-black">{haul.startTime.toLocaleTimeString()}</div>
+			{:else if activeTab === 'coriolis'}
+				<!-- Coriolis Tab -->
+				<div class="space-y-6">
+					<div class="text-center mb-6">
+						<h3 class="text-2xl font-semibold text-oil-black mb-2">Coriolis Meter Readings</h3>
+						<p class="text-oil-gray">Real-time volume, flow, and gravity measurements</p>
 					</div>
-					<div>
-						<div class="text-sm text-oil-gray">Duration</div>
-						<div class="font-mono text-oil-black">
-							{#if haul.endTime}
-								{Math.round((haul.endTime.getTime() - haul.startTime.getTime()) / (1000 * 60))}m
-							{:else}
-								{Math.round((Date.now() - haul.startTime.getTime()) / (1000 * 60))}m (ongoing)
-							{/if}
+
+					{#if latestCoriolis}
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🛢️</div>
+								<div class="metric-display text-oil-orange text-3xl mb-2">{latestCoriolis.netVolume.toFixed(1)}</div>
+								<div class="text-oil-gray font-medium">Net Volume (BBL)</div>
+								<div class="mt-2 text-sm text-oil-gray">Real-time measurement</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🌊</div>
+								<div class="metric-display text-blue-600 text-3xl mb-2">{latestCoriolis.massFlowRate.toFixed(2)}</div>
+								<div class="text-oil-gray font-medium">Mass Flow Rate (BBL/min)</div>
+								<div class="mt-2 text-sm text-oil-gray">Current flow</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">⚖️</div>
+								<div class="metric-display text-emerald-600 text-3xl mb-2">{latestCoriolis.apiGravity.toFixed(1)}°</div>
+								<div class="text-oil-gray font-medium">API Gravity</div>
+								<div class="mt-2 text-sm text-oil-gray">Oil density measure</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">💧</div>
+								<div class="metric-display text-amber-600 text-3xl mb-2">{latestCoriolis.waterCut.toFixed(2)}%</div>
+								<div class="text-oil-gray font-medium">Water Cut</div>
+								<div class="mt-2 text-sm text-oil-gray">Water content</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🌡️</div>
+								<div class="metric-display text-red-600 text-3xl mb-2">{latestCoriolis.oilTemp.toFixed(1)}°F</div>
+								<div class="text-oil-gray font-medium">Oil Temperature</div>
+								<div class="mt-2 text-sm text-oil-gray">At meter</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">💨</div>
+								<div class="metric-display text-purple-600 text-3xl mb-2">{latestCoriolis.entrainedGas.toFixed(2)}%</div>
+								<div class="text-oil-gray font-medium">Entrained Gas</div>
+								<div class="mt-2 text-sm text-oil-gray">Gas content</div>
+							</div>
 						</div>
-					</div>
-					<div>
-						<div class="text-sm text-oil-gray">Driver Efficiency</div>
-						<div class="font-mono text-oil-black">{driver.averageEfficiency.toFixed(1)}%</div>
-					</div>
-					<div>
-						<div class="text-sm text-oil-gray">Truck Efficiency</div>
-						<div class="font-mono text-oil-black">{truck.averageEfficiency.toFixed(1)}%</div>
-					</div>
+
+						<!-- Coriolis Trends Chart -->
+						<div class="glass-card p-6">
+							<h4 class="font-semibold text-oil-black mb-4">Volume & Flow Trends</h4>
+							<RealtimeChart 
+								title="Volume & Flow Rate"
+								color="#004E89"
+								height={300}
+								unit=" BBL/min"
+								animated={true}
+							/>
+						</div>
+					{:else}
+						<div class="text-center py-12">
+							<div class="text-4xl mb-4">📊</div>
+							<div class="text-xl text-oil-gray">No Coriolis data available</div>
+						</div>
+					{/if}
 				</div>
-			</div>
+
+			{:else if activeTab === 'temperature'}
+				<!-- Temperature Tab -->
+				<div class="space-y-6">
+					<div class="text-center mb-6">
+						<h3 class="text-2xl font-semibold text-oil-black mb-2">Temperature Monitoring</h3>
+						<p class="text-oil-gray">Multi-sensor temperature tracking and analysis</p>
+					</div>
+
+					{#if latestReading}
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🌡️</div>
+								<div class="metric-display text-blue-600 text-3xl mb-2">{latestReading.internal.toFixed(1)}°F</div>
+								<div class="text-oil-gray font-medium">Internal Oil Temperature</div>
+								<div class="mt-2 text-sm text-oil-gray">Primary measurement</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">☀️</div>
+								<div class="metric-display text-orange-600 text-3xl mb-2">{latestReading.ambient.toFixed(1)}°F</div>
+								<div class="text-oil-gray font-medium">Ambient Temperature</div>
+								<div class="mt-2 text-sm text-oil-gray">External conditions</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🚛</div>
+								<div class="metric-display text-emerald-600 text-3xl mb-2">{latestReading.tankerTemp.toFixed(1)}°F</div>
+								<div class="text-oil-gray font-medium">Tanker Temperature</div>
+								<div class="mt-2 text-sm text-oil-gray">Tank wall temperature</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🛢️</div>
+								<div class="metric-display text-red-600 text-3xl mb-2">{latestReading.oilTemp.toFixed(1)}°F</div>
+								<div class="text-oil-gray font-medium">Oil Temperature</div>
+								<div class="mt-2 text-sm text-oil-gray">Product temperature</div>
+							</div>
+						</div>
+
+						<!-- Temperature Differential Analysis -->
+						<div class="glass-card p-6">
+							<h4 class="font-semibold text-oil-black mb-4">Temperature Analysis</h4>
+							<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+								<div class="text-center p-4 bg-blue-50 rounded-xl">
+									<div class="text-lg mb-2">🔄</div>
+									<div class="font-semibold text-blue-700">{(latestReading.ambient - latestReading.internal).toFixed(1)}°F</div>
+									<div class="text-sm text-blue-600">Ambient Differential</div>
+								</div>
+								<div class="text-center p-4 bg-emerald-50 rounded-xl">
+									<div class="text-lg mb-2">📊</div>
+									<div class="font-semibold text-emerald-700">{(latestReading.tankerTemp - latestReading.oilTemp).toFixed(1)}°F</div>
+									<div class="text-sm text-emerald-600">Tank Differential</div>
+								</div>
+								<div class="text-center p-4 bg-amber-50 rounded-xl">
+									<div class="text-lg mb-2">⚡</div>
+									<div class="font-semibold text-amber-700">Normal</div>
+									<div class="text-sm text-amber-600">Thermal Status</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Temperature Trends Chart -->
+						<div class="glass-card p-6">
+							<h4 class="font-semibold text-oil-black mb-4">Temperature Trends</h4>
+							<RealtimeChart 
+								title="Multi-Sensor Temperature"
+								color="#FF6B35"
+								height={300}
+								unit="°F"
+								animated={true}
+							/>
+						</div>
+					{:else}
+						<div class="text-center py-12">
+							<div class="text-4xl mb-4">🌡️</div>
+							<div class="text-xl text-oil-gray">No temperature data available</div>
+						</div>
+					{/if}
+				</div>
+
+			{:else if activeTab === 'pressure'}
+				<!-- Pressure Tab -->
+				<div class="space-y-6">
+					<div class="text-center mb-6">
+						<h3 class="text-2xl font-semibold text-oil-black mb-2">Pressure Systems</h3>
+						<p class="text-oil-gray">Comprehensive pressure monitoring and safety thresholds</p>
+					</div>
+
+					{#if latestPressure}
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">⬆️</div>
+								<div class="metric-display text-emerald-600 text-3xl mb-2">{latestPressure.tankerOnLoad.toFixed(1)}</div>
+								<div class="text-oil-gray font-medium">Tanker OnLoad (PSI)</div>
+								<div class="mt-2 text-sm text-emerald-600">✓ Normal Range</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">⬇️</div>
+								<div class="metric-display text-blue-600 text-3xl mb-2">{latestPressure.tankerOffLoad.toFixed(1)}</div>
+								<div class="text-oil-gray font-medium">Tanker OffLoad (PSI)</div>
+								<div class="mt-2 text-sm text-blue-600">✓ Vacuum Normal</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🔄</div>
+								<div class="metric-display text-amber-600 text-3xl mb-2">{latestPressure.tankerInternal.toFixed(1)}</div>
+								<div class="text-oil-gray font-medium">Internal Pressure (PSI)</div>
+								<div class="mt-2 text-sm text-amber-600">✓ Optimal</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">💨</div>
+								<div class="metric-display text-purple-600 text-3xl mb-2">{latestPressure.tankVentLine.toFixed(1)}</div>
+								<div class="text-oil-gray font-medium">Vent Line (PSI)</div>
+								<div class="mt-2 text-sm text-purple-600">✓ Safe</div>
+							</div>
+						</div>
+
+						<!-- Pressure Safety Thresholds -->
+						<div class="glass-card p-6">
+							<h4 class="font-semibold text-oil-black mb-4">Safety Thresholds</h4>
+							<div class="space-y-4">
+								<div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+									<span class="font-medium text-emerald-700">OnLoad Pressure</span>
+									<div class="text-right">
+										<div class="text-emerald-700 font-semibold">{latestPressure.tankerOnLoad.toFixed(1)} PSI</div>
+										<div class="text-sm text-emerald-600">Safe: 120-180 PSI</div>
+									</div>
+								</div>
+								<div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+									<span class="font-medium text-blue-700">Internal Pressure</span>
+									<div class="text-right">
+										<div class="text-blue-700 font-semibold">{latestPressure.tankerInternal.toFixed(1)} PSI</div>
+										<div class="text-sm text-blue-600">Safe: 10-20 PSI</div>
+									</div>
+								</div>
+								<div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+									<span class="font-medium text-purple-700">Vent Line</span>
+									<div class="text-right">
+										<div class="text-purple-700 font-semibold">{latestPressure.tankVentLine.toFixed(1)} PSI</div>
+										<div class="text-sm text-purple-600">Safe: 0-5 PSI</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Pressure Trends Chart -->
+						<div class="glass-card p-6">
+							<h4 class="font-semibold text-oil-black mb-4">Pressure Trends</h4>
+							<RealtimeChart 
+								title="Pressure System Monitoring"
+								color="#10b981"
+								height={300}
+								unit=" PSI"
+								animated={true}
+							/>
+						</div>
+					{:else}
+						<div class="text-center py-12">
+							<div class="text-4xl mb-4">⚡</div>
+							<div class="text-xl text-oil-gray">No pressure data available</div>
+						</div>
+					{/if}
+				</div>
+
+			{:else if activeTab === 'safety'}
+				<!-- Safety Tab -->
+				<div class="space-y-6">
+					<div class="text-center mb-6">
+						<h3 class="text-2xl font-semibold text-oil-black mb-2">Safety Systems</h3>
+						<p class="text-oil-gray">Gas detection, valve status, and safety alerts</p>
+					</div>
+
+					{#if latestGas}
+						<!-- Gas Detection Grid -->
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">☠️</div>
+								<div class="metric-display text-red-600 text-2xl mb-2">{latestGas.h2sExternal.toFixed(1)} PPM</div>
+								<div class="text-oil-gray font-medium">H2S External</div>
+								<div class="mt-2 text-sm {getSafetyStatus(latestGas.h2sExternal, {warning: 10, critical: 20}) === 'normal' ? 'text-emerald-600' : 'text-red-600'}">
+									{getSafetyStatus(latestGas.h2sExternal, {warning: 10, critical: 20}) === 'normal' ? '✓ Safe' : '⚠️ Monitor'}
+								</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🏠</div>
+								<div class="metric-display text-red-600 text-2xl mb-2">{latestGas.h2sInternal.toFixed(1)} PPM</div>
+								<div class="text-oil-gray font-medium">H2S Internal</div>
+								<div class="mt-2 text-sm {getSafetyStatus(latestGas.h2sInternal, {warning: 10, critical: 20}) === 'normal' ? 'text-emerald-600' : 'text-red-600'}">
+									{getSafetyStatus(latestGas.h2sInternal, {warning: 10, critical: 20}) === 'normal' ? '✓ Safe' : '⚠️ Monitor'}
+								</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">💨</div>
+								<div class="metric-display text-blue-600 text-2xl mb-2">{latestGas.coExternal.toFixed(1)} PPM</div>
+								<div class="text-oil-gray font-medium">CO External</div>
+								<div class="mt-2 text-sm {getSafetyStatus(latestGas.coExternal, {warning: 35, critical: 200}) === 'normal' ? 'text-emerald-600' : 'text-red-600'}">
+									{getSafetyStatus(latestGas.coExternal, {warning: 35, critical: 200}) === 'normal' ? '✓ Safe' : '⚠️ Monitor'}
+								</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🔥</div>
+								<div class="metric-display text-amber-600 text-2xl mb-2">{latestGas.lelExternal.toFixed(1)}%</div>
+								<div class="text-oil-gray font-medium">LEL External</div>
+								<div class="mt-2 text-sm {getSafetyStatus(latestGas.lelExternal, {warning: 10, critical: 25}) === 'normal' ? 'text-emerald-600' : 'text-red-600'}">
+									{getSafetyStatus(latestGas.lelExternal, {warning: 10, critical: 25}) === 'normal' ? '✓ Safe' : '⚠️ Monitor'}
+								</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">💨</div>
+								<div class="metric-display text-emerald-600 text-2xl mb-2">{latestGas.o2External.toFixed(1)}%</div>
+								<div class="text-oil-gray font-medium">O2 External</div>
+								<div class="mt-2 text-sm {getSafetyStatus(Math.abs(latestGas.o2External - 20.9), {warning: 1, critical: 3}) === 'normal' ? 'text-emerald-600' : 'text-red-600'}">
+									{getSafetyStatus(Math.abs(latestGas.o2External - 20.9), {warning: 1, critical: 3}) === 'normal' ? '✓ Normal' : '⚠️ Monitor'}
+								</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🛡️</div>
+								<div class="metric-display text-emerald-600 text-2xl mb-2">All Clear</div>
+								<div class="text-oil-gray font-medium">Safety Status</div>
+								<div class="mt-2 text-sm text-emerald-600">✓ Systems Normal</div>
+							</div>
+						</div>
+
+						<!-- Safety Alerts -->
+						<div class="glass-card p-6">
+							<h4 class="font-semibold text-oil-black mb-4">Active Safety Alerts</h4>
+							<div class="text-center py-8">
+								<div class="text-4xl mb-3">✅</div>
+								<div class="text-xl font-semibold text-emerald-700 mb-2">No Active Alerts</div>
+								<div class="text-emerald-600">All safety systems operating normally</div>
+							</div>
+						</div>
+					{:else}
+						<div class="text-center py-12">
+							<div class="text-4xl mb-4">🛡️</div>
+							<div class="text-xl text-oil-gray">No safety data available</div>
+						</div>
+					{/if}
+				</div>
+
+			{:else if activeTab === 'drydrive'}
+				<!-- DryDrive Tab -->
+				<div class="space-y-6">
+					<div class="text-center mb-6">
+						<h3 class="text-2xl font-semibold text-oil-black mb-2">DryDrive System</h3>
+						<p class="text-oil-gray">Pump performance and electrical system monitoring</p>
+					</div>
+
+					{#if latestDryDrive}
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">⚙️</div>
+								<div class="metric-display text-blue-600 text-3xl mb-2">{latestDryDrive.pumpRpm.toFixed(0)}</div>
+								<div class="text-oil-gray font-medium">Pump RPM</div>
+								<div class="mt-2 text-sm text-blue-600">✓ Optimal Speed</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🌡️</div>
+								<div class="metric-display text-red-600 text-3xl mb-2">{latestDryDrive.pumpTemp.toFixed(1)}°F</div>
+								<div class="text-oil-gray font-medium">Pump Temperature</div>
+								<div class="mt-2 text-sm {latestDryDrive.pumpTemp > 200 ? 'text-red-600' : 'text-emerald-600'}">
+									{latestDryDrive.pumpTemp > 200 ? '⚠️ High' : '✓ Normal'}
+								</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">⚡</div>
+								<div class="metric-display text-amber-600 text-3xl mb-2">{latestDryDrive.inverterVoltage.toFixed(1)}V</div>
+								<div class="text-oil-gray font-medium">Inverter Voltage</div>
+								<div class="mt-2 text-sm text-amber-600">✓ Stable</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🔥</div>
+								<div class="metric-display text-orange-600 text-3xl mb-2">{latestDryDrive.inverterTemp.toFixed(1)}°F</div>
+								<div class="text-oil-gray font-medium">Inverter Temp</div>
+								<div class="mt-2 text-sm {latestDryDrive.inverterTemp > 160 ? 'text-red-600' : 'text-emerald-600'}">
+									{latestDryDrive.inverterTemp > 160 ? '⚠️ High' : '✓ Normal'}
+								</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">🔧</div>
+								<div class="metric-display text-purple-600 text-3xl mb-2">{latestDryDrive.motorTemp.toFixed(1)}°F</div>
+								<div class="text-oil-gray font-medium">Motor Temperature</div>
+								<div class="mt-2 text-sm {latestDryDrive.motorTemp > 180 ? 'text-red-600' : 'text-emerald-600'}">
+									{latestDryDrive.motorTemp > 180 ? '⚠️ High' : '✓ Normal'}
+								</div>
+							</div>
+
+							<div class="glass-card p-6 text-center">
+								<div class="text-3xl mb-3">⏱️</div>
+								<div class="metric-display text-emerald-600 text-3xl mb-2">{latestDryDrive.totalPumpTime}</div>
+								<div class="text-oil-gray font-medium">Runtime (min)</div>
+								<div class="mt-2 text-sm text-emerald-600">✓ Tracking</div>
+							</div>
+						</div>
+
+						<!-- System Performance Summary -->
+						<div class="glass-card p-6">
+							<h4 class="font-semibold text-oil-black mb-4">System Performance</h4>
+							<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+								<div class="text-center p-4 bg-emerald-50 rounded-xl">
+									<div class="text-lg mb-2">✅</div>
+									<div class="font-semibold text-emerald-700">Excellent</div>
+									<div class="text-sm text-emerald-600">Overall Performance</div>
+								</div>
+								<div class="text-center p-4 bg-blue-50 rounded-xl">
+									<div class="text-lg mb-2">⚡</div>
+									<div class="font-semibold text-blue-700">98.5%</div>
+									<div class="text-sm text-blue-600">Efficiency Rating</div>
+								</div>
+								<div class="text-center p-4 bg-amber-50 rounded-xl">
+									<div class="text-lg mb-2">🔧</div>
+									<div class="font-semibold text-amber-700">Normal</div>
+									<div class="text-sm text-amber-600">Maintenance Status</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Performance Trends Chart -->
+						<div class="glass-card p-6">
+							<h4 class="font-semibold text-oil-black mb-4">Performance Trends</h4>
+							<RealtimeChart 
+								title="DryDrive Performance Metrics"
+								color="#8b5cf6"
+								height={300}
+								unit="%"
+								animated={true}
+							/>
+						</div>
+					{:else}
+						<div class="text-center py-12">
+							<div class="text-4xl mb-4">⚙️</div>
+							<div class="text-xl text-oil-gray">No DryDrive data available</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	</div>
 </div> 

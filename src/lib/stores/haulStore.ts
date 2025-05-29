@@ -1,9 +1,83 @@
 import { writable, derived } from 'svelte/store';
 
+// Enhanced temperature readings
 export interface TemperatureReading {
 	timestamp: Date;
 	ambient: number;
 	internal: number;
+	tankerTemp: number;
+	oilTemp: number;
+}
+
+// New Coriolis meter readings
+export interface CoriolisReading {
+	timestamp: Date;
+	netVolume: number;        // BBL
+	massFlowRate: number;     // BBL/min
+	apiGravity: number;       // API degrees
+	waterCut: number;         // percentage
+	oilTemp: number;          // °F
+	entrainedGas: number;     // percentage
+}
+
+// Pressure sensor readings
+export interface PressureReading {
+	timestamp: Date;
+	tankerOnLoad: number;     // PSI
+	tankerOffLoad: number;    // PSI vacuum
+	tankerInternal: number;   // PSI
+	tankVentLine: number;     // PSI
+}
+
+// Gas detection readings
+export interface GasDetection {
+	timestamp: Date;
+	h2sExternal: number;      // PPM
+	h2sInternal: number;      // PPM
+	coExternal: number;       // PPM
+	coInternal: number;       // PPM
+	lelExternal: number;      // % LEL
+	lelInternal: number;      // % LEL
+	o2External: number;       // % O2
+}
+
+// Enhanced SCADA readings
+export interface ScadaReading {
+	timestamp: Date;
+	tankLevel: number;        // feet
+	oilTemp: number;          // °F
+	flowRate: number;         // BBL/min
+	systemPressure: number;   // PSI
+	gasDetection: boolean;    // safety status
+}
+
+// DryDrive pump system data
+export interface DryDriveData {
+	timestamp: Date;
+	pumpRpm: number;
+	pumpTemp: number;         // °F
+	inverterVoltage: number;  // V
+	inverterTemp: number;     // °F
+	motorTemp: number;        // °F
+	rectifierTemp: number;    // °F
+	generatorTemp: number;    // °F
+	pumpStartTime?: Date;
+	pumpStopTime?: Date;
+	totalPumpTime: number;    // minutes
+}
+
+// Enhanced SCADA status
+export interface ScadaStatus {
+	systemOnline: boolean;
+	connectedDevices: number;
+	networkHealth: number;        // percentage
+	lastUpdate: Date;
+	dataLatency: number;          // milliseconds
+	coriolisOnline: boolean;
+	gasDetectorsOnline: boolean;
+	pressureSensorsOnline: boolean;
+	temperatureSensorsOnline: boolean;
+	dryDriveOnline: boolean;
 }
 
 export interface Site {
@@ -27,6 +101,11 @@ export interface Haul {
 	startTime: Date;
 	endTime?: Date;
 	temperatureReadings: TemperatureReading[];
+	coriolisReadings: CoriolisReading[];
+	pressureReadings: PressureReading[];
+	gasDetections: GasDetection[];
+	scadaReadings: ScadaReading[];
+	dryDriveData: DryDriveData[];
 	currentLocation?: { lat: number; lng: number };
 	transitProgress: number; // 0-100%
 	estimatedTimeRemaining: number; // minutes
@@ -159,7 +238,22 @@ export const activeHauls = writable<Haul[]>([
 		status: 'transit',
 		startTime: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
 		temperatureReadings: [
-			{ timestamp: new Date(), ambient: 98.2, internal: 76.1 }
+			{ timestamp: new Date(), ambient: 98.2, internal: 76.1, tankerTemp: 78.5, oilTemp: 76.8 }
+		],
+		coriolisReadings: [
+			{ timestamp: new Date(), netVolume: 172.5, massFlowRate: 3.2, apiGravity: 42.1, waterCut: 0.8, oilTemp: 76.8, entrainedGas: 0.2 }
+		],
+		pressureReadings: [
+			{ timestamp: new Date(), tankerOnLoad: 145.2, tankerOffLoad: -12.3, tankerInternal: 14.7, tankVentLine: 2.1 }
+		],
+		gasDetections: [
+			{ timestamp: new Date(), h2sExternal: 0.5, h2sInternal: 0.2, coExternal: 2.1, coInternal: 1.8, lelExternal: 0.0, lelInternal: 0.0, o2External: 20.9 }
+		],
+		scadaReadings: [
+			{ timestamp: new Date(), tankLevel: 18.2, oilTemp: 76.8, flowRate: 3.2, systemPressure: 145.2, gasDetection: false }
+		],
+		dryDriveData: [
+			{ timestamp: new Date(), pumpRpm: 1750, pumpTemp: 185.3, inverterVoltage: 480.2, inverterTemp: 142.1, motorTemp: 156.7, rectifierTemp: 138.9, generatorTemp: 162.4, totalPumpTime: 42 }
 		],
 		currentLocation: { lat: 30.5, lng: -99.2 },
 		transitProgress: 67,
@@ -186,7 +280,22 @@ export const activeHauls = writable<Haul[]>([
 		status: 'loading',
 		startTime: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
 		temperatureReadings: [
-			{ timestamp: new Date(), ambient: 92.4, internal: 74.3 }
+			{ timestamp: new Date(), ambient: 92.4, internal: 74.3, tankerTemp: 75.1, oilTemp: 74.8 }
+		],
+		coriolisReadings: [
+			{ timestamp: new Date(), netVolume: 202.4, massFlowRate: 4.1, apiGravity: 38.7, waterCut: 1.2, oilTemp: 74.8, entrainedGas: 0.1 }
+		],
+		pressureReadings: [
+			{ timestamp: new Date(), tankerOnLoad: 152.8, tankerOffLoad: -8.9, tankerInternal: 16.2, tankVentLine: 1.8 }
+		],
+		gasDetections: [
+			{ timestamp: new Date(), h2sExternal: 0.3, h2sInternal: 0.1, coExternal: 1.8, coInternal: 1.5, lelExternal: 0.0, lelInternal: 0.0, o2External: 20.8 }
+		],
+		scadaReadings: [
+			{ timestamp: new Date(), tankLevel: 22.1, oilTemp: 74.8, flowRate: 4.1, systemPressure: 152.8, gasDetection: false }
+		],
+		dryDriveData: [
+			{ timestamp: new Date(), pumpRpm: 1820, pumpTemp: 178.9, inverterVoltage: 478.5, inverterTemp: 139.7, motorTemp: 151.2, rectifierTemp: 135.4, generatorTemp: 158.1, totalPumpTime: 12 }
 		],
 		currentLocation: { lat: 28.8644, lng: -97.9222 },
 		transitProgress: 0,
@@ -215,7 +324,22 @@ export const activeHauls = writable<Haul[]>([
 		status: 'offloading',
 		startTime: new Date(Date.now() - 125 * 60 * 1000), // 2 hours 5 minutes ago
 		temperatureReadings: [
-			{ timestamp: new Date(), ambient: 89.1, internal: 78.9 }
+			{ timestamp: new Date(), ambient: 89.1, internal: 78.9, tankerTemp: 79.2, oilTemp: 79.0 }
+		],
+		coriolisReadings: [
+			{ timestamp: new Date(), netVolume: 177.8, massFlowRate: 2.8, apiGravity: 41.3, waterCut: 0.6, oilTemp: 79.0, entrainedGas: 0.3 }
+		],
+		pressureReadings: [
+			{ timestamp: new Date(), tankerOnLoad: 148.7, tankerOffLoad: -15.2, tankerInternal: 13.9, tankVentLine: 2.3 }
+		],
+		gasDetections: [
+			{ timestamp: new Date(), h2sExternal: 0.7, h2sInternal: 0.4, coExternal: 2.3, coInternal: 2.0, lelExternal: 0.0, lelInternal: 0.0, o2External: 20.7 }
+		],
+		scadaReadings: [
+			{ timestamp: new Date(), tankLevel: 19.5, oilTemp: 79.0, flowRate: 2.8, systemPressure: 148.7, gasDetection: false }
+		],
+		dryDriveData: [
+			{ timestamp: new Date(), pumpRpm: 1680, pumpTemp: 192.1, inverterVoltage: 481.7, inverterTemp: 145.8, motorTemp: 162.3, rectifierTemp: 142.1, generatorTemp: 167.9, totalPumpTime: 118 }
 		],
 		currentLocation: { lat: 29.7604, lng: -95.3698 },
 		transitProgress: 100,
@@ -249,6 +373,11 @@ export const completedHauls = writable<Haul[]>([
 		startTime: new Date(Date.now() - 180 * 60 * 1000),
 		endTime: new Date(Date.now() - 60 * 60 * 1000),
 		temperatureReadings: [],
+		coriolisReadings: [],
+		pressureReadings: [],
+		gasDetections: [],
+		scadaReadings: [],
+		dryDriveData: [],
 		transitProgress: 100,
 		estimatedTimeRemaining: 0
 	}
@@ -293,10 +422,15 @@ export function calculateExpectedLoss(
 }
 
 // SCADA system status
-export const scadaStatus = writable({
+export const scadaStatus = writable<ScadaStatus>({
 	systemOnline: true,
 	lastUpdate: new Date(),
-	connectedDevices: 3,
+	connectedDevices: 15,
 	dataLatency: 1.2, // seconds
-	networkHealth: 98.7 // percentage
+	networkHealth: 98.7, // percentage
+	coriolisOnline: true,
+	gasDetectorsOnline: true,
+	pressureSensorsOnline: true,
+	temperatureSensorsOnline: true,
+	dryDriveOnline: true
 }); 

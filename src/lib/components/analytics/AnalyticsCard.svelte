@@ -1,69 +1,141 @@
 <script lang="ts">
 	export let title: string;
-	export let value: number | string;
-	export let unit: string = '';
+	export let value: string | number;
+	export let subtitle: string = '';
 	export let trend: 'up' | 'down' | 'stable' = 'stable';
 	export let trendValue: string = '';
-	export let icon: string = '📊';
-	export let color: 'blue' | 'emerald' | 'amber' | 'red' | 'slate' = 'blue';
+	export let icon: string = '';
+	export let color: string = 'blue';
+	export let size: 'small' | 'medium' | 'large' = 'medium';
 
-	function getTrendIcon(trend: string) {
-		switch (trend) {
-			case 'up': return '📈';
-			case 'down': return '📉';
-			default: return '➡️';
+	// Enhanced color mappings for analytics
+	const colorMap = {
+		blue: { 
+			primary: 'text-oil-blue', 
+			bg: 'from-blue-50/90 to-blue-100/70',
+			accent: 'bg-oil-blue/15',
+			border: 'border-oil-blue/25',
+			gradient: 'from-oil-blue/20 to-oil-blue/5'
+		},
+		orange: { 
+			primary: 'text-oil-orange', 
+			bg: 'from-orange-50/90 to-orange-100/70',
+			accent: 'bg-oil-orange/15',
+			border: 'border-oil-orange/25',
+			gradient: 'from-oil-orange/20 to-oil-orange/5'
+		},
+		emerald: { 
+			primary: 'text-emerald-600', 
+			bg: 'from-emerald-50/90 to-emerald-100/70',
+			accent: 'bg-emerald-600/15',
+			border: 'border-emerald-600/25',
+			gradient: 'from-emerald-600/20 to-emerald-600/5'
+		},
+		amber: { 
+			primary: 'text-amber-600', 
+			bg: 'from-amber-50/90 to-amber-100/70',
+			accent: 'bg-amber-600/15',
+			border: 'border-amber-600/25',
+			gradient: 'from-amber-600/20 to-amber-600/5'
+		},
+		red: { 
+			primary: 'text-red-600', 
+			bg: 'from-red-50/90 to-red-100/70',
+			accent: 'bg-red-600/15',
+			border: 'border-red-600/25',
+			gradient: 'from-red-600/20 to-red-600/5'
+		},
+		purple: { 
+			primary: 'text-purple-600', 
+			bg: 'from-purple-50/90 to-purple-100/70',
+			accent: 'bg-purple-600/15',
+			border: 'border-purple-600/25',
+			gradient: 'from-purple-600/20 to-purple-600/5'
 		}
-	}
+	};
 
-	function getTrendColor(trend: string) {
-		switch (trend) {
-			case 'up': return 'text-emerald-600';
-			case 'down': return 'text-red-600';
-			default: return 'text-slate-600';
-		}
-	}
+	$: colors = colorMap[color as keyof typeof colorMap] || colorMap.blue;
 
-	function getCardTheme(color: string) {
-		switch (color) {
-			case 'emerald': return 'from-emerald-50 to-emerald-100 border-emerald-200';
-			case 'amber': return 'from-amber-50 to-amber-100 border-amber-200';
-			case 'red': return 'from-red-50 to-red-100 border-red-200';
-			case 'slate': return 'from-slate-50 to-slate-100 border-slate-200';
-			default: return 'from-blue-50 to-blue-100 border-blue-200';
+	// Size configurations
+	$: sizeClasses = {
+		small: {
+			container: 'p-4',
+			icon: 'w-10 h-10 text-xl',
+			title: 'text-sm',
+			value: 'text-xl',
+			subtitle: 'text-xs'
+		},
+		medium: {
+			container: 'p-6',
+			icon: 'w-12 h-12 text-2xl',
+			title: 'text-base',
+			value: 'text-2xl',
+			subtitle: 'text-sm'
+		},
+		large: {
+			container: 'p-8',
+			icon: 'w-16 h-16 text-3xl',
+			title: 'text-lg',
+			value: 'text-4xl',
+			subtitle: 'text-base'
 		}
-	}
+	}[size];
 
-	function getValueColor(color: string) {
-		switch (color) {
-			case 'emerald': return 'text-emerald-700';
-			case 'amber': return 'text-amber-700';
-			case 'red': return 'text-red-700';
-			case 'slate': return 'text-slate-700';
-			default: return 'text-blue-700';
-		}
-	}
+	// Trend indicators
+	$: trendIcon = trend === 'up' ? '↗️' : trend === 'down' ? '↘️' : '➡️';
+	$: trendColor = trend === 'up' ? 'text-emerald-600' : trend === 'down' ? 'text-red-600' : 'text-oil-gray';
 </script>
 
-<div class="glass-card p-4 sm:p-6 bg-gradient-to-br {getCardTheme(color)} border">
-	<div class="flex items-start justify-between mb-3 sm:mb-4">
-		<div class="text-lg sm:text-2xl">{icon}</div>
+<div class="analytics-card {sizeClasses.container} group">
+	<!-- Enhanced header with analytics styling -->
+	<div class="flex items-start justify-between mb-4">
+		<div class="flex items-center gap-4">
+			{#if icon}
+				<div class="{sizeClasses.icon} rounded-2xl {colors.accent} flex items-center justify-center shadow-inner border {colors.border}">
+					<span class="filter drop-shadow-sm">{icon}</span>
+				</div>
+			{/if}
+			<div class="flex-1">
+				<h3 class="font-bold text-oil-black {sizeClasses.title} leading-tight mb-1">{title}</h3>
+				{#if subtitle}
+					<p class="text-oil-gray {sizeClasses.subtitle} font-medium">{subtitle}</p>
+				{/if}
+			</div>
+		</div>
+		
+		<!-- Enhanced trend indicator -->
 		{#if trendValue}
-			<div class="flex items-center gap-1 text-xs {getTrendColor(trend)}">
-				<span>{getTrendIcon(trend)}</span>
-				<span class="font-medium">{trendValue}</span>
+			<div class="text-right">
+				<div class="flex items-center gap-1 {sizeClasses.subtitle} {trendColor} font-bold">
+					<span>{trendIcon}</span>
+					<span>{trendValue}</span>
+				</div>
 			</div>
 		{/if}
 	</div>
-	
-	<div class="space-y-1 sm:space-y-2">
-		<h3 class="text-xs sm:text-sm font-medium text-oil-black leading-tight">{title}</h3>
-		<div class="flex items-baseline gap-1 sm:gap-2">
-			<div class="metric-display text-xl sm:text-3xl {getValueColor(color)} leading-tight">
-				{typeof value === 'number' ? value.toFixed(1) : value}
-			</div>
-			{#if unit}
-				<span class="text-xs sm:text-sm {getValueColor(color)} opacity-70">{unit}</span>
-			{/if}
+
+	<!-- Enhanced value display with analytics styling -->
+	<div class="relative mb-4">
+		<div class="display-medium {colors.primary} {sizeClasses.value} font-bold group-hover:scale-105 transition-transform duration-300">
+			{typeof value === 'number' ? value.toLocaleString() : value}
 		</div>
+		
+		<!-- Analytics background accent -->
+		<div class="absolute inset-0 bg-gradient-to-br {colors.bg} rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+	</div>
+
+	<!-- Enhanced analytics accent elements -->
+	<div class="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r {colors.gradient} rounded-b-2xl opacity-70"></div>
+	
+	<!-- Analytics corner indicators -->
+	<div class="absolute top-4 right-4 flex gap-1">
+		<div class="w-1.5 h-1.5 {colors.accent} rounded-full opacity-60"></div>
+		<div class="w-1.5 h-1.5 {colors.accent} rounded-full opacity-40"></div>
+		<div class="w-1.5 h-1.5 {colors.accent} rounded-full opacity-20"></div>
+	</div>
+
+	<!-- Professional data visualization hint -->
+	<div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-30 transition-opacity duration-300">
+		<div class="w-8 h-4 bg-gradient-to-r {colors.gradient} rounded-sm"></div>
 	</div>
 </div> 
