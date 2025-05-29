@@ -79,8 +79,21 @@
 
 <!-- Mobile Navigation Menu -->
 {#if mobileMenuOpen}
-	<div class="md:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onclick={closeMobileMenu}>
-		<div class="absolute top-0 right-0 w-72 h-full bg-white/95 backdrop-blur-xl shadow-2xl" onclick={(e) => e.stopPropagation()}>
+	<div 
+		class="md:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" 
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="mobile-menu-title"
+		tabindex="0"
+		onclick={closeMobileMenu}
+		onkeydown={(e) => e.key === 'Escape' && closeMobileMenu()}
+	>
+		<div 
+			class="absolute top-0 right-0 w-72 h-full bg-white/95 backdrop-blur-xl shadow-2xl" 
+			role="document"
+			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+		>
 			<!-- Mobile Menu Header -->
 			<div class="flex items-center justify-between p-4 border-b border-gray-200">
 				<div class="flex items-center space-x-3">
@@ -88,7 +101,7 @@
 						<DryDriveLogo size={32} />
 					</div>
 					<div>
-						<h2 class="text-lg font-bold text-oil-black">DryDrive</h2>
+						<h2 id="mobile-menu-title" class="text-lg font-bold text-oil-black">DryDrive</h2>
 						<p class="text-xs text-oil-gray">Oil Field Monitoring</p>
 					</div>
 				</div>

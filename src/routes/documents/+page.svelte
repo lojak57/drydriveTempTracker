@@ -44,7 +44,7 @@
     <div class="header-actions">
       <button 
         class="upload-btn"
-        on:click={() => showUploadModal = true}
+        onclick={() => showUploadModal = true}
       >
         <Plus size={16} />
         Upload Documents
@@ -57,7 +57,7 @@
     <button 
       class="tab-btn"
       class:active={activeTab === 'library'}
-      on:click={() => activeTab = 'library'}
+      onclick={() => activeTab = 'library'}
     >
       <Library size={16} />
       Document Library
@@ -67,7 +67,7 @@
     <button 
       class="tab-btn"
       class:active={activeTab === 'compliance'}
-      on:click={() => activeTab = 'compliance'}
+      onclick={() => activeTab = 'compliance'}
     >
       <Shield size={16} />
       Compliance
@@ -79,7 +79,7 @@
     <button 
       class="tab-btn"
       class:active={activeTab === 'upload'}
-      on:click={() => activeTab = 'upload'}
+      onclick={() => activeTab = 'upload'}
     >
       <Upload size={16} />
       Upload
@@ -120,13 +120,26 @@
 
 <!-- Upload Modal -->
 {#if showUploadModal}
-  <div class="modal-overlay" on:click={() => showUploadModal = false}>
-    <div class="modal-content" on:click|stopPropagation>
+  <div 
+    class="modal-overlay" 
+    role="dialog" 
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    tabindex="0"
+    onclick={() => showUploadModal = false}
+    onkeydown={(e) => e.key === 'Escape' && (showUploadModal = false)}
+  >
+    <div 
+      class="modal-content" 
+      role="document"
+      onclick={(e) => e.stopPropagation()}
+      onkeydown={(e) => e.stopPropagation()}
+    >
       <div class="modal-header">
-        <h3>Upload Documents</h3>
+        <h3 id="modal-title">Upload Documents</h3>
         <button 
           class="modal-close"
-          on:click={() => showUploadModal = false}
+          onclick={() => showUploadModal = false}
         >
           ×
         </button>
