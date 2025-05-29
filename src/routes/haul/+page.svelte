@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import Navigation from '$lib/components/ui/Navigation.svelte';
+	import { page } from '$app/stores';
 	import { activeHauls, drivers, trucks, scadaStatus, currentHaul, type Haul, type Driver, type Truck } from '$lib/stores/haulStore';
 	import HaulCard from '$lib/components/dashboard/HaulCard.svelte';
 	import HaulDetailView from '$lib/components/dashboard/HaulDetailView.svelte';
@@ -10,6 +10,7 @@
 	let dataUpdateInterval: number;
 	let lastUpdate = new Date();
 	let selectedHaul: Haul | null = null;
+	let haulId: string | null = null;
 
 	// Simulate live SCADA data updates
 	onMount(() => {
@@ -66,6 +67,12 @@
 
 			lastUpdate = new Date();
 		}, 3000); // Update every 3 seconds
+
+		// Get haul ID from URL params
+		haulId = $page.url.searchParams.get('id');
+		if (haulId) {
+			selectedHaul = $activeHauls.find(h => h.id === haulId) || null;
+		}
 	});
 
 	onDestroy(() => {
@@ -80,7 +87,13 @@
 
 	function closeHaulDetail() {
 		selectedHaul = null;
+		// Navigate back to fleet or hauls page
+		window.history.back();
 	}
+
+	// Get driver and truck info
+	$: driver = selectedHaul ? $drivers.find(d => d.id === selectedHaul.driverId) : null;
+	$: truck = selectedHaul ? $trucks.find(t => t.id === selectedHaul.truckId) : null;
 
 	$: driverMap = $drivers.reduce((map: Record<string, Driver>, driver) => {
 		map[driver.id] = driver;
@@ -93,72 +106,100 @@
 	}, {});
 </script>
 
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-	<Navigation />
-	
-	<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-		<!-- Header -->
-		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
-			<div>
-				<h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-oil-black">Live Haul Monitoring</h1>
-				<p class="text-sm sm:text-base text-oil-gray mt-2">Real-time SCADA data from field operations</p>
-			</div>
-			<div class="text-left sm:text-right">
-				<div class="text-sm text-oil-gray">Last Update</div>
-				<div class="font-mono text-oil-black text-sm">{lastUpdate.toLocaleTimeString()}</div>
-			</div>
-		</div>
-
-		<!-- System Status Row -->
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-			<SystemStatusCard />
-			<LiveDataFeed />
-			<div class="glass-card p-6">
-				<div class="flex items-center gap-3 mb-4">
-					<div class="w-3 h-3 bg-emerald-400 rounded-full shadow-sm animate-pulse"></div>
-					<h3 class="font-semibold text-oil-black">Active Hauls</h3>
-				</div>
-				<div class="metric-display text-oil-orange">{$activeHauls.length}</div>
-				<p class="text-sm text-oil-gray mt-2">Currently monitoring</p>
-			</div>
-			<div class="glass-card p-6">
-				<div class="flex items-center gap-3 mb-4">
-					<div class="w-3 h-3 bg-oil-blue rounded-full shadow-sm"></div>
-					<h3 class="font-semibold text-oil-black">Fleet Status</h3>
-				</div>
-				<div class="metric-display text-oil-blue">{$trucks.length}</div>
-				<p class="text-sm text-oil-gray mt-2">Trucks operational</p>
-			</div>
-		</div>
-
-		<!-- Active Hauls Grid -->
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-			{#each $activeHauls as haul (haul.id)}
-				<HaulCard 
-					{haul} 
-					driver={driverMap[haul.driverId]}
-					truck={truckMap[haul.truckId]}
-					on:select={() => selectHaul(haul)}
-				/>
-			{/each}
-		</div>
-
-		{#if $activeHauls.length === 0}
-			<div class="glass-card p-12 text-center">
-				<div class="text-6xl mb-4">🚛</div>
-				<h3 class="display-medium text-oil-black mb-2">No Active Hauls</h3>
-				<p class="text-oil-gray">All trucks are currently idle or offline</p>
-			</div>
-		{/if}
-	</main>
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+	<div>
+		<h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-oil-black">Live Haul Monitoring</h1>
+		<p class="text-sm sm:text-base text-oil-gray mt-2">Real-time SCADA data from field operations</p>
+	</div>
+	<div class="text-left sm:text-right">
+		<div class="text-sm text-oil-gray">Last Update</div>
+		<div class="font-mono text-oil-black text-sm">{lastUpdate.toLocaleTimeString()}</div>
+	</div>
 </div>
 
+<!-- System Status Row -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+	<SystemStatusCard />
+	<LiveDataFeed />
+	<div class="glass-card p-6">
+		<div class="flex items-center gap-3 mb-4">
+			<div class="w-3 h-3 bg-emerald-400 rounded-full shadow-sm animate-pulse"></div>
+			<h3 class="font-semibold text-oil-black">Active Hauls</h3>
+		</div>
+		<div class="metric-display text-oil-orange">{$activeHauls.length}</div>
+		<p class="text-sm text-oil-gray mt-2">Currently monitoring</p>
+	</div>
+	<div class="glass-card p-6">
+		<div class="flex items-center gap-3 mb-4">
+			<div class="w-3 h-3 bg-oil-blue rounded-full shadow-sm"></div>
+			<h3 class="font-semibold text-oil-black">Fleet Status</h3>
+		</div>
+		<div class="metric-display text-oil-blue">{$trucks.length}</div>
+		<p class="text-sm text-oil-gray mt-2">Trucks operational</p>
+	</div>
+</div>
+
+<!-- Active Hauls Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+	{#each $activeHauls as haul (haul.id)}
+		<HaulCard 
+			{haul} 
+			driver={driverMap[haul.driverId]}
+			truck={truckMap[haul.truckId]}
+			on:select={() => selectHaul(haul)}
+		/>
+	{/each}
+</div>
+
+{#if $activeHauls.length === 0}
+	<div class="glass-card p-12 text-center">
+		<div class="text-6xl mb-4">🚛</div>
+		<h3 class="display-medium text-oil-black mb-2">No Active Hauls</h3>
+		<p class="text-oil-gray">All trucks are currently idle or offline</p>
+	</div>
+{/if}
+
 <!-- Haul Detail Modal -->
-{#if selectedHaul}
+{#if selectedHaul && driver && truck}
 	<HaulDetailView 
-		haul={selectedHaul}
-		driver={driverMap[selectedHaul.driverId]}
-		truck={truckMap[selectedHaul.truckId]}
-		on:close={closeHaulDetail}
+		haul={selectedHaul} 
+		{driver} 
+		{truck} 
+		on:close={closeHaulDetail} 
 	/>
+{:else if haulId}
+	<!-- Loading or not found state -->
+	<div class="glass-card p-8 sm:p-12 text-center">
+		<div class="text-6xl mb-4">🔍</div>
+		<h3 class="text-xl font-semibold text-oil-black mb-2">Haul Not Found</h3>
+		<p class="text-oil-gray mb-4">The requested haul could not be found or may have been completed.</p>
+		<button 
+			onclick={() => window.history.back()}
+			class="px-4 py-2 bg-oil-orange text-white rounded-lg hover:bg-oil-orange/80 transition-colors"
+		>
+			Go Back
+		</button>
+	</div>
+{:else}
+	<!-- No haul ID provided -->
+	<div class="glass-card p-8 sm:p-12 text-center">
+		<div class="text-6xl mb-4">📋</div>
+		<h3 class="text-xl font-semibold text-oil-black mb-2">No Haul Selected</h3>
+		<p class="text-oil-gray mb-4">Please select a haul from the fleet operations or haul history page.</p>
+		<div class="space-x-4">
+			<a 
+				href="/fleet"
+				class="inline-block px-4 py-2 bg-oil-orange text-white rounded-lg hover:bg-oil-orange/80 transition-colors"
+			>
+				View Fleet
+			</a>
+			<a 
+				href="/hauls"
+				class="inline-block px-4 py-2 bg-oil-blue text-white rounded-lg hover:bg-oil-blue/80 transition-colors"
+			>
+				View History
+			</a>
+		</div>
+	</div>
 {/if} 
