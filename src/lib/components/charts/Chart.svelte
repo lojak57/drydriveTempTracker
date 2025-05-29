@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import Chart from 'chart.js/auto';
-  import 'chartjs-adapter-date-fns';
+  import { browser } from '$app/environment';
 
   export let type: 'line' | 'bar' | 'doughnut' | 'pie' = 'line';
   export let data: any;
@@ -10,7 +9,8 @@
   export let width: number | undefined = undefined;
 
   let canvas: HTMLCanvasElement;
-  let chart: Chart | null = null;
+  let chart: any = null;
+  let Chart: any = null;
 
   // Default options for oil field theme
   const defaultOptions = {
@@ -97,8 +97,24 @@
     }
   };
 
-  onMount(() => {
-    // Don't create chart in onMount, let reactive statement handle it
+  onMount(async () => {
+    if (browser) {
+      try {
+        // Dynamic import Chart.js only on client side
+        const chartModule = await import('chart.js/auto');
+        Chart = chartModule.default;
+        
+        // Import date adapter
+        await import('chartjs-adapter-date-fns');
+        
+        // Initialize chart if we have all required data
+        if (canvas && data && isValidChartData(data)) {
+          createChart();
+        }
+      } catch (error) {
+        console.error('Error loading Chart.js:', error);
+      }
+    }
   });
 
   onDestroy(() => {
@@ -108,31 +124,9 @@
     }
   });
 
-  // Update chart when data changes
-  $: if (chart && data) {
-    try {
-      chart.data = data;
-      chart.update();
-    } catch (error) {
-      console.error('Error updating chart data:', error);
-    }
-  }
-
-  // Update chart when options change
-  $: if (chart && options) {
-    try {
-      chart.options = {
-        ...defaultOptions,
-        ...options
-      };
-      chart.update();
-    } catch (error) {
-      console.error('Error updating chart options:', error);
-    }
-  }
-
-  // Create chart when canvas and data become available
-  $: if (canvas && data && !chart && isValidChartData(data)) {
+  function createChart() {
+    if (!Chart || !canvas || !data) return;
+    
     try {
       // Destroy any existing chart on this canvas first
       const existingChart = Chart.getChart(canvas);
@@ -151,8 +145,36 @@
         options: mergedOptions
       });
     } catch (error) {
-      console.error('Error creating chart in reactive statement:', error);
+      console.error('Error creating chart:', error);
     }
+  }
+
+  // Update chart when data changes
+  $: if (chart && data && browser) {
+    try {
+      chart.data = data;
+      chart.update();
+    } catch (error) {
+      console.error('Error updating chart data:', error);
+    }
+  }
+
+  // Update chart when options change
+  $: if (chart && options && browser) {
+    try {
+      chart.options = {
+        ...defaultOptions,
+        ...options
+      };
+      chart.update();
+    } catch (error) {
+      console.error('Error updating chart options:', error);
+    }
+  }
+
+  // Create chart when canvas and data become available
+  $: if (browser && Chart && canvas && data && !chart && isValidChartData(data)) {
+    createChart();
   }
 
   // Validate chart data structure

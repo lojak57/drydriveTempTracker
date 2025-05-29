@@ -1,125 +1,218 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import Chart from './Chart.svelte';
+	import { browser } from '$app/environment';
+	import Chart from '$lib/components/charts/Chart.svelte';
 
-	export let title: string;
-	export let data: number[] = [];
-	export let labels: string[] = [];
+	export let title: string = 'Real-time Data';
 	export let color: string = '#004E89';
-	export let height: number = 300;
-	export let maxDataPoints: number = 20;
+	export let height: number = 200;
 	export let unit: string = '';
-	export let showGrid: boolean = true;
 	export let animated: boolean = true;
+	export let showGrid: boolean = true;
+	export let maxDataPoints: number = 20;
+	export let updateInterval: number = 4000; // milliseconds
 
-	let chartData: any;
-	let updateInterval: number;
+	let chartData: any = null;
+	let dataPoints: number[] = [];
+	let labels: string[] = [];
+	let updateTimer: number;
+	let isLive = false;
 
-	// Generate realistic oil field data if no data provided
-	const generateRealtimeData = () => {
-		const now = new Date();
-		const newLabels = [];
-		const newData = [];
+	// Responsive settings with SSR-safe defaults
+	let screenWidth = 1024; // Default fallback for SSR
+
+	onMount(() => {
+		if (browser) {
+			screenWidth = window.innerWidth;
+			
+			// Update screen width on resize
+			const handleResize = () => {
+				screenWidth = window.innerWidth;
+			};
+			window.addEventListener('resize', handleResize);
+			
+			// Initialize chart data
+			generateRealisticData();
+			setupChartData();
+			startLiveUpdates();
+			
+			return () => {
+				window.removeEventListener('resize', handleResize);
+			};
+		}
+	});
+
+	onDestroy(() => {
+		if (updateTimer) {
+			clearInterval(updateTimer);
+		}
+	});
+
+	function generateRealisticData() {
+		// Generate realistic oil field data based on chart title
+		const baseValue = getBaseValueFromTitle(title);
+		const variance = baseValue * 0.1; // 10% variance
 		
-		for (let i = maxDataPoints - 1; i >= 0; i--) {
-			const time = new Date(now.getTime() - i * 30000); // 30 second intervals
-			newLabels.push(time.toLocaleTimeString('en-US', { 
-				hour12: false, 
+		// Initialize with historical data points
+		for (let i = 0; i < maxDataPoints; i++) {
+			const timestamp = new Date(Date.now() - (maxDataPoints - i) * updateInterval);
+			const value = baseValue + (Math.random() - 0.5) * variance;
+			
+			dataPoints.push(Math.max(0, value));
+			labels.push(timestamp.toLocaleTimeString([], { 
 				hour: '2-digit', 
 				minute: '2-digit',
 				second: '2-digit'
 			}));
-			
-			// Generate realistic oil field data with some variation
-			const baseValue = title.toLowerCase().includes('temp') ? 85 : 
-							 title.toLowerCase().includes('pressure') ? 120 :
-							 title.toLowerCase().includes('flow') ? 450 :
-							 title.toLowerCase().includes('volume') ? 2500 : 100;
-			
-			const variation = baseValue * 0.1; // 10% variation
-			const value = baseValue + (Math.random() - 0.5) * variation;
-			newData.push(Math.round(value * 100) / 100);
 		}
-		
-		return { labels: newLabels, data: newData };
-	};
+	}
 
-	// Update chart data
-	const updateChartData = () => {
-		let currentLabels = labels.length > 0 ? [...labels] : [];
-		let currentData = data.length > 0 ? [...data] : [];
+	function getBaseValueFromTitle(title: string): number {
+		const titleLower = title.toLowerCase();
 		
-		// If no data provided, generate realistic data
-		if (currentData.length === 0) {
-			const generated = generateRealtimeData();
-			currentLabels = generated.labels;
-			currentData = generated.data;
-		} else {
-			// Add new data point
-			const now = new Date();
-			const newLabel = now.toLocaleTimeString('en-US', { 
-				hour12: false, 
-				hour: '2-digit', 
-				minute: '2-digit',
-				second: '2-digit'
-			});
-			
-			// Generate new data point with realistic variation
-			const lastValue = currentData[currentData.length - 1] || 100;
-			const variation = lastValue * 0.05; // 5% variation
-			const newValue = lastValue + (Math.random() - 0.5) * variation;
-			
-			currentLabels.push(newLabel);
-			currentData.push(Math.round(newValue * 100) / 100);
-			
-			// Keep only the last maxDataPoints
-			if (currentLabels.length > maxDataPoints) {
-				currentLabels = currentLabels.slice(-maxDataPoints);
-				currentData = currentData.slice(-maxDataPoints);
-			}
-		}
+		// Return realistic values based on common oil field metrics
+		if (titleLower.includes('temperature')) return 85; // °F
+		if (titleLower.includes('pressure')) return 120; // PSI
+		if (titleLower.includes('flow')) return 450; // rate
+		if (titleLower.includes('volume')) return 2500; // BBL
+		if (titleLower.includes('h2s') || titleLower.includes('safety')) return 0.5; // PPM
+		if (titleLower.includes('network') || titleLower.includes('health')) return 97; // %
+		if (titleLower.includes('efficiency')) return 94; // %
 		
+		return 75; // Default fallback
+	}
+
+	function setupChartData() {
 		chartData = {
-			labels: currentLabels,
+			labels: labels,
 			datasets: [{
 				label: title,
-				data: currentData,
+				data: dataPoints,
 				borderColor: color,
 				backgroundColor: `${color}20`,
 				borderWidth: 2,
 				fill: true,
 				tension: 0.4,
-				pointRadius: 3,
-				pointHoverRadius: 5,
-				pointBackgroundColor: color,
-				pointBorderColor: '#ffffff',
-				pointBorderWidth: 2
+				pointRadius: 0,
+				pointHoverRadius: 4,
+				pointHoverBackgroundColor: color,
+				pointHoverBorderColor: '#ffffff',
+				pointHoverBorderWidth: 2
 			}]
 		};
-	};
-
-	onMount(() => {
-		// Initialize chart data first
-		updateChartData();
-		
-		// Only start animation if data is properly initialized
-		if (animated && chartData && chartData.datasets && chartData.datasets.length > 0) {
-			updateInterval = setInterval(() => {
-				updateChartData();
-			}, 4000);
-		}
-	});
-
-	onDestroy(() => {
-		if (updateInterval) {
-			clearInterval(updateInterval);
-		}
-	});
-
-	// Update when props change
-	$: if (data || labels) {
-		updateChartData();
 	}
+
+	function startLiveUpdates() {
+		if (!browser) return;
+		
+		isLive = true;
+		updateTimer = setInterval(() => {
+			addNewDataPoint();
+			setupChartData();
+		}, updateInterval);
+	}
+
+	function addNewDataPoint() {
+		const baseValue = getBaseValueFromTitle(title);
+		const variance = baseValue * 0.08; // Slightly smaller variance for more realistic data
+		
+		// Add some trending behavior
+		const lastValue = dataPoints[dataPoints.length - 1] || baseValue;
+		const trend = (Math.random() - 0.5) * 0.3; // Small trend component
+		const noise = (Math.random() - 0.5) * variance; // Random noise
+		
+		const newValue = Math.max(0, lastValue + trend + noise);
+		const newTimestamp = new Date().toLocaleTimeString([], { 
+			hour: '2-digit', 
+			minute: '2-digit',
+			second: '2-digit'
+		});
+		
+		// Add new point and remove old one if we're at max capacity
+		dataPoints.push(newValue);
+		labels.push(newTimestamp);
+		
+		if (dataPoints.length > maxDataPoints) {
+			dataPoints.shift();
+			labels.shift();
+		}
+	}
+
+	// Responsive chart options
+	$: chartOptions = {
+		responsive: true,
+		maintainAspectRatio: false,
+		plugins: {
+			legend: {
+				display: false
+			},
+			tooltip: {
+				mode: 'index',
+				intersect: false,
+				backgroundColor: 'rgba(255, 255, 255, 0.95)',
+				titleColor: '#1a1a1a',
+				bodyColor: '#6b7280',
+				borderColor: color,
+				borderWidth: 1,
+				cornerRadius: 8,
+				padding: 8,
+				titleFont: {
+					size: screenWidth < 640 ? 11 : 12,
+					weight: '600'
+				},
+				bodyFont: {
+					size: screenWidth < 640 ? 10 : 11
+				},
+				callbacks: {
+					label: function(context: any) {
+						return `${context.parsed.y.toFixed(1)}${unit}`;
+					}
+				}
+			}
+		},
+		interaction: {
+			mode: 'nearest',
+			axis: 'x',
+			intersect: false
+		},
+		scales: {
+			x: {
+				display: true,
+				grid: {
+					display: showGrid,
+					color: 'rgba(0, 78, 137, 0.1)'
+				},
+				ticks: {
+					maxTicksLimit: screenWidth < 640 ? 3 : screenWidth < 1024 ? 4 : 6,
+					color: '#6b7280',
+					font: {
+						size: screenWidth < 640 ? 9 : screenWidth < 1024 ? 10 : 11
+					}
+				}
+			},
+			y: {
+				display: true,
+				grid: {
+					display: showGrid,
+					color: 'rgba(0, 78, 137, 0.1)'
+				},
+				ticks: {
+					maxTicksLimit: screenWidth < 640 ? 4 : 6,
+					color: '#6b7280',
+					font: {
+						size: screenWidth < 640 ? 9 : screenWidth < 1024 ? 10 : 11
+					},
+					callback: function(value: any) {
+						return value + unit;
+					}
+				}
+			}
+		},
+		animation: animated ? {
+			duration: 750,
+			easing: 'easeInOutQuart'
+		} : false
+	};
 </script>
 
 <div class="realtime-chart">
@@ -136,63 +229,7 @@
 			type="line" 
 			data={chartData}
 			{height}
-			options={{
-				responsive: true,
-				maintainAspectRatio: false,
-				interaction: {
-					intersect: false,
-					mode: 'index'
-				},
-				plugins: {
-					legend: {
-						display: false
-					},
-					tooltip: {
-						callbacks: {
-							label: function(context: any) {
-								return `${context.dataset.label}: ${context.parsed.y}${unit}`;
-							}
-						}
-					}
-				},
-				scales: {
-					x: {
-						display: true,
-						grid: {
-							display: showGrid,
-							color: 'rgba(0, 78, 137, 0.1)'
-						},
-						ticks: {
-							maxTicksLimit: window.innerWidth < 640 ? 4 : window.innerWidth < 1024 ? 6 : 8,
-							color: '#6b7280',
-							font: {
-								size: window.innerWidth < 640 ? 9 : window.innerWidth < 1024 ? 10 : 11
-							}
-						}
-					},
-					y: {
-						display: true,
-						grid: {
-							display: showGrid,
-							color: 'rgba(0, 78, 137, 0.1)'
-						},
-						ticks: {
-							maxTicksLimit: window.innerWidth < 640 ? 4 : 6,
-							color: '#6b7280',
-							font: {
-								size: window.innerWidth < 640 ? 9 : window.innerWidth < 1024 ? 10 : 11
-							},
-							callback: function(value: any) {
-								return value + unit;
-							}
-						}
-					}
-				},
-				animation: animated ? {
-					duration: 750,
-					easing: 'easeInOutQuart'
-				} : false
-			}}
+			options={chartOptions}
 		/>
 	{:else}
 		<div class="chart-loading" style="height: {height}px;">
