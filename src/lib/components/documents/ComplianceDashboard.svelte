@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
   import { AlertTriangle, CheckCircle, Clock, XCircle, FileText, TrendingUp, Calendar, Shield, Download } from 'lucide-svelte';
   import { documentStats, complianceAlerts, documents, documentActions, type ComplianceAlert } from '$lib/stores/documentStore';
   import MetricCard from '$lib/components/ui/MetricCard.svelte';
@@ -9,6 +10,12 @@
   
   let selectedTimeframe: '7d' | '30d' | '90d' | '1y' = '30d';
   let showOnlyExpiring = false;
+  let currentTime = new Date(1735064220000); // Static timestamp for SSR consistency
+  
+  // Update to current time once mounted
+  onMount(() => {
+    currentTime = new Date();
+  });
   
   // Filter alerts by customer if specified
   $: filteredAlerts = customerId 
@@ -40,7 +47,7 @@
       expiringDocuments: expiring,
       pendingDocuments: pending,
       complianceScore,
-      lastUpdated: new Date()
+      lastUpdated: currentTime
     };
   })();
   
@@ -137,12 +144,11 @@
   
   // Get documents expiring in timeframe
   const getExpiringDocuments = (days: number) => {
-    const now = new Date();
-    const futureDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+    const futureDate = new Date(currentTime.getTime() + days * 24 * 60 * 60 * 1000);
     
     return filteredDocuments.filter(doc => 
       doc.expiryDate && 
-      doc.expiryDate > now && 
+      doc.expiryDate > currentTime && 
       doc.expiryDate <= futureDate
     );
   };
@@ -155,7 +161,7 @@
   // Export compliance report
   const exportComplianceReport = () => {
     const reportData = {
-      generatedAt: new Date().toISOString(),
+      generatedAt: currentTime.toISOString(),
       customerId,
       stats: filteredStats,
       alerts: filteredAlerts,
@@ -166,7 +172,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `compliance-report-${formatDate(new Date())}.json`;
+    a.download = `compliance-report-${formatDate(currentTime)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

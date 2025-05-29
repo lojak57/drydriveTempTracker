@@ -33,9 +33,13 @@
 	let activeAlerts = 0;
 	
 	let updateInterval: number;
+	let currentDate = new Date(1735064220000); // Static timestamp for SSR consistency
 
 	// Enhanced real-time SCADA simulation
 	onMount(() => {
+		// Update to current time once mounted
+		currentDate = new Date();
+		
 		updateInterval = setInterval(() => {
 			// Core Operations (Row 1)
 			currentTemp = 70 + Math.random() * 15; // 70-85°F
@@ -59,6 +63,9 @@
 			dryDriveTemp = 175 + Math.random() * 25; // 175-200°F
 			networkHealth = 95 + Math.random() * 5; // 95-100%
 			activeAlerts = Math.random() > 0.9 ? Math.floor(Math.random() * 3) : 0;
+			
+			// Update current date for real-time calculations
+			currentDate = new Date();
 		}, 4000);
 	});
 
@@ -72,9 +79,8 @@
 	$: totalActiveVolume = $activeHauls.reduce((sum, haul) => sum + haul.initialVolume, 0);
 	$: totalExpectedLoss = $activeHauls.reduce((sum, haul) => sum + haul.expectedLoss, 0);
 	$: completedToday = browser ? $completedHauls.filter(haul => {
-		const today = new Date();
 		const haulDate = haul.endTime || haul.startTime;
-		return haulDate.toDateString() === today.toDateString();
+		return haulDate.toDateString() === currentDate.toDateString();
 	}).length : 0;
 	
 	$: haulsByStatus = $activeHauls.reduce((counts, haul) => {

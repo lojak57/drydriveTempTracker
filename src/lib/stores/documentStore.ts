@@ -1,4 +1,5 @@
 import { writable, derived } from 'svelte/store';
+import { browser } from '$app/environment';
 
 export interface CustomerDocument {
   id: string;
@@ -243,7 +244,8 @@ export const uploadProgress = writable<{ [key: string]: number }>({});
 
 // Derived stores for analytics
 export const documentStats = derived(documents, ($documents: CustomerDocument[]): DocumentStats => {
-  const now = new Date();
+  // Use static timestamp for SSR consistency, will be updated on client
+  const now = browser ? new Date() : new Date(1735064220000);
   const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
   
   const total = $documents.length;
@@ -269,7 +271,8 @@ export const documentStats = derived(documents, ($documents: CustomerDocument[])
 
 export const complianceAlerts = derived(documents, ($documents: CustomerDocument[]): ComplianceAlert[] => {
   const alerts: ComplianceAlert[] = [];
-  const now = new Date();
+  // Use static timestamp for SSR consistency, will be updated on client
+  const now = browser ? new Date() : new Date(1735064220000);
   const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
   
   $documents.forEach((doc: CustomerDocument) => {
@@ -312,8 +315,8 @@ export const documentActions = {
   addDocument: (document: Omit<CustomerDocument, 'id' | 'uploadDate'>) => {
     const newDocument: CustomerDocument = {
       ...document,
-      id: `doc-${Date.now()}`,
-      uploadDate: new Date()
+      id: `doc-${browser ? Date.now() : 1735064220000}`,
+      uploadDate: browser ? new Date() : new Date(1735064220000)
     };
     
     documents.update((docs: CustomerDocument[]) => [...docs, newDocument]);
