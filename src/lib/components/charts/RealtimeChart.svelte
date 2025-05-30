@@ -13,6 +13,7 @@
 	export let updateInterval: number = 4000; // milliseconds
 
 	let chartData: any = null;
+	let chartOptions: any = null;
 	let dataPoints: number[] = [];
 	let labels: string[] = [];
 	let updateTimer: number;
@@ -24,7 +25,6 @@
 	onMount(() => {
 		if (browser) {
 			screenWidth = window.innerWidth;
-			chartOptions = createChartOptions();
 			
 			// Update screen width on resize
 			const handleResize = () => {
@@ -33,10 +33,8 @@
 			};
 			window.addEventListener('resize', handleResize);
 			
-			// Initialize chart data
-			generateRealisticData();
-			setupChartData();
-			startLiveUpdates();
+			// Initialize chart
+			initializeChart();
 			
 			return () => {
 				window.removeEventListener('resize', handleResize);
@@ -50,7 +48,25 @@
 		}
 	});
 
+	function initializeChart() {
+		// Generate initial data
+		generateRealisticData();
+		
+		// Create chart options
+		chartOptions = createChartOptions();
+		
+		// Setup chart data
+		setupChartData();
+		
+		// Start live updates
+		startLiveUpdates();
+	}
+
 	function generateRealisticData() {
+		// Clear existing data
+		dataPoints = [];
+		labels = [];
+		
 		// Generate realistic oil field data based on chart title
 		const baseValue = getBaseValueFromTitle(title);
 		const variance = baseValue * 0.1; // 10% variance
@@ -140,13 +156,18 @@
 		}
 	}
 
-	// Responsive chart options - moved to function to avoid SSR issues
-	let chartOptions: any = null;
-	
 	function createChartOptions() {
 		return {
 			responsive: true,
 			maintainAspectRatio: false,
+			layout: {
+				padding: {
+					left: 15,
+					right: 15,
+					top: 15,
+					bottom: 50 // Much more padding for x-axis labels
+				}
+			},
 			plugins: {
 				legend: {
 					display: false
@@ -154,20 +175,13 @@
 				tooltip: {
 					mode: 'index',
 					intersect: false,
-					backgroundColor: 'rgba(255, 255, 255, 0.95)',
-					titleColor: '#1a1a1a',
-					bodyColor: '#6b7280',
+					backgroundColor: 'rgba(0, 0, 0, 0.8)',
+					titleColor: '#ffffff',
+					bodyColor: '#ffffff',
 					borderColor: color,
 					borderWidth: 1,
 					cornerRadius: 8,
-					padding: 8,
-					titleFont: {
-						size: screenWidth < 640 ? 11 : 12,
-						weight: '600'
-					},
-					bodyFont: {
-						size: screenWidth < 640 ? 10 : 11
-					},
+					displayColors: false,
 					callbacks: {
 						label: function(context: any) {
 							return `${context.parsed.y.toFixed(1)}${unit}`;
@@ -175,242 +189,248 @@
 					}
 				}
 			},
-			interaction: {
-				mode: 'nearest',
-				axis: 'x',
-				intersect: false
-			},
 			scales: {
 				x: {
-					display: true,
+					display: true, // Force display
+					position: 'bottom',
 					grid: {
 						display: showGrid,
-						color: 'rgba(0, 78, 137, 0.1)'
+						color: 'rgba(0, 0, 0, 0.1)',
+						lineWidth: 1
 					},
 					ticks: {
-						maxTicksLimit: screenWidth < 640 ? 3 : screenWidth < 1024 ? 4 : 6,
-						color: '#6b7280',
+						display: true, // Force display
+						maxTicksLimit: screenWidth > 768 ? 5 : 3,
+						color: '#374151',
 						font: {
-							size: screenWidth < 640 ? 9 : screenWidth < 1024 ? 10 : 11
-						}
+							size: 12,
+							weight: 500,
+							family: 'SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif'
+						},
+						padding: 10, // More padding
+						maxRotation: 0,
+						minRotation: 0
+					},
+					border: {
+						display: true,
+						color: '#d1d5db'
 					}
 				},
 				y: {
-					display: true,
+					display: showGrid,
+					position: 'left',
 					grid: {
 						display: showGrid,
-						color: 'rgba(0, 78, 137, 0.1)'
+						color: 'rgba(0, 0, 0, 0.1)',
+						lineWidth: 1
 					},
 					ticks: {
-						maxTicksLimit: screenWidth < 640 ? 4 : 6,
-						color: '#6b7280',
+						display: true,
+						maxTicksLimit: 5,
+						color: '#374151',
 						font: {
-							size: screenWidth < 640 ? 9 : screenWidth < 1024 ? 10 : 11
+							size: 12,
+							weight: 500,
+							family: 'SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif'
 						},
 						callback: function(value: any) {
-							return value + unit;
-						}
+							return `${value}${unit}`;
+						},
+						padding: 10
+					},
+					border: {
+						display: true,
+						color: '#d1d5db'
 					}
 				}
+			},
+			interaction: {
+				intersect: false,
+				mode: 'index'
 			},
 			animation: animated ? {
 				duration: 750,
 				easing: 'easeInOutQuart'
-			} : false
+			} : false,
+			elements: {
+				line: {
+					tension: 0.4
+				},
+				point: {
+					radius: 0,
+					hoverRadius: 4
+				}
+			}
 		};
 	}
 </script>
 
-<div class="realtime-chart">
+<div class="realtime-chart-container" style="height: {height}px;">
 	<div class="chart-header">
-		<h3 class="chart-title">{title}</h3>
-		<div class="chart-status">
-			<div class="status-indicator {animated ? 'live' : 'static'}"></div>
-			<span class="status-text">{animated ? 'Live' : 'Static'}</span>
+		<div class="chart-title-container">
+			<h3 class="chart-title">{title}</h3>
+			{#if isLive}
+				<div class="live-indicator">
+					<div class="live-dot"></div>
+					<span class="live-text">LIVE</span>
+				</div>
+			{/if}
 		</div>
 	</div>
 	
-	{#if chartData && chartData.datasets && chartData.datasets.length > 0 && chartOptions}
-		<Chart 
-			type="line" 
-			data={chartData}
-			{height}
-			options={chartOptions}
-		/>
-	{:else}
-		<div class="chart-loading" style="height: {height}px;">
-			<div class="loading-content">
+	<div class="chart-wrapper">
+		{#if chartData && chartOptions}
+			<Chart 
+				type="line" 
+				data={chartData} 
+				options={chartOptions}
+			/>
+		{:else}
+			<div class="chart-loading">
 				<div class="loading-spinner"></div>
-				<p>Loading chart data...</p>
+				<span>Loading chart data...</span>
 			</div>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
 
 <style>
-	.realtime-chart {
-		background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+	.realtime-chart-container {
+		background: rgba(255, 255, 255, 0.95);
 		backdrop-filter: blur(20px);
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 16px;
-		padding: 16px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-		transition: all 0.3s ease;
-		overflow: hidden;
+		border-radius: 20px;
+		box-shadow: 
+			0 8px 32px rgba(0, 0, 0, 0.1),
+			0 2px 8px rgba(0, 0, 0, 0.05),
+			inset 0 1px 0 rgba(255, 255, 255, 0.8);
+		padding: 20px;
+		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 	}
-	
-	.realtime-chart:hover {
+
+	.realtime-chart-container:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+		box-shadow: 
+			0 12px 40px rgba(0, 0, 0, 0.15),
+			0 4px 12px rgba(0, 0, 0, 0.08),
+			inset 0 1px 0 rgba(255, 255, 255, 0.9);
 	}
-	
+
 	.chart-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
 		margin-bottom: 12px;
-		flex-wrap: wrap;
-		gap: 8px;
 	}
-	
+
+	.chart-title-container {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
 	.chart-title {
-		font-size: 14px;
+		font-size: 16px;
 		font-weight: 600;
-		color: #1a1a1a;
+		color: #1f2937;
 		margin: 0;
-		line-height: 1.3;
+		line-height: 1.2;
 	}
-	
-	.chart-status {
+
+	.live-indicator {
 		display: flex;
 		align-items: center;
 		gap: 6px;
 		padding: 4px 8px;
-		background: rgba(255, 255, 255, 0.2);
-		border-radius: 8px;
-		border: 1px solid rgba(255, 255, 255, 0.3);
+		background: rgba(16, 185, 129, 0.1);
+		border: 1px solid rgba(16, 185, 129, 0.2);
+		border-radius: 12px;
 	}
-	
-	.status-indicator {
+
+	.live-dot {
 		width: 6px;
 		height: 6px;
-		border-radius: 50%;
-		background: #6b7280;
-	}
-	
-	.status-indicator.live {
 		background: #10b981;
-		animation: pulse 2s infinite;
-	}
-	
-	.status-text {
-		font-size: 10px;
-		font-weight: 500;
-		color: #6b7280;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
-	
-	.chart-loading {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		border: 1px dashed rgba(255, 255, 255, 0.3);
-	}
-	
-	.loading-content {
-		text-align: center;
-		color: #6b7280;
-	}
-	
-	.loading-spinner {
-		width: 24px;
-		height: 24px;
-		border: 2px solid rgba(107, 114, 128, 0.2);
-		border-top: 2px solid #6b7280;
 		border-radius: 50%;
-		animation: spin 1s linear infinite;
-		margin: 0 auto 8px;
+		animation: livePulse 2s infinite;
 	}
-	
-	.loading-content p {
-		font-size: 12px;
-		margin: 0;
-	}
-	
-	@keyframes pulse {
+
+	@keyframes livePulse {
 		0%, 100% {
 			opacity: 1;
+			transform: scale(1);
 		}
 		50% {
 			opacity: 0.5;
+			transform: scale(1.2);
 		}
 	}
-	
+
+	.live-text {
+		font-size: 10px;
+		font-weight: 600;
+		color: #10b981;
+		letter-spacing: 0.5px;
+	}
+
+	.chart-wrapper {
+		height: calc(100% - 45px); /* More space for chart */
+		position: relative;
+		min-height: 350px; /* Increased minimum height */
+		overflow: visible; /* Ensure labels aren't clipped */
+	}
+
+	.chart-loading {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 100%;
+		color: #6b7280;
+		gap: 12px;
+	}
+
+	.loading-spinner {
+		width: 24px;
+		height: 24px;
+		border: 2px solid #e5e7eb;
+		border-top: 2px solid #7CB342;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+	}
+
 	@keyframes spin {
 		0% { transform: rotate(0deg); }
 		100% { transform: rotate(360deg); }
 	}
-	
-	/* Mobile optimizations */
-	@media (max-width: 640px) {
-		.realtime-chart {
-			padding: 12px;
-			border-radius: 12px;
+
+	/* Mobile responsiveness */
+	@media (max-width: 768px) {
+		.realtime-chart-container {
+			padding: 16px;
 		}
-		
-		.chart-header {
-			margin-bottom: 8px;
-			gap: 6px;
-		}
-		
+
 		.chart-title {
-			font-size: 12px;
+			font-size: 14px;
 		}
-		
-		.chart-status {
-			padding: 3px 6px;
-			border-radius: 6px;
-			gap: 4px;
-		}
-		
-		.status-indicator {
-			width: 4px;
-			height: 4px;
-		}
-		
-		.status-text {
-			font-size: 8px;
-		}
-		
-		.loading-content p {
-			font-size: 10px;
-		}
-		
-		.loading-spinner {
-			width: 20px;
-			height: 20px;
-		}
-		
-		.realtime-chart:hover {
-			transform: none;
+
+		.live-text {
+			font-size: 9px;
 		}
 	}
-	
-	/* Tablet optimizations */
-	@media (min-width: 641px) and (max-width: 1024px) {
-		.realtime-chart {
-			padding: 18px;
+
+	/* Dark mode support */
+	@media (prefers-color-scheme: dark) {
+		.realtime-chart-container {
+			background: rgba(30, 30, 30, 0.95);
+			border-color: rgba(255, 255, 255, 0.1);
 		}
-		
+
 		.chart-title {
-			font-size: 16px;
+			color: #f3f4f6;
 		}
-		
-		.status-text {
-			font-size: 11px;
+
+		.chart-loading {
+			color: #9ca3af;
 		}
 	}
 </style> 

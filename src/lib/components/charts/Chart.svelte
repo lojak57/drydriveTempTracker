@@ -197,18 +197,19 @@
   .chart-container {
     position: relative;
     width: 100%;
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
     border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 0;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   canvas {
     max-width: 100%;
     max-height: 100%;
     display: block !important;
+    border-radius: 12px;
   }
 </style> 

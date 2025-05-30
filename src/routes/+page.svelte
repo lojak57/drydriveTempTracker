@@ -2,11 +2,15 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { browser } from '$app/environment';
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
+	import RoleMetricCard from '$lib/components/ui/RoleMetricCard.svelte';
 	import RealtimeChart from '$lib/components/charts/RealtimeChart.svelte';
 	import GaugeChart from '$lib/components/charts/GaugeChart.svelte';
 	import DryDriveLogo from '$lib/components/ui/DryDriveLogo.svelte';
 	import HaulCard from '$lib/components/dashboard/HaulCard.svelte';
+	import RoleSelector from '$lib/components/shared/RoleSelector.svelte';
 	import { activeHauls, completedHauls, scadaStatus, drivers, trucks } from '$lib/stores/haulStore';
+	import { selectedRole, isRoleView, type RoleId } from '$lib/stores/roleStore';
+	import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-svelte';
 
 	// Enhanced real-time metrics
 	let currentTemp = 76.3;
@@ -34,6 +38,52 @@
 	
 	let updateInterval: number;
 	let currentDate = new Date(1735064220000); // Static timestamp for SSR consistency
+
+	// Role-based navigation state
+	let executiveTab = 'overview';
+	let driverTab = 'performance';
+	let dispatchTab = 'active-hauls';
+	let yardTab = 'truck-overview';
+	let regionalTab = 'yards-overview';
+
+	const executiveTabs = [
+		{ id: 'overview', label: 'Executive Overview', icon: '📊' },
+		{ id: 'financial', label: 'Financial Performance', icon: '💰' },
+		{ id: 'operations', label: 'Operations Summary', icon: '🏭' },
+		{ id: 'strategic', label: 'Strategic Metrics', icon: '🎯' }
+	];
+
+	const driverTabs = [
+		{ id: 'performance', label: 'My Performance', icon: '📊' },
+		{ id: 'schedule', label: 'Schedule & Routes', icon: '📅' },
+		{ id: 'safety', label: 'Safety Record', icon: '🛡️' },
+		{ id: 'earnings', label: 'Earnings & Bonuses', icon: '💰' }
+	];
+
+	const dispatchTabs = [
+		{ id: 'active-hauls', label: 'Active Hauls', icon: '🚛' },
+		{ id: 'scheduling', label: 'Route Planning', icon: '📅' },
+		{ id: 'fleet-status', label: 'Fleet Status', icon: '📊' },
+		{ id: 'alerts', label: 'Alerts & Issues', icon: '🚨' }
+	];
+
+	const yardTabs = [
+		{ id: 'truck-overview', label: 'Fleet Overview', icon: '🚛' },
+		{ id: 'truck-individual', label: 'Individual Trucks', icon: '🔧' },
+		{ id: 'driver-overview', label: 'Driver Overview', icon: '👥' },
+		{ id: 'driver-individual', label: 'Individual Drivers', icon: '👨‍💼' },
+		{ id: 'yard-operations', label: 'Yard Operations', icon: '🏭' },
+		{ id: 'maintenance', label: 'Maintenance', icon: '⚙️' }
+	];
+
+	const regionalTabs = [
+		{ id: 'yards-overview', label: 'Yards Overview', icon: '🏭' },
+		{ id: 'fleet-regional', label: 'Regional Fleet', icon: '🚛' },
+		{ id: 'driver-regional', label: 'Regional Drivers', icon: '👥' },
+		{ id: 'performance', label: 'Performance Analytics', icon: '📊' },
+		{ id: 'financial', label: 'Financial Overview', icon: '💰' },
+		{ id: 'strategic', label: 'Strategic Planning', icon: '🎯' }
+	];
 
 	// Enhanced real-time SCADA simulation
 	onMount(() => {
@@ -98,490 +148,2927 @@
 	<p class="text-xs sm:text-base text-oil-gray">Real-time SCADA monitoring and fleet management platform</p>
 </div>
 
-<!-- Enhanced System Status Banner -->
-<div class="glass-card p-3 sm:p-6 mb-4 sm:mb-8">
-	<div class="status-banner flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-		<div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-			<div class="flex items-center gap-2 justify-center sm:justify-start">
-				<div class="w-3 h-3 sm:w-4 sm:h-4 {$scadaStatus.systemOnline ? 'bg-emerald-400' : 'bg-red-400'} rounded-full animate-pulse"></div>
-				<span class="font-semibold text-oil-black text-sm sm:text-base">System Online</span>
-			</div>
-			<div class="hidden sm:block text-oil-gray">|</div>
-			<div class="text-xs sm:text-sm text-oil-gray text-center sm:text-left">
-				{$scadaStatus.connectedDevices} devices connected
-			</div>
-			<div class="hidden sm:block text-oil-gray">|</div>
-			<div class="text-xs sm:text-sm text-oil-gray text-center sm:text-left">
-				Coriolis: {$scadaStatus.coriolisOnline ? '✓' : '✗'}
-			</div>
-			<div class="hidden sm:block text-oil-gray">|</div>
-			<div class="text-xs sm:text-sm text-oil-gray text-center sm:text-left">
-				Gas Detectors: {$scadaStatus.gasDetectorsOnline ? '✓' : '✗'}
-			</div>
-			<div class="hidden sm:block text-oil-gray">|</div>
-			<div class="text-xs sm:text-sm text-oil-gray text-center sm:text-left">
-				DryDrive: {$scadaStatus.dryDriveOnline ? '✓' : '✗'}
+<!-- Role Selector -->
+<div class="flex justify-center mb-6 sm:mb-8">
+	<RoleSelector />
+</div>
+
+<!-- Role-Based Dashboard Content -->
+{#if $isRoleView}
+	<!-- Role-Specific Header -->
+	<div class="glass-card p-4 sm:p-6 mb-6 sm:mb-8 text-center" style="border-color: {$selectedRole.colorScheme.primary};">
+		<div class="flex items-center justify-center gap-4 mb-4">
+			<span class="text-4xl">{$selectedRole.icon}</span>
+			<div>
+				<h2 class="text-2xl sm:text-3xl font-bold" style="color: {$selectedRole.colorScheme.primary};">{$selectedRole.name} Dashboard</h2>
+				<p class="text-sm sm:text-base text-oil-gray">{$selectedRole.description}</p>
 			</div>
 		</div>
-		<div class="text-center sm:text-right">
-			<div class="text-xs sm:text-sm text-oil-gray">Network Health: {$scadaStatus.networkHealth.toFixed(1)}%</div>
-			<div class="font-mono text-oil-black text-xs sm:text-sm">{$scadaStatus.lastUpdate.toLocaleTimeString()}</div>
+		<div class="focus-banner" style="background: linear-gradient(135deg, {$selectedRole.colorScheme.primary}15 0%, {$selectedRole.colorScheme.secondary}10 100%); border-color: {$selectedRole.colorScheme.primary}30;">
+			<span class="font-semibold" style="color: {$selectedRole.colorScheme.primary};">Focus:</span>
+			<span class="text-oil-black">{$selectedRole.focus}</span>
 		</div>
 	</div>
-</div>
 
-<!-- Primary Navigation Actions -->
-<div class="glass-card p-4 sm:p-8 text-center mb-4 sm:mb-8">
-	<h3 class="text-lg sm:text-2xl lg:text-3xl font-semibold tracking-tight text-oil-black mb-3 sm:mb-6">Dashboard Navigation</h3>
-	<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
-		<a 
-			href="/haul" 
-			class="nav-card block p-3 sm:p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 touch-manipulation"
-			style="background: linear-gradient(135deg, #7CB342 0%, #9CCC65 100%);"
-		>
-			<div class="text-xl sm:text-3xl mb-2">🚛</div>
-			<div class="font-bold text-sm sm:text-lg mb-1 text-white">Live Haul Monitoring</div>
-			<div class="text-white/90 text-xs sm:text-sm font-medium">Monitor active hauls and real-time data</div>
-		</a>
+	<!-- Role-Specific Content -->
+	{#if $selectedRole.id === 'executive'}
+		<!-- Executive Dashboard with Navigation -->
+		<div class="executive-dashboard">
+			<!-- Executive Navigation -->
+			<div class="role-navigation mb-6">
+				<div class="nav-tabs">
+					{#each executiveTabs as tab}
+						<button 
+							class="nav-tab {executiveTab === tab.id ? 'active' : ''}"
+							style="--primary-color: {$selectedRole.colorScheme.primary}"
+							on:click={() => executiveTab = tab.id}
+						>
+							<span class="tab-icon">{tab.icon}</span>
+							<span class="tab-label">{tab.label}</span>
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Executive Tab Content -->
+			{#if executiveTab === 'overview'}
+				<div class="tab-content">
+					<div class="hero-metrics-grid mb-8">
+						{#each $selectedRole.layout.heroMetrics as metricId}
+							{@const metric = $selectedRole.metrics.find(m => m.id === metricId)}
+							{#if metric}
+								<RoleMetricCard {metric} colorScheme={$selectedRole.colorScheme} />
+							{/if}
+						{/each}
+					</div>
+					<div class="charts-grid">
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Company Performance Overview"
+								color={$selectedRole.colorScheme.primary}
+								height={400}
+								unit="$M"
+								animated={true}
+							/>
+						</div>
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Regional Revenue Distribution"
+								color={$selectedRole.colorScheme.secondary}
+								height={400}
+								unit="%"
+								animated={true}
+							/>
+						</div>
+					</div>
+				</div>
+			{:else if executiveTab === 'financial'}
+				<div class="tab-content">
+					<div class="financial-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+						<MetricCard 
+							title="Monthly Revenue" 
+							value="$4.2M" 
+							unit="" 
+							icon="💰" 
+							status="normal"
+							trend="up"
+							trendValue="+15.3%"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Operating Margin" 
+							value="23.8" 
+							unit="%" 
+							icon="📈" 
+							status="normal"
+							trend="up"
+							trendValue="+2.1%"
+							color="blue"
+						/>
+						<MetricCard 
+							title="EBITDA" 
+							value="$1.8M" 
+							unit="" 
+							icon="💎" 
+							status="normal"
+							trend="up"
+							trendValue="+18.7%"
+							color="orange"
+						/>
+					</div>
+					<div class="financial-charts grid grid-cols-1 lg:grid-cols-2 gap-6">
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Revenue Trends (12 Months)"
+								color="#10B981"
+								height={400}
+								unit="$M"
+								animated={true}
+							/>
+						</div>
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Cost Analysis & Margins"
+								color="#3B82F6"
+								height={400}
+								unit="%"
+								animated={true}
+							/>
+						</div>
+					</div>
+				</div>
+			{:else if executiveTab === 'operations'}
+				<div class="tab-content">
+					<div class="operations-summary grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						<MetricCard 
+							title="Total Fleet" 
+							value="247" 
+							unit="trucks" 
+							icon="🚛" 
+							status="normal"
+							trend="up"
+							trendValue="+12"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Active Drivers" 
+							value="189" 
+							unit="" 
+							icon="👨‍💼" 
+							status="normal"
+							trend="stable"
+							trendValue="+3"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Daily Hauls" 
+							value="156" 
+							unit="" 
+							icon="📦" 
+							status="normal"
+							trend="up"
+							trendValue="+8"
+							color="orange"
+						/>
+						<MetricCard 
+							title="System Uptime" 
+							value="99.2" 
+							unit="%" 
+							icon="⚡" 
+							status="normal"
+							trend="stable"
+							trendValue="+0.1%"
+							color="emerald"
+						/>
+					</div>
+				</div>
+			{:else if executiveTab === 'strategic'}
+				<div class="tab-content">
+					<div class="strategic-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+						<MetricCard 
+							title="Market Share" 
+							value="34.2" 
+							unit="%" 
+							icon="🎯" 
+							status="normal"
+							trend="up"
+							trendValue="+2.8%"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Customer Retention" 
+							value="94.7" 
+							unit="%" 
+							icon="🤝" 
+							status="normal"
+							trend="up"
+							trendValue="+1.2%"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Growth Rate" 
+							value="28.5" 
+							unit="%" 
+							icon="📈" 
+							status="normal"
+							trend="up"
+							trendValue="+5.3%"
+							color="orange"
+						/>
+					</div>
+				</div>
+			{/if}
+		</div>
+
+	{:else if $selectedRole.id === 'driver'}
+		<!-- Driver Dashboard with Navigation -->
+		<div class="driver-dashboard">
+			<!-- Driver Navigation -->
+			<div class="role-navigation mb-6">
+				<div class="nav-tabs">
+					{#each driverTabs as tab}
+						<button 
+							class="nav-tab {driverTab === tab.id ? 'active' : ''}"
+							style="--primary-color: {$selectedRole.colorScheme.primary}"
+							on:click={() => driverTab = tab.id}
+						>
+							<span class="tab-icon">{tab.icon}</span>
+							<span class="tab-label">{tab.label}</span>
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Driver Tab Content -->
+			{#if driverTab === 'performance'}
+				<div class="tab-content">
+					<div class="driver-metrics grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						<MetricCard 
+							title="Safety Score" 
+							value="98.5" 
+							unit="%" 
+							icon="🛡️" 
+							status="normal"
+							trend="up"
+							trendValue="+1.2%"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Efficiency Rating" 
+							value="94.2" 
+							unit="%" 
+							icon="⚡" 
+							status="normal"
+							trend="up"
+							trendValue="+3.1%"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Hauls This Week" 
+							value="23" 
+							unit="" 
+							icon="📦" 
+							status="normal"
+							trend="up"
+							trendValue="+2"
+							color="orange"
+						/>
+						<MetricCard 
+							title="On-Time Delivery" 
+							value="96.8" 
+							unit="%" 
+							icon="⏰" 
+							status="normal"
+							trend="stable"
+							trendValue="+0.5%"
+							color="emerald"
+						/>
+					</div>
+				</div>
+			{:else if driverTab === 'schedule'}
+				<div class="tab-content">
+					<div class="schedule-view glass-card p-6">
+						<h3 class="text-xl font-bold mb-4">Today's Schedule</h3>
+						<div class="schedule-items space-y-4">
+							{#each [
+								{ time: '06:00', location: 'Permian Basin Yard', type: 'Pickup', status: 'completed' },
+								{ time: '08:30', location: 'Midland Refinery', type: 'Delivery', status: 'completed' },
+								{ time: '11:00', location: 'Eagle Ford Site', type: 'Pickup', status: 'in-progress' },
+								{ time: '14:30', location: 'Houston Terminal', type: 'Delivery', status: 'scheduled' },
+								{ time: '17:00', location: 'Return to Yard', type: 'End Shift', status: 'scheduled' }
+							] as item}
+								<div class="schedule-item flex items-center gap-4 p-4 bg-white/50 rounded-lg">
+									<div class="time-badge">
+										<span class="font-mono text-sm">{item.time}</span>
+									</div>
+									<div class="flex-1">
+										<h4 class="font-semibold">{item.location}</h4>
+										<p class="text-sm text-oil-gray">{item.type}</p>
+									</div>
+									<div class="status-badge status-{item.status}">
+										{item.status.replace('-', ' ')}
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</div>
+			{:else if driverTab === 'safety'}
+				<div class="tab-content">
+					<div class="safety-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+						<MetricCard 
+							title="Days Without Incident" 
+							value="247" 
+							unit="days" 
+							icon="🏆" 
+							status="normal"
+							trend="up"
+							trendValue="+1"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Safety Training" 
+							value="100" 
+							unit="%" 
+							icon="📚" 
+							status="normal"
+							trend="stable"
+							trendValue="Current"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Vehicle Inspections" 
+							value="23/23" 
+							unit="" 
+							icon="🔍" 
+							status="normal"
+							trend="stable"
+							trendValue="Perfect"
+							color="emerald"
+						/>
+					</div>
+				</div>
+			{:else if driverTab === 'earnings'}
+				<div class="tab-content">
+					<div class="earnings-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+						<MetricCard 
+							title="This Week" 
+							value="$2,847" 
+							unit="" 
+							icon="💰" 
+							status="normal"
+							trend="up"
+							trendValue="+$312"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Safety Bonus" 
+							value="$500" 
+							unit="" 
+							icon="🏆" 
+							status="normal"
+							trend="stable"
+							trendValue="Earned"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Efficiency Bonus" 
+							value="$275" 
+							unit="" 
+							icon="⚡" 
+							status="normal"
+							trend="up"
+							trendValue="+$75"
+							color="orange"
+						/>
+					</div>
+				</div>
+			{/if}
+		</div>
+
+	{:else if $selectedRole.id === 'dispatch'}
+		<!-- Dispatch Overview Header -->
+		<div class="dispatch-header">
+			<div class="overview-cards grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+				<MetricCard 
+					title="Active Hauls" 
+					value="47" 
+					unit="" 
+					icon="🚛" 
+					status="normal"
+					trend="up"
+					trendValue="+3"
+					color="blue"
+				/>
+				<MetricCard 
+					title="Pending Dispatch" 
+					value="12" 
+					unit="" 
+					icon="⏳" 
+					status="warning"
+					trend="up"
+					trendValue="+2"
+					color="orange"
+				/>
+				<MetricCard 
+					title="Fleet Utilization" 
+					value="89.2" 
+					unit="%" 
+					icon="📊" 
+					status="normal"
+					trend="up"
+					trendValue="+1.3%"
+					color="green"
+				/>
+				<MetricCard 
+					title="Avg ETA Accuracy" 
+					value="94.7" 
+					unit="%" 
+					icon="🎯" 
+					status="normal"
+					trend="up"
+					trendValue="+0.8%"
+					color="purple"
+				/>
+			</div>
+		</div>
 		
-		<a 
-			href="/fleet" 
-			class="nav-card block p-3 sm:p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 touch-manipulation"
-			style="background: linear-gradient(135deg, #558B2F 0%, #7CB342 100%);"
-		>
-			<div class="text-xl sm:text-3xl mb-2">🚚</div>
-			<div class="font-bold text-sm sm:text-lg mb-1 text-white">Fleet Operations</div>
-			<div class="text-white/90 text-xs sm:text-sm font-medium">Complete fleet visibility and control</div>
-		</a>
-		
-		<a 
-			href="/admin" 
-			class="nav-card block p-3 sm:p-6 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 touch-manipulation"
-			style="background: linear-gradient(135deg, #CDDC39 0%, #9CCC65 100%);"
-		>
-			<div class="text-xl sm:text-3xl mb-2">📊</div>
-			<div class="font-bold text-sm sm:text-lg mb-1 text-white">Analytics Dashboard</div>
-			<div class="text-white/90 text-xs sm:text-sm font-medium">Historical data and performance metrics</div>
-		</a>
+		<!-- Active Haul Ticket -->
+		<div class="haul-ticket-section mb-8">
+			<div class="section-header">
+				<h2>Dispatch Haul Management</h2>
+				<div class="haul-controls">
+					<button class="haul-nav-btn">
+						<ChevronLeft size={16} />
+						Previous
+					</button>
+					<span class="haul-counter">1 of 47</span>
+					<button class="haul-nav-btn">
+						Next
+						<ChevronRight size={16} />
+					</button>
+				</div>
+			</div>
+			
+			<div class="haul-ticket-container">
+				<div class="ticket-header">
+					<div class="ticket-info">
+						<h3>Haul #HL-2024-001547</h3>
+						<span class="ticket-status in-transit">IN TRANSIT</span>
+						<small>Driver: Mike Johnson</small>
+					</div>
+					<div class="ticket-time">
+						<span>Started: 8:30 AM</span>
+						<span>ETA: 4:15 PM</span>
+						<span>Progress: 67%</span>
+					</div>
+				</div>
+				
+				<div class="ticket-content">
+					<!-- Route Information -->
+					<div class="ticket-section">
+						<h4>Route & Status</h4>
+						<div class="route-info">
+							<div class="location">
+								<strong>From:</strong> Permian Basin Site A<br>
+								<small>Contact: John Smith - (432) 555-0123</small>
+							</div>
+							<div class="route-arrow">→</div>
+							<div class="location">
+								<strong>To:</strong> Houston Refinery Terminal<br>
+								<small>Contact: Maria Rodriguez - (713) 555-0456</small>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Volume & Temperature -->
+					<div class="ticket-metrics">
+						<div class="metric-item">
+							<label>Loaded Volume</label>
+							<span class="metric-value">27,722.1 BBL</span>
+						</div>
+						<div class="metric-item">
+							<label>Current Temp</label>
+							<span class="metric-value">82.1°F</span>
+						</div>
+						<div class="metric-item">
+							<label>Expected Loss</label>
+							<span class="metric-value">19.2 BBL</span>
+						</div>
+						<div class="metric-item">
+							<label>Current Location</label>
+							<span class="metric-value">Austin, TX</span>
+						</div>
+					</div>
+					
+					<!-- Coriolis & Financial -->
+					<div class="ticket-section">
+						<h4>Measurements & Billing</h4>
+						<div class="measurement-financial">
+							<div class="measurement-data">
+								<span><strong>Onload Meter:</strong> COR-PB-001</span>
+								<span><strong>Gross Volume:</strong> 27,845.6 BBL</span>
+								<span><strong>Net Volume:</strong> 27,722.1 BBL</span>
+							</div>
+							<div class="financial-data">
+								<span><strong>Rate:</strong> $485.50</span>
+								<span><strong>Fuel Surcharge:</strong> $23.75</span>
+								<span><strong>Total:</strong> $509.25</span>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Documentation -->
+					<div class="ticket-section">
+						<h4>Documentation</h4>
+						<div class="document-status">
+							<div class="doc-item completed">
+								<CheckCircle size={14} />
+								<span>BOL-2024-001547</span>
+							</div>
+							<div class="doc-item completed">
+								<CheckCircle size={14} />
+								<span>MAN-2024-001547</span>
+							</div>
+							<div class="doc-item completed">
+								<CheckCircle size={14} />
+								<span>PERM-TX-2024-0456</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div class="ticket-actions">
+					<button class="action-btn primary">Reassign Driver</button>
+					<button class="action-btn secondary">View Full Details</button>
+					<button class="action-btn secondary">Contact Driver</button>
+					<button class="action-btn danger">Emergency Stop</button>
+				</div>
+			</div>
+		</div>
+
+	{:else if $selectedRole.id === 'yard-manager'}
+		<!-- Yard Manager Dashboard with Navigation -->
+		<div class="yard-manager-dashboard">
+			<!-- Yard Manager Navigation -->
+			<div class="role-navigation mb-6">
+				<div class="nav-tabs">
+					{#each yardTabs as tab}
+						<button 
+							class="nav-tab {yardTab === tab.id ? 'active' : ''}"
+							style="--primary-color: {$selectedRole.colorScheme.primary}"
+							on:click={() => yardTab = tab.id}
+						>
+							<span class="tab-icon">{tab.icon}</span>
+							<span class="tab-label">{tab.label}</span>
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Yard Manager Tab Content -->
+			{#if yardTab === 'truck-overview'}
+				<div class="tab-content">
+					<div class="fleet-summary grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						<MetricCard 
+							title="Total Fleet" 
+							value="24" 
+							unit="trucks" 
+							icon="🚛" 
+							status="normal"
+							trend="stable"
+							trendValue="+2"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Active Today" 
+							value="18" 
+							unit="" 
+							icon="✅" 
+							status="normal"
+							trend="up"
+							trendValue="+3"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="In Maintenance" 
+							value="3" 
+							unit="" 
+							icon="🔧" 
+							status="warning"
+							trend="down"
+							trendValue="-1"
+							color="amber"
+						/>
+						<MetricCard 
+							title="Utilization Rate" 
+							value="87.5" 
+							unit="%" 
+							icon="📊" 
+							status="normal"
+							trend="up"
+							trendValue="+4.2%"
+							color="emerald"
+						/>
+					</div>
+
+					<!-- Fleet Performance Charts -->
+					<div class="fleet-charts grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Fleet Utilization Trends"
+								color="#7CB342"
+								height={400}
+								unit="%"
+								animated={true}
+							/>
+						</div>
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Fuel Efficiency by Truck"
+								color="#558B2F"
+								height={400}
+								unit=" MPG"
+								animated={true}
+							/>
+						</div>
+					</div>
+
+					<!-- Fleet Status Breakdown -->
+					<div class="fleet-status glass-card p-6">
+						<h3 class="text-xl font-bold mb-4">Fleet Status Breakdown</h3>
+						<div class="status-grid grid grid-cols-1 md:grid-cols-3 gap-6">
+							<div class="status-category">
+								<h4 class="font-semibold text-emerald-600 mb-3">Active (18)</h4>
+								<div class="truck-list space-y-2">
+									{#each $trucks.slice(0, 6) as truck}
+										<div class="truck-item flex justify-between items-center p-2 bg-emerald-50 rounded">
+											<span class="font-medium">{truck.id}</span>
+											<span class="text-sm text-emerald-600">On Route</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+							<div class="status-category">
+								<h4 class="font-semibold text-amber-600 mb-3">Maintenance (3)</h4>
+								<div class="truck-list space-y-2">
+									{#each $trucks.slice(6, 9) as truck}
+										<div class="truck-item flex justify-between items-center p-2 bg-amber-50 rounded">
+											<span class="font-medium">{truck.id}</span>
+											<span class="text-sm text-amber-600">Service</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+							<div class="status-category">
+								<h4 class="font-semibold text-gray-600 mb-3">Available (3)</h4>
+								<div class="truck-list space-y-2">
+									{#each $trucks.slice(9, 12) as truck}
+										<div class="truck-item flex justify-between items-center p-2 bg-gray-50 rounded">
+											<span class="font-medium">{truck.id}</span>
+											<span class="text-sm text-gray-600">Ready</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			{:else if yardTab === 'truck-individual'}
+				<div class="tab-content">
+					<div class="individual-trucks">
+						<div class="trucks-header flex justify-between items-center mb-6">
+							<h3 class="text-xl font-bold">Individual Truck Management</h3>
+							<div class="truck-filters flex gap-4">
+								<select class="filter-select">
+									<option>All Trucks</option>
+									<option>Active</option>
+									<option>Maintenance</option>
+									<option>Available</option>
+								</select>
+								<select class="filter-select">
+									<option>Sort by ID</option>
+									<option>Sort by Efficiency</option>
+									<option>Sort by Mileage</option>
+									<option>Sort by Last Service</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="trucks-grid grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+							{#each $trucks.slice(0, 12) as truck, index}
+								<div class="truck-detail-card glass-card p-6">
+									<div class="truck-header flex justify-between items-start mb-4">
+										<div>
+											<h4 class="text-lg font-bold text-oil-black">{truck.id}</h4>
+											<p class="text-sm text-oil-gray">{truck.model} ({truck.year})</p>
+										</div>
+										<span class="status-badge status-{index < 6 ? 'active' : index < 9 ? 'maintenance' : 'available'}">
+											{index < 6 ? 'Active' : index < 9 ? 'Maintenance' : 'Available'}
+										</span>
+									</div>
+
+									<div class="truck-metrics grid grid-cols-2 gap-4 mb-4">
+										<div class="metric-item">
+											<span class="metric-label">Capacity</span>
+											<span class="metric-value">{truck.capacity.toLocaleString()} gal</span>
+										</div>
+										<div class="metric-item">
+											<span class="metric-label">Efficiency</span>
+											<span class="metric-value">{truck.averageEfficiency.toFixed(1)}%</span>
+										</div>
+										<div class="metric-item">
+											<span class="metric-label">Mileage</span>
+											<span class="metric-value">{(45000 + Math.random() * 50000).toLocaleString()} mi</span>
+										</div>
+										<div class="metric-item">
+											<span class="metric-label">Fuel Level</span>
+											<span class="metric-value">{(65 + Math.random() * 30).toFixed(0)}%</span>
+										</div>
+									</div>
+
+									<div class="truck-details space-y-2 mb-4">
+										<div class="detail-row flex justify-between">
+											<span class="text-oil-gray text-sm">Current Driver:</span>
+											<span class="text-oil-black text-sm font-medium">
+												{index < 6 ? $drivers[index % $drivers.length].name : 'Unassigned'}
+											</span>
+										</div>
+										<div class="detail-row flex justify-between">
+											<span class="text-oil-gray text-sm">Last Service:</span>
+											<span class="text-oil-black text-sm font-medium">{Math.floor(Math.random() * 30) + 1} days ago</span>
+										</div>
+										<div class="detail-row flex justify-between">
+											<span class="text-oil-gray text-sm">Next Service:</span>
+											<span class="text-oil-black text-sm font-medium">{Math.floor(Math.random() * 45) + 15} days</span>
+										</div>
+									</div>
+
+									<div class="truck-actions flex gap-2">
+										<button class="btn-sm bg-blue-500 text-white px-3 py-1 rounded-lg text-xs">Track</button>
+										<button class="btn-sm bg-emerald-500 text-white px-3 py-1 rounded-lg text-xs">Assign</button>
+										<button class="btn-sm bg-amber-500 text-white px-3 py-1 rounded-lg text-xs">Service</button>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</div>
+
+			{:else if yardTab === 'driver-overview'}
+				<div class="tab-content">
+					<div class="driver-summary grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						<MetricCard 
+							title="Total Drivers" 
+							value="28" 
+							unit="" 
+							icon="👥" 
+							status="normal"
+							trend="up"
+							trendValue="+2"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Active Today" 
+							value="22" 
+							unit="" 
+							icon="🚛" 
+							status="normal"
+							trend="up"
+							trendValue="+4"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Avg Safety Score" 
+							value="96.8" 
+							unit="%" 
+							icon="🛡️" 
+							status="normal"
+							trend="up"
+							trendValue="+1.2%"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Avg Efficiency" 
+							value="94.3" 
+							unit="%" 
+							icon="⚡" 
+							status="normal"
+							trend="up"
+							trendValue="+2.1%"
+							color="blue"
+						/>
+					</div>
+
+					<!-- Driver Performance Charts -->
+					<div class="driver-charts grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Driver Safety Scores Distribution"
+								color="#10B981"
+								height={400}
+								unit="%"
+								animated={true}
+							/>
+						</div>
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Driver Efficiency Trends"
+								color="#3B82F6"
+								height={400}
+								unit="%"
+								animated={true}
+							/>
+						</div>
+					</div>
+					
+					<!-- Active Haul Ticket -->
+					<div class="haul-ticket-section mb-8">
+						<div class="section-header">
+							<h2>Current Haul Ticket</h2>
+							<div class="haul-controls">
+								<button class="haul-nav-btn">
+									<ChevronLeft size={16} />
+									Previous
+								</button>
+								<span class="haul-counter">1 of 3</span>
+								<button class="haul-nav-btn">
+									Next
+									<ChevronRight size={16} />
+								</button>
+							</div>
+						</div>
+						
+						<div class="haul-ticket-container">
+							<div class="ticket-header">
+								<div class="ticket-info">
+									<h3>Haul #HL-2024-001547</h3>
+									<span class="ticket-status in-transit">IN TRANSIT</span>
+								</div>
+								<div class="ticket-time">
+									<span>Started: 8:30 AM</span>
+									<span>ETA: 4:15 PM</span>
+								</div>
+							</div>
+							
+							<div class="ticket-content">
+								<!-- Route Information -->
+								<div class="ticket-section">
+									<h4>Route</h4>
+									<div class="route-info">
+										<div class="location">
+											<strong>From:</strong> Permian Basin Site A<br>
+											<small>1247 County Road 1250, Midland, TX</small>
+										</div>
+										<div class="route-arrow">→</div>
+										<div class="location">
+											<strong>To:</strong> Houston Refinery Terminal<br>
+											<small>8901 Ship Channel Blvd, Houston, TX</small>
+										</div>
+									</div>
+								</div>
+								
+								<!-- Volume & Temperature -->
+								<div class="ticket-metrics">
+									<div class="metric-item">
+										<label>Loaded Volume</label>
+										<span class="metric-value">27,722.1 BBL</span>
+									</div>
+									<div class="metric-item">
+										<label>Current Temp</label>
+										<span class="metric-value">82.1°F</span>
+									</div>
+									<div class="metric-item">
+										<label>Expected Loss</label>
+										<span class="metric-value">19.2 BBL</span>
+									</div>
+									<div class="metric-item">
+										<label>H₂S Level</label>
+										<span class="metric-value safe">0.8 PPM</span>
+									</div>
+								</div>
+								
+								<!-- Product Info -->
+								<div class="ticket-section">
+									<h4>Product</h4>
+									<div class="product-details">
+										<span><strong>Type:</strong> Crude Oil (WTI Sweet)</span>
+										<span><strong>API Gravity:</strong> 38.5°</span>
+										<span><strong>Density:</strong> 0.864 g/cm³</span>
+									</div>
+								</div>
+								
+								<!-- Equipment -->
+								<div class="ticket-section">
+									<h4>Equipment</h4>
+									<div class="equipment-details">
+										<div class="equipment-item">
+											<span><strong>Truck:</strong> Unit 892 (TX-TRK-892)</span>
+											<span><strong>Trailer:</strong> Trailer 445 (TX-TRL-445)</span>
+										</div>
+									</div>
+								</div>
+								
+								<!-- Safety Status -->
+								<div class="ticket-section">
+									<h4>Safety Status</h4>
+									<div class="safety-indicators">
+										<div class="safety-item completed">
+											<CheckCircle size={16} />
+											<span>Pre-trip Inspection</span>
+										</div>
+										<div class="safety-item completed">
+											<CheckCircle size={16} />
+											<span>Gas Detection</span>
+										</div>
+										<div class="safety-item completed">
+											<CheckCircle size={16} />
+											<span>Documentation</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="ticket-actions">
+								<button class="action-btn primary">Update Status</button>
+								<button class="action-btn secondary">View Full Details</button>
+								<button class="action-btn secondary">Report Issue</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			{:else if yardTab === 'driver-individual'}
+				<div class="tab-content">
+					<div class="individual-drivers">
+						<div class="drivers-header flex justify-between items-center mb-6">
+							<h3 class="text-xl font-bold">Individual Driver Management</h3>
+							<div class="driver-filters flex gap-4">
+								<select class="filter-select">
+									<option>All Drivers</option>
+									<option>Active</option>
+									<option>Off Duty</option>
+									<option>On Break</option>
+								</select>
+								<select class="filter-select">
+									<option>Sort by Name</option>
+									<option>Sort by Safety Score</option>
+									<option>Sort by Efficiency</option>
+									<option>Sort by Experience</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="drivers-grid grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+							{#each $drivers.slice(0, 12) as driver, index}
+								<div class="driver-detail-card glass-card p-6">
+									<div class="driver-header flex justify-between items-start mb-4">
+										<div>
+											<h4 class="text-lg font-bold text-oil-black">{driver.name}</h4>
+											<p class="text-sm text-oil-gray">{driver.experience} years experience</p>
+										</div>
+										<span class="status-badge status-{index < 8 ? 'active' : 'available'}">
+											{index < 8 ? 'Active' : 'Available'}
+										</span>
+									</div>
+
+									<div class="driver-metrics grid grid-cols-2 gap-4 mb-4">
+										<div class="metric-item">
+											<span class="metric-label">Safety Score</span>
+											<span class="metric-value">{(95 + Math.random() * 5).toFixed(1)}%</span>
+										</div>
+										<div class="metric-item">
+											<span class="metric-label">Efficiency</span>
+											<span class="metric-value">{driver.averageEfficiency.toFixed(1)}%</span>
+										</div>
+										<div class="metric-item">
+											<span class="metric-label">Total Hauls</span>
+											<span class="metric-value">{driver.totalHauls.toLocaleString()}</span>
+										</div>
+										<div class="metric-item">
+											<span class="metric-label">This Week</span>
+											<span class="metric-value">{Math.floor(Math.random() * 15) + 10}</span>
+										</div>
+									</div>
+
+									<div class="driver-details space-y-2 mb-4">
+										<div class="detail-row flex justify-between">
+											<span class="text-oil-gray text-sm">Current Truck:</span>
+											<span class="text-oil-black text-sm font-medium">
+												{index < 8 ? $trucks[index % $trucks.length].id : 'Unassigned'}
+											</span>
+										</div>
+										<div class="detail-row flex justify-between">
+											<span class="text-oil-gray text-sm">Hours Today:</span>
+											<span class="text-oil-black text-sm font-medium">{(Math.random() * 8 + 2).toFixed(1)} hrs</span>
+										</div>
+										<div class="detail-row flex justify-between">
+											<span class="text-oil-gray text-sm">Last Training:</span>
+											<span class="text-oil-black text-sm font-medium">{Math.floor(Math.random() * 90) + 1} days ago</span>
+										</div>
+									</div>
+
+									<div class="driver-actions flex gap-2">
+										<button class="btn-sm bg-blue-500 text-white px-3 py-1 rounded-lg text-xs">Schedule</button>
+										<button class="btn-sm bg-emerald-500 text-white px-3 py-1 rounded-lg text-xs">Assign</button>
+										<button class="btn-sm bg-purple-500 text-white px-3 py-1 rounded-lg text-xs">Training</button>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</div>
+
+			{:else if yardTab === 'yard-operations'}
+				<div class="tab-content">
+					<div class="yard-operations-summary grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						<MetricCard 
+							title="Daily Throughput" 
+							value="2,847" 
+							unit="BBL" 
+							icon="🛢️" 
+							status="normal"
+							trend="up"
+							trendValue="+312"
+							color="orange"
+						/>
+						<MetricCard 
+							title="Turnaround Time" 
+							value="2.3" 
+							unit="hrs" 
+							icon="⏱️" 
+							status="normal"
+							trend="down"
+							trendValue="-0.4"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Loading Efficiency" 
+							value="94.7" 
+							unit="%" 
+							icon="📊" 
+							status="normal"
+							trend="up"
+							trendValue="+2.1%"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Safety Incidents" 
+							value="0" 
+							unit="today" 
+							icon="🛡️" 
+							status="normal"
+							trend="stable"
+							trendValue="247 days"
+							color="emerald"
+						/>
+					</div>
+
+					<!-- Yard Operations Details -->
+					<div class="operations-details grid grid-cols-1 lg:grid-cols-2 gap-6">
+						<div class="loading-bays glass-card p-6">
+							<h3 class="text-xl font-bold mb-4">Loading Bay Status</h3>
+							<div class="bays-grid grid grid-cols-2 gap-4">
+								{#each Array(6) as _, index}
+									<div class="bay-status p-4 rounded-lg {index < 4 ? 'bg-emerald-100 border-emerald-300' : 'bg-gray-100 border-gray-300'} border">
+										<div class="flex justify-between items-center">
+											<span class="font-semibold">Bay {index + 1}</span>
+											<span class="text-sm {index < 4 ? 'text-emerald-600' : 'text-gray-600'}">
+												{index < 4 ? 'Loading' : 'Available'}
+											</span>
+										</div>
+										{#if index < 4}
+											<div class="mt-2 text-sm text-emerald-700">
+												Truck: T-{200 + index}<br>
+												Progress: {75 + Math.random() * 20}%
+											</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<div class="yard-schedule glass-card p-6">
+							<h3 class="text-xl font-bold mb-4">Today's Schedule</h3>
+							<div class="schedule-timeline space-y-3">
+								{#each [
+									{ time: '06:00', event: 'Shift Start - 8 drivers', status: 'completed' },
+									{ time: '08:30', event: 'Peak Loading Period', status: 'in-progress' },
+									{ time: '12:00', event: 'Lunch Break Rotation', status: 'scheduled' },
+									{ time: '14:00', event: 'Maintenance Window', status: 'scheduled' },
+									{ time: '18:00', event: 'Evening Shift Handover', status: 'scheduled' }
+								] as item}
+									<div class="timeline-item flex items-center gap-4">
+										<div class="time-badge-small">
+											<span class="font-mono text-xs">{item.time}</span>
+										</div>
+										<div class="flex-1">
+											<p class="font-medium text-sm">{item.event}</p>
+										</div>
+										<span class="status-badge-small status-{item.status}">
+											{item.status.replace('-', ' ')}
+										</span>
+									</div>
+								{/each}
+							</div>
+						</div>
+					</div>
+				</div>
+
+			{:else if yardTab === 'maintenance'}
+				<div class="tab-content">
+					<div class="maintenance-summary grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						<MetricCard 
+							title="Scheduled Today" 
+							value="3" 
+							unit="trucks" 
+							icon="🔧" 
+							status="normal"
+							trend="stable"
+							trendValue="On Track"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Overdue Services" 
+							value="1" 
+							unit="" 
+							icon="⚠️" 
+							status="warning"
+							trend="down"
+							trendValue="-2"
+							color="amber"
+						/>
+						<MetricCard 
+							title="Parts Inventory" 
+							value="94" 
+							unit="%" 
+							icon="📦" 
+							status="normal"
+							trend="stable"
+							trendValue="+2%"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Avg Downtime" 
+							value="4.2" 
+							unit="hrs" 
+							icon="⏱️" 
+							status="normal"
+							trend="down"
+							trendValue="-0.8"
+							color="emerald"
+						/>
+					</div>
+
+					<!-- Maintenance Schedule -->
+					<div class="maintenance-details grid grid-cols-1 lg:grid-cols-2 gap-6">
+						<div class="maintenance-schedule glass-card p-6">
+							<h3 class="text-xl font-bold mb-4">Maintenance Schedule</h3>
+							<div class="schedule-list space-y-4">
+								{#each [
+									{ truck: 'T-205', type: 'Oil Change', scheduled: '09:00', duration: '2 hrs', status: 'in-progress' },
+									{ truck: 'T-212', type: 'Brake Inspection', scheduled: '11:00', duration: '3 hrs', status: 'scheduled' },
+									{ truck: 'T-198', type: 'Annual DOT', scheduled: '14:00', duration: '4 hrs', status: 'scheduled' },
+									{ truck: 'T-223', type: 'Tire Rotation', scheduled: '16:00', duration: '1 hr', status: 'scheduled' }
+								] as maintenance}
+									<div class="maintenance-item p-4 bg-white/50 rounded-lg border">
+										<div class="flex justify-between items-start mb-2">
+											<div>
+												<h4 class="font-semibold">{maintenance.truck}</h4>
+												<p class="text-sm text-oil-gray">{maintenance.type}</p>
+											</div>
+											<span class="status-badge status-{maintenance.status}">
+												{maintenance.status.replace('-', ' ')}
+											</span>
+										</div>
+										<div class="maintenance-details grid grid-cols-2 gap-4 text-sm">
+											<div>
+												<span class="text-oil-gray">Scheduled:</span>
+												<span class="font-medium">{maintenance.scheduled}</span>
+											</div>
+											<div>
+												<span class="text-oil-gray">Duration:</span>
+												<span class="font-medium">{maintenance.duration}</span>
+											</div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						</div>
+
+						<div class="parts-inventory glass-card p-6">
+							<h3 class="text-xl font-bold mb-4">Parts Inventory</h3>
+							<div class="inventory-list space-y-3">
+								{#each [
+									{ part: 'Engine Oil (5W-30)', stock: 24, min: 10, status: 'good' },
+									{ part: 'Brake Pads', stock: 8, min: 6, status: 'good' },
+									{ part: 'Air Filters', stock: 3, min: 5, status: 'low' },
+									{ part: 'Hydraulic Fluid', stock: 15, min: 8, status: 'good' },
+									{ part: 'Tires (Commercial)', stock: 12, min: 8, status: 'good' }
+								] as item}
+									<div class="inventory-item flex justify-between items-center p-3 bg-white/50 rounded-lg">
+										<div>
+											<h4 class="font-medium">{item.part}</h4>
+											<p class="text-sm text-oil-gray">Min: {item.min} units</p>
+										</div>
+										<div class="text-right">
+											<span class="font-bold {item.status === 'low' ? 'text-amber-600' : 'text-emerald-600'}">
+												{item.stock}
+											</span>
+											<span class="text-sm text-oil-gray">units</span>
+										</div>
+									</div>
+								{/each}
+							</div>
+						</div>
+					</div>
+				</div>
+			{/if}
+		</div>
+
+	{:else if $selectedRole.id === 'regional-manager'}
+		<!-- Regional Manager Dashboard with Navigation -->
+		<div class="regional-manager-dashboard">
+			<!-- Regional Manager Navigation -->
+			<div class="role-navigation mb-6">
+				<div class="nav-tabs">
+					{#each regionalTabs as tab}
+						<button 
+							class="nav-tab {regionalTab === tab.id ? 'active' : ''}"
+							style="--primary-color: {$selectedRole.colorScheme.primary}"
+							on:click={() => regionalTab = tab.id}
+						>
+							<span class="tab-icon">{tab.icon}</span>
+							<span class="tab-label">{tab.label}</span>
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Regional Manager Tab Content -->
+			{#if regionalTab === 'yards-overview'}
+				<div class="tab-content">
+					<div class="regional-summary grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						<MetricCard 
+							title="Total Yards" 
+							value="12" 
+							unit="" 
+							icon="🏭" 
+							status="normal"
+							trend="up"
+							trendValue="+1"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Regional Efficiency" 
+							value="91.8" 
+							unit="%" 
+							icon="📊" 
+							status="normal"
+							trend="up"
+							trendValue="+3.2%"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Daily Volume" 
+							value="34.2K" 
+							unit="BBL" 
+							icon="🛢️" 
+							status="normal"
+							trend="up"
+							trendValue="+2.1K"
+							color="orange"
+						/>
+						<MetricCard 
+							title="Monthly Revenue" 
+							value="$4.8M" 
+							unit="" 
+							icon="💰" 
+							status="normal"
+							trend="up"
+							trendValue="+12.5%"
+							color="emerald"
+						/>
+					</div>
+
+					<!-- Yard Performance Rankings -->
+					<div class="yard-rankings glass-card p-6 mb-8">
+						<h3 class="text-xl font-bold mb-4">Yard Performance Rankings</h3>
+						<div class="rankings-table">
+							<div class="table-header grid grid-cols-7 gap-4 p-4 bg-gray-50 rounded-lg mb-2">
+								<span class="font-medium text-oil-black">Rank</span>
+								<span class="font-medium text-oil-black">Yard</span>
+								<span class="font-medium text-oil-black">Efficiency</span>
+								<span class="font-medium text-oil-black">Revenue</span>
+								<span class="font-medium text-oil-black">Fleet Size</span>
+								<span class="font-medium text-oil-black">Drivers</span>
+								<span class="font-medium text-oil-black">Trend</span>
+							</div>
+							{#each [
+								{ rank: 1, name: 'Permian Basin', efficiency: 94.2, revenue: '$485K', fleet: 24, drivers: 28, trend: 'up' },
+								{ rank: 2, name: 'Eagle Ford', efficiency: 92.8, revenue: '$467K', fleet: 22, drivers: 26, trend: 'up' },
+								{ rank: 3, name: 'Bakken North', efficiency: 91.5, revenue: '$423K', fleet: 19, drivers: 23, trend: 'stable' },
+								{ rank: 4, name: 'Marcellus', efficiency: 90.1, revenue: '$398K', fleet: 16, drivers: 20, trend: 'down' },
+								{ rank: 5, name: 'Haynesville', efficiency: 89.7, revenue: '$376K', fleet: 15, drivers: 18, trend: 'up' },
+								{ rank: 6, name: 'Barnett', efficiency: 88.9, revenue: '$354K', fleet: 18, drivers: 22, trend: 'stable' }
+							] as yard}
+								<div class="table-row grid grid-cols-7 gap-4 p-4 border-b border-gray-100 hover:bg-gray-50">
+									<span class="text-oil-black font-bold">#{yard.rank}</span>
+									<span class="text-oil-black font-medium">{yard.name}</span>
+									<span class="text-emerald-600 font-medium">{yard.efficiency}%</span>
+									<span class="text-oil-black">{yard.revenue}</span>
+									<span class="text-oil-gray">{yard.fleet} trucks</span>
+									<span class="text-oil-gray">{yard.drivers} drivers</span>
+									<span class="trend-indicator {yard.trend === 'up' ? 'text-emerald-600' : yard.trend === 'down' ? 'text-red-600' : 'text-gray-600'}">
+										{yard.trend === 'up' ? '↗️' : yard.trend === 'down' ? '↘️' : '➡️'}
+									</span>
+								</div>
+							{/each}
+						</div>
+					</div>
+
+					<!-- Regional Performance Charts -->
+					<div class="regional-charts grid grid-cols-1 lg:grid-cols-2 gap-6">
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Cross-Yard Efficiency Comparison"
+								color="#4CAF50"
+								height={400}
+								unit="%"
+								animated={true}
+							/>
+						</div>
+						<div class="chart-container">
+							<RealtimeChart 
+								title="Regional Revenue Trends"
+								color="#9CCC65"
+								height={400}
+								unit="$K"
+								animated={true}
+							/>
+						</div>
+					</div>
+				</div>
+
+			{:else if regionalTab === 'fleet-regional'}
+				<div class="tab-content">
+					<div class="regional-fleet-summary grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						<MetricCard 
+							title="Total Fleet" 
+							value="247" 
+							unit="trucks" 
+							icon="🚛" 
+							status="normal"
+							trend="up"
+							trendValue="+15"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Active Today" 
+							value="189" 
+							unit="" 
+							icon="✅" 
+							status="normal"
+							trend="up"
+							trendValue="+12"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Avg Utilization" 
+							value="87.3" 
+							unit="%" 
+							icon="📊" 
+							status="normal"
+							trend="up"
+							trendValue="+4.2%"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Maintenance Rate" 
+							value="8.9" 
+							unit="%" 
+							icon="🔧" 
+							status="normal"
+							trend="down"
+							trendValue="-1.2%"
+							color="emerald"
+						/>
+					</div>
+
+					<!-- Fleet Distribution by Yard -->
+					<div class="fleet-distribution glass-card p-6 mb-8">
+						<h3 class="text-xl font-bold mb-4">Fleet Distribution by Yard</h3>
+						<div class="distribution-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{#each [
+								{ yard: 'Permian Basin', trucks: 24, active: 18, maintenance: 3, available: 3 },
+								{ yard: 'Eagle Ford', trucks: 22, active: 17, maintenance: 2, available: 3 },
+								{ yard: 'Bakken North', trucks: 19, active: 15, maintenance: 2, available: 2 },
+								{ yard: 'Marcellus', trucks: 16, active: 12, maintenance: 2, available: 2 },
+								{ yard: 'Haynesville', trucks: 15, active: 11, maintenance: 2, available: 2 },
+								{ yard: 'Barnett', trucks: 18, active: 14, maintenance: 2, available: 2 }
+							] as yard}
+								<div class="yard-fleet-card p-4 bg-white/50 rounded-lg border">
+									<h4 class="font-semibold mb-3">{yard.yard}</h4>
+									<div class="fleet-stats space-y-2">
+										<div class="stat-row flex justify-between">
+											<span class="text-oil-gray">Total:</span>
+											<span class="font-medium">{yard.trucks}</span>
+										</div>
+										<div class="stat-row flex justify-between">
+											<span class="text-emerald-600">Active:</span>
+											<span class="font-medium">{yard.active}</span>
+										</div>
+										<div class="stat-row flex justify-between">
+											<span class="text-amber-600">Maintenance:</span>
+											<span class="font-medium">{yard.maintenance}</span>
+										</div>
+										<div class="stat-row flex justify-between">
+											<span class="text-gray-600">Available:</span>
+											<span class="font-medium">{yard.available}</span>
+										</div>
+									</div>
+									<div class="utilization-bar mt-3">
+										<div class="bg-gray-200 rounded-full h-2">
+											<div class="bg-emerald-500 h-2 rounded-full" style="width: {(yard.active / yard.trucks * 100)}%"></div>
+										</div>
+										<span class="text-xs text-oil-gray mt-1">{((yard.active / yard.trucks) * 100).toFixed(1)}% utilization</span>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</div>
+
+			{:else if regionalTab === 'driver-regional'}
+				<div class="tab-content">
+					<div class="regional-driver-summary grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+						<MetricCard 
+							title="Total Drivers" 
+							value="312" 
+							unit="" 
+							icon="👥" 
+							status="normal"
+							trend="up"
+							trendValue="+18"
+							color="blue"
+						/>
+						<MetricCard 
+							title="Active Today" 
+							value="247" 
+							unit="" 
+							icon="🚛" 
+							status="normal"
+							trend="up"
+							trendValue="+15"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Avg Safety Score" 
+							value="95.7" 
+							unit="%" 
+							icon="🛡️" 
+							status="normal"
+							trend="up"
+							trendValue="+1.8%"
+							color="emerald"
+						/>
+						<MetricCard 
+							title="Training Compliance" 
+							value="97.2" 
+							unit="%" 
+							icon="📚" 
+							status="normal"
+							trend="up"
+							trendValue="+2.1%"
+							color="blue"
+						/>
+					</div>
+
+					<!-- Driver Distribution by Yard -->
+					<div class="driver-distribution glass-card p-6 mb-8">
+						<h3 class="text-xl font-bold mb-4">Driver Performance by Yard</h3>
+						<div class="distribution-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{#each [
+								{ yard: 'Permian Basin', drivers: 28, avgSafety: 96.8, avgEfficiency: 94.3, topPerformer: 'John Smith' },
+								{ yard: 'Eagle Ford', drivers: 26, avgSafety: 95.9, avgEfficiency: 93.7, topPerformer: 'Mike Johnson' },
+								{ yard: 'Bakken North', drivers: 23, avgSafety: 95.2, avgEfficiency: 92.8, topPerformer: 'Dave Wilson' },
+								{ yard: 'Marcellus', drivers: 20, avgSafety: 94.8, avgEfficiency: 91.9, topPerformer: 'Tom Brown' },
+								{ yard: 'Haynesville', drivers: 18, avgSafety: 94.5, avgEfficiency: 91.2, topPerformer: 'Steve Davis' },
+								{ yard: 'Barnett', drivers: 22, avgSafety: 95.1, avgEfficiency: 92.5, topPerformer: 'Paul Miller' }
+							] as yard}
+								<div class="yard-driver-card p-4 bg-white/50 rounded-lg border">
+									<h4 class="font-semibold mb-3">{yard.yard}</h4>
+									<div class="driver-stats space-y-2">
+										<div class="stat-row flex justify-between">
+											<span class="text-oil-gray">Drivers:</span>
+											<span class="font-medium">{yard.drivers}</span>
+										</div>
+										<div class="stat-row flex justify-between">
+											<span class="text-emerald-600">Avg Safety:</span>
+											<span class="font-medium">{yard.avgSafety}%</span>
+										</div>
+										<div class="stat-row flex justify-between">
+											<span class="text-blue-600">Avg Efficiency:</span>
+											<span class="font-medium">{yard.avgEfficiency}%</span>
+										</div>
+										<div class="stat-row flex justify-between">
+											<span class="text-oil-gray">Top Performer:</span>
+											<span class="font-medium text-sm">{yard.topPerformer}</span>
+										</div>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</div>
+
+			{:else}
+				<!-- Other regional tabs with similar comprehensive content -->
+				<div class="tab-content">
+					<div class="hero-metrics-grid mb-8">
+						{#each $selectedRole.layout.heroMetrics as metricId}
+							{@const metric = $selectedRole.metrics.find(m => m.id === metricId)}
+							{#if metric}
+								<RoleMetricCard {metric} colorScheme={$selectedRole.colorScheme} />
+							{/if}
+						{/each}
+					</div>
+				</div>
+			{/if}
+		</div>
+	{/if}
+{/if}
+
+<!-- System Overview Dashboard (when no role is selected) -->
+{#if !$isRoleView}
+	<!-- Core Operations Metrics (Row 1) -->
+	<div class="metrics-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+		<MetricCard 
+			title="Current Temp" 
+			value={currentTemp.toFixed(1)} 
+			unit="°F" 
+			icon="🌡️" 
+			status={currentTemp > 80 ? 'warning' : 'normal'}
+			trend="up"
+			trendValue="+2.3°F"
+			color="orange"
+		/>
+		<MetricCard 
+			title="Ambient Temp" 
+			value={ambientTemp.toFixed(1)} 
+			unit="°F" 
+			icon="🌤️" 
+			status={ambientTemp > 100 ? 'critical' : 'normal'}
+			trend="up"
+			trendValue="+5.1°F"
+			color="red"
+		/>
+		<MetricCard 
+			title="System Pressure" 
+			value={systemPressure.toFixed(1)} 
+			unit="PSI" 
+			icon="⚡" 
+			status={systemPressure > 160 ? 'warning' : 'normal'}
+			trend="stable"
+			trendValue="+2.1 PSI"
+			color="blue"
+		/>
+		<MetricCard 
+			title="Flow Rate" 
+			value={flowRate.toFixed(1)} 
+			unit="BBL/min" 
+			icon="💧" 
+			status="normal"
+			trend="up"
+			trendValue="+0.3"
+			color="emerald"
+		/>
 	</div>
-</div>
 
-<!-- Enhanced 4x4 Metrics Grid -->
-<div class="metric-grid grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-6 sm:mb-8">
-	<!-- Row 1: Core Operations -->
-	<MetricCard 
-		title="Internal Oil Temp" 
-		value={currentTemp} 
-		unit="°F" 
-		icon="🌡️" 
-		status={currentTemp > 120 ? 'warning' : 'normal'}
-		trend="stable"
-		trendValue="+0.2°"
-		color="orange"
-	/>
-	<MetricCard 
-		title="Ambient Temp" 
-		value={ambientTemp} 
-		unit="°F" 
-		icon="🌤️" 
-		status="normal"
-		trend="up"
-		trendValue="+1.5°"
-		color="blue"
-	/>
-	<MetricCard 
-		title="System Pressure" 
-		value={systemPressure} 
-		unit="PSI" 
-		icon="📊" 
-		status={systemPressure > 180 ? 'warning' : 'normal'}
-		trend="stable"
-		trendValue="-0.3"
-		color="emerald"
-	/>
-	<MetricCard 
-		title="Flow Rate" 
-		value={flowRate} 
-		unit="BBL/min" 
-		icon="🌊" 
-		status="normal"
-		trend="up"
-		trendValue="+0.8"
-		color="blue"
-	/>
-
-	<!-- Row 2: Coriolis Measurements -->
-	<MetricCard 
-		title="Net Volume" 
-		value={netVolume} 
-		unit="BBL" 
-		icon="🛢️" 
-		status="normal"
-		trend="stable"
-		trendValue="+2.1"
-		color="orange"
-	/>
-	<MetricCard 
-		title="API Gravity" 
-		value={apiGravity} 
-		unit="°API" 
-		icon="⚖️" 
-		status="normal"
-		trend="stable"
-		trendValue="+0.1"
-		color="emerald"
-	/>
-	<MetricCard 
-		title="Water Cut" 
-		value={waterCut} 
-		unit="%" 
-		icon="💧" 
-		status={waterCut > 2 ? 'warning' : 'normal'}
-		trend="down"
-		trendValue="-0.05"
-		color="blue"
-	/>
-	<MetricCard 
-		title="Mass Flow Rate" 
-		value={massFlowRate} 
-		unit="BBL/min" 
-		icon="⚡" 
-		status="normal"
-		trend="up"
-		trendValue="+1.2"
-		color="amber"
-	/>
-
-	<!-- Row 3: Safety & Pressure -->
-	<MetricCard 
-		title="H2S Levels" 
-		value={h2sLevels.toFixed(1)} 
-		unit="PPM" 
-		icon="⚠️" 
-		status={h2sLevels > 10 ? 'critical' : h2sLevels > 5 ? 'warning' : 'normal'}
-		trend="stable"
-		trendValue="0.0"
-		color="red"
-	/>
-	<MetricCard 
-		title="Tanker Pressure" 
-		value={tankerPressure.toFixed(1)} 
-		unit="PSI" 
-		icon="🔧" 
-		status={tankerPressure > 180 ? 'warning' : 'normal'}
-		trend="down"
-		trendValue="-2.1"
-		color="emerald"
-	/>
-	<MetricCard 
-		title="Gas Detection" 
-		value={gasDetectionStatus === 'normal' ? 'SAFE' : gasDetectionStatus.toUpperCase()} 
-		unit="" 
-		icon="🛡️" 
-		status={gasDetectionStatus}
-		trend="stable"
-		trendValue="All Clear"
-		color="emerald"
-	/>
-	<MetricCard 
-		title="Pump RPM" 
-		value={pumpRpm.toFixed(0)} 
-		unit="RPM" 
-		icon="⚙️" 
-		status="normal"
-		trend="stable"
-		trendValue="+5"
-		color="blue"
-	/>
-
-	<!-- Row 4: System Health -->
-	<MetricCard 
-		title="SCADA Status" 
-		value={$scadaStatus.systemOnline ? 'ONLINE' : 'OFFLINE'} 
-		unit="" 
-		icon="📡" 
-		status={$scadaStatus.systemOnline ? 'normal' : 'critical'}
-		trend="stable"
-		trendValue="98% uptime"
-		color="emerald"
-	/>
-	<MetricCard 
-		title="DryDrive Temp" 
-		value={dryDriveTemp.toFixed(1)} 
-		unit="°F" 
-		icon="🔥" 
-		status={dryDriveTemp > 200 ? 'warning' : 'normal'}
-		trend="up"
-		trendValue="+3.2°"
-		color="orange"
-	/>
-	<MetricCard 
-		title="Network Health" 
-		value={networkHealth.toFixed(1)} 
-		unit="%" 
-		icon="📶" 
-		status={networkHealth < 90 ? 'warning' : 'normal'}
-		trend="stable"
-		trendValue="+1%"
-		color="blue"
-	/>
-	<MetricCard 
-		title="Active Alerts" 
-		value={activeAlerts} 
-		unit="" 
-		icon="🚨" 
-		status={activeAlerts > 0 ? 'warning' : 'normal'}
-		trend="stable"
-		trendValue="0 critical"
-		color={activeAlerts > 0 ? 'red' : 'emerald'}
-	/>
-</div>
-
-<!-- Real-time Data Visualizations -->
-<div class="mb-4 sm:mb-8">
-	<div class="text-center mb-4 sm:mb-6">
-		<h2 class="text-lg sm:text-3xl font-bold tracking-tight text-oil-black mb-2">Live System Monitoring</h2>
-		<p class="text-oil-gray text-xs sm:text-base">Real-time visualization of critical oil field operations</p>
+	<!-- Coriolis Measurements (Row 2) -->
+	<div class="metrics-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+		<MetricCard 
+			title="Net Volume" 
+			value={netVolume.toFixed(1)} 
+			unit="BBL" 
+			icon="🛢️" 
+			status="normal"
+			trend="up"
+			trendValue="+12.3 BBL"
+			color="orange"
+		/>
+		<MetricCard 
+			title="API Gravity" 
+			value={apiGravity.toFixed(1)} 
+			unit="° API" 
+			icon="⚖️" 
+			status="normal"
+			trend="stable"
+			trendValue="+0.2°"
+			color="blue"
+		/>
+		<MetricCard 
+			title="Water Cut" 
+			value={waterCut.toFixed(1)} 
+			unit="%" 
+			icon="💧" 
+			status={waterCut > 2 ? 'warning' : 'normal'}
+			trend="down"
+			trendValue="-0.1%"
+			color="emerald"
+		/>
+		<MetricCard 
+			title="Mass Flow Rate" 
+			value={massFlowRate.toFixed(1)} 
+			unit="BBL/min" 
+			icon="📊" 
+			status="normal"
+			trend="up"
+			trendValue="+0.2"
+			color="purple"
+		/>
 	</div>
-	
-	{#if currentTemp && ambientTemp && systemPressure && flowRate}
-	<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-		<!-- Temperature Monitoring Chart -->
+
+	<!-- Safety & Pressure (Row 3) -->
+	<div class="metrics-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+		<MetricCard 
+			title="H2S Levels" 
+			value={h2sLevels.toFixed(1)} 
+			unit="PPM" 
+			icon="☠️" 
+			status={h2sLevels > 1.5 ? 'critical' : h2sLevels > 1.0 ? 'warning' : 'normal'}
+			trend={h2sLevels > 1.0 ? 'up' : 'stable'}
+			trendValue={h2sLevels > 1.0 ? '+0.3 PPM' : 'Safe'}
+			color={h2sLevels > 1.5 ? 'red' : h2sLevels > 1.0 ? 'amber' : 'emerald'}
+		/>
+		<MetricCard 
+			title="Tanker Pressure" 
+			value={tankerPressure.toFixed(1)} 
+			unit="PSI" 
+			icon="🚛" 
+			status={tankerPressure > 155 ? 'warning' : 'normal'}
+			trend="stable"
+			trendValue="+1.2 PSI"
+			color="blue"
+		/>
+		<MetricCard 
+			title="Gas Detection" 
+			value={gasDetectionStatus === 'normal' ? 'Normal' : gasDetectionStatus === 'warning' ? 'Warning' : 'Critical'} 
+			unit="" 
+			icon="🔍" 
+			status={gasDetectionStatus}
+			trend={gasDetectionStatus === 'normal' ? 'stable' : 'up'}
+			trendValue={gasDetectionStatus === 'normal' ? 'All Clear' : 'Alert'}
+			color={gasDetectionStatus === 'normal' ? 'emerald' : gasDetectionStatus === 'warning' ? 'amber' : 'red'}
+		/>
+		<MetricCard 
+			title="Pump RPM" 
+			value={pumpRpm.toFixed(0)} 
+			unit="RPM" 
+			icon="⚙️" 
+			status={pumpRpm > 1800 ? 'warning' : 'normal'}
+			trend="stable"
+			trendValue="+25 RPM"
+			color="purple"
+		/>
+	</div>
+
+	<!-- System Health (Row 4) -->
+	<div class="metrics-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+		<MetricCard 
+			title="SCADA Status" 
+			value={scadaStatusValue === 'online' ? 'Online' : 'Offline'} 
+			unit="" 
+			icon="🖥️" 
+			status={scadaStatusValue === 'online' ? 'normal' : 'critical'}
+			trend="stable"
+			trendValue="99.8% Uptime"
+			color={scadaStatusValue === 'online' ? 'emerald' : 'red'}
+		/>
+		<MetricCard 
+			title="DryDrive Temp" 
+			value={dryDriveTemp.toFixed(1)} 
+			unit="°F" 
+			icon="🌡️" 
+			status={dryDriveTemp > 190 ? 'warning' : 'normal'}
+			trend="stable"
+			trendValue="+3.2°F"
+			color="orange"
+		/>
+		<MetricCard 
+			title="Network Health" 
+			value={networkHealth.toFixed(1)} 
+			unit="%" 
+			icon="📡" 
+			status={networkHealth < 95 ? 'warning' : 'normal'}
+			trend="up"
+			trendValue="+0.3%"
+			color="emerald"
+		/>
+		<MetricCard 
+			title="Active Alerts" 
+			value={activeAlerts.toString()} 
+			unit="alerts" 
+			icon="🚨" 
+			status={activeAlerts > 0 ? 'warning' : 'normal'}
+			trend={activeAlerts > 0 ? 'up' : 'stable'}
+			trendValue={activeAlerts > 0 ? `+${activeAlerts}` : 'None'}
+			color={activeAlerts > 0 ? 'amber' : 'emerald'}
+		/>
+	</div>
+
+	<!-- Fleet Operations Summary (Row 5) -->
+	<div class="metrics-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+		<MetricCard 
+			title="Active Hauls" 
+			value={$activeHauls.length.toString()} 
+			unit="" 
+			icon="🚛" 
+			status="normal"
+			trend="up"
+			trendValue="+3"
+			color="blue"
+		/>
+		<MetricCard 
+			title="Total Volume" 
+			value={totalActiveVolume.toLocaleString()} 
+			unit="BBL" 
+			icon="🛢️" 
+			status="normal"
+			trend="up"
+			trendValue="+1,247 BBL"
+			color="orange"
+		/>
+		<MetricCard 
+			title="Expected Loss" 
+			value={totalExpectedLoss.toFixed(1)} 
+			unit="BBL" 
+			icon="📉" 
+			status={totalExpectedLoss > 50 ? 'warning' : 'normal'}
+			trend="down"
+			trendValue="-2.3 BBL"
+			color="emerald"
+		/>
+		<MetricCard 
+			title="Completed Today" 
+			value={completedToday.toString()} 
+			unit="hauls" 
+			icon="✅" 
+			status="normal"
+			trend="up"
+			trendValue="+8"
+			color="emerald"
+		/>
+	</div>
+
+	<!-- Real-time Charts Section -->
+	<div class="charts-grid grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-6 sm:mb-8">
 		<div class="chart-container">
 			<RealtimeChart 
 				title="Temperature Monitoring"
-				color="#7CB342"
-				height={200}
+				color="#F59E0B"
+				height={400}
 				unit="°F"
 				animated={true}
 			/>
 		</div>
-		
-		<!-- Flow Rate & Pressure Chart -->
 		<div class="chart-container">
 			<RealtimeChart 
-				title="Flow Rate & System Pressure"
-				color="#558B2F"
-				height={200}
+				title="Pressure Systems"
+				color="#3B82F6"
+				height={400}
+				unit=" PSI"
+				animated={true}
+			/>
+		</div>
+		<div class="chart-container">
+			<RealtimeChart 
+				title="Flow Rate Analysis"
+				color="#10B981"
+				height={450}
 				unit=" BBL/min"
 				animated={true}
 			/>
 		</div>
-	</div>
-	
-	<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-		<!-- Volume Trends -->
 		<div class="chart-container">
 			<RealtimeChart 
-				title="Net Volume Trends"
-				color="#9CCC65"
-				height={180}
+				title="Volume Tracking"
+				color="#8B5CF6"
+				height={450}
 				unit=" BBL"
 				animated={true}
 			/>
 		</div>
-		
-		<!-- Safety Monitoring -->
-		<div class="chart-container">
-			<RealtimeChart 
-				title="H2S Safety Levels"
-				color="#ef4444"
-				height={180}
-				unit=" PPM"
-				animated={true}
-			/>
-		</div>
-		
-		<!-- System Health -->
-		<div class="chart-container">
-			<RealtimeChart 
-				title="Network & System Health"
-				color="#CDDC39"
-				height={180}
-				unit="%"
-				animated={true}
-			/>
-		</div>
 	</div>
-	{/if}
-</div>
 
-<!-- Key Performance Indicators -->
-<div class="mb-4 sm:mb-8">
-	<div class="text-center mb-4 sm:mb-6">
-		<h2 class="text-lg sm:text-3xl font-bold tracking-tight text-oil-black mb-2">Performance Dashboard</h2>
-		<p class="text-oil-gray text-xs sm:text-base">Critical performance indicators and safety metrics</p>
-	</div>
-	
-	{#if currentTemp && systemPressure && h2sLevels && networkHealth && flowRate}
-	<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-		<!-- System Efficiency -->
-		<div class="glass-card">
+	<!-- Gauge Charts Section -->
+	<div class="gauges-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-6 sm:mb-8">
+		<div class="gauge-container">
 			<GaugeChart 
 				title="System Efficiency"
+				value={87.3}
+				max={100}
+				unit="%"
+				color="#10B981"
+				thresholds={{ warning: 70, critical: 85 }}
+			/>
+		</div>
+		<div class="gauge-container">
+			<GaugeChart 
+				title="Safety Score"
 				value={96.8}
 				max={100}
 				unit="%"
-				color="emerald"
-				size={100}
-				thresholds={{ warning: 85, critical: 75 }}
+				color="#059669"
+				thresholds={{ warning: 80, critical: 90 }}
 			/>
 		</div>
-		
-		<!-- Temperature Status -->
-		<div class="glass-card">
+		<div class="gauge-container">
 			<GaugeChart 
-				title="Oil Temperature"
-				value={currentTemp}
-				max={120}
-				min={60}
-				unit="°F"
-				color="emerald"
-				size={100}
-				thresholds={{ warning: 95, critical: 110 }}
-			/>
-		</div>
-		
-		<!-- Pressure Status -->
-		<div class="glass-card">
-			<GaugeChart 
-				title="System Pressure"
-				value={systemPressure}
-				max={200}
-				min={100}
-				unit=" PSI"
-				color="emerald"
-				size={100}
-				thresholds={{ warning: 180, critical: 190 }}
-			/>
-		</div>
-		
-		<!-- Safety Score -->
-		<div class="glass-card">
-			<GaugeChart 
-				title="Safety Score"
-				value={h2sLevels < 5 ? 98 : h2sLevels < 10 ? 85 : 65}
+				title="Equipment Health"
+				value={92.1}
 				max={100}
 				unit="%"
-				color="emerald"
-				size={100}
-				thresholds={{ warning: 80, critical: 70 }}
-			/>
-		</div>
-		
-		<!-- Network Health -->
-		<div class="glass-card">
-			<GaugeChart 
-				title="Network Health"
-				value={networkHealth}
-				max={100}
-				unit="%"
-				color="emerald"
-				size={100}
-				thresholds={{ warning: 90, critical: 80 }}
-			/>
-		</div>
-		
-		<!-- Flow Rate Status -->
-		<div class="glass-card">
-			<GaugeChart 
-				title="Flow Rate"
-				value={flowRate}
-				max={5}
-				min={0}
-				unit=" BBL/min"
-				color="emerald"
-				size={100}
-				thresholds={{ warning: 4.5, critical: 4.8 }}
+				color="#3B82F6"
+				thresholds={{ warning: 75, critical: 85 }}
 			/>
 		</div>
 	</div>
-	{/if}
-</div>
 
-<!-- Operations Overview -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 mb-4 sm:mb-8">
-	<!-- Active Operations -->
-	<div class="glass-card p-3 sm:p-6">
-		<div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-			<div class="w-2 h-2 sm:w-3 sm:h-3 bg-emerald-400 rounded-full animate-pulse"></div>
-			<h3 class="text-lg sm:text-2xl lg:text-3xl font-semibold tracking-tight text-oil-black">Active Operations</h3>
+	<!-- Active Hauls Overview -->
+	<div class="hauls-section mb-6 sm:mb-8">
+		<div class="section-header mb-4 sm:mb-6">
+			<h2 class="text-xl sm:text-2xl font-bold text-oil-black mb-2">Active Hauls Overview</h2>
+			<p class="text-sm sm:text-base text-oil-gray">Real-time monitoring of oil transport operations</p>
 		</div>
 		
-		<div class="space-y-3 sm:space-y-4">
-			<div class="flex justify-between items-center p-2 sm:p-3 bg-white/30 rounded-xl">
-				<span class="text-oil-gray text-xs sm:text-sm">Total Active Hauls</span>
-				<span class="metric-display text-oil-orange text-lg sm:text-xl">{$activeHauls.length}</span>
-			</div>
-			
-			<div class="flex justify-between items-center p-2 sm:p-3 bg-white/30 rounded-xl">
-				<span class="text-oil-gray text-xs sm:text-sm">Total Volume</span>
-				<span class="metric-display text-oil-blue text-lg sm:text-xl">{totalActiveVolume.toLocaleString()}</span>
-			</div>
-			
-			<div class="flex justify-between items-center p-2 sm:p-3 bg-white/30 rounded-xl">
-				<span class="text-oil-gray text-xs sm:text-sm">Expected Loss</span>
-				<span class="metric-display text-amber-600 text-lg sm:text-xl">{totalExpectedLoss.toFixed(1)}</span>
-			</div>
-		</div>
-	</div>
-
-	<!-- Haul Status Breakdown -->
-	<div class="glass-card p-3 sm:p-6">
-		<div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-			<div class="w-2 h-2 sm:w-3 sm:h-3 bg-blue-400 rounded-full"></div>
-			<h3 class="text-lg sm:text-2xl lg:text-3xl font-semibold tracking-tight text-oil-black">Haul Status</h3>
+		<div class="hauls-grid grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+			{#each $activeHauls.slice(0, 6) as haul}
+				{@const driver = $drivers.find(d => d.id === haul.driverId)}
+				{@const truck = $trucks.find(t => t.id === haul.truckId)}
+				{#if driver && truck}
+					<HaulCard {haul} {driver} {truck} />
+				{/if}
+			{/each}
 		</div>
 		
-		<div class="space-y-2 sm:space-y-3">
-			<div class="flex justify-between items-center p-2 sm:p-3 bg-amber-50 rounded-xl border border-amber-200">
-				<div class="flex items-center gap-1 sm:gap-2">
-					<span class="text-base sm:text-lg">📦</span>
-					<span class="text-amber-700 font-medium text-xs sm:text-sm">Loading</span>
-				</div>
-				<span class="metric-display text-amber-700 text-base sm:text-lg">{haulsByStatus.loading || 0}</span>
+		{#if $activeHauls.length > 6}
+			<div class="text-center mt-6">
+				<a href="/hauls" class="inline-flex items-center gap-2 px-6 py-3 bg-oil-orange text-white rounded-lg font-medium hover:bg-oil-orange/90 transition-colors">
+					View All {$activeHauls.length} Active Hauls
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+					</svg>
+				</a>
 			</div>
-			
-			<div class="flex justify-between items-center p-2 sm:p-3 bg-blue-50 rounded-xl border border-blue-200">
-				<div class="flex items-center gap-1 sm:gap-2">
-					<span class="text-base sm:text-lg">🚛</span>
-					<span class="text-blue-700 font-medium text-xs sm:text-sm">In Transit</span>
-				</div>
-				<span class="metric-display text-blue-700 text-base sm:text-lg">{haulsByStatus.transit || 0}</span>
-			</div>
-			
-			<div class="flex justify-between items-center p-2 sm:p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-				<div class="flex items-center gap-1 sm:gap-2">
-					<span class="text-base sm:text-lg">🏭</span>
-					<span class="text-emerald-700 font-medium text-xs sm:text-sm">Offloading</span>
-				</div>
-				<span class="metric-display text-emerald-700 text-base sm:text-lg">{haulsByStatus.offloading || 0}</span>
-			</div>
-		</div>
+		{/if}
 	</div>
+{/if}
 
-	<!-- Daily Summary -->
-	<div class="glass-card p-3 sm:p-6 md:col-span-2 lg:col-span-1">
-		<div class="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-			<div class="w-2 h-2 sm:w-3 sm:h-3 bg-oil-orange rounded-full"></div>
-			<h3 class="text-lg sm:text-2xl lg:text-3xl font-semibold tracking-tight text-oil-black">Today's Summary</h3>
-		</div>
+<style>
+	.focus-banner {
+		padding: 12px 20px;
+		border-radius: 12px;
+		border: 1px solid;
+		margin-top: 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		font-size: 14px;
+	}
+
+	.role-metrics-container {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	.hero-metrics-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 20px;
+	}
+
+	.primary-metrics-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		gap: 16px;
+	}
+
+	.role-charts-container {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 24px;
+	}
+
+	.hero-chart-container {
+		background: rgba(255, 255, 255, 0.95);
+		backdrop-filter: blur(20px);
+		border: 2px solid;
+		border-radius: 20px;
+		padding: 24px;
+		box-shadow: 
+			0 12px 40px rgba(0, 0, 0, 0.12),
+			0 4px 12px rgba(0, 0, 0, 0.06),
+			inset 0 1px 0 rgba(255, 255, 255, 0.9);
+	}
+
+	.chart-header {
+		margin-bottom: 20px;
+	}
+
+	.chart-title {
+		font-size: 24px;
+		font-weight: 700;
+		margin-bottom: 8px;
+		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+	}
+
+	.chart-relevance {
+		font-size: 14px;
+		color: #374151;
+		font-weight: 500;
+	}
+
+	.chart-placeholder {
+		height: 300px;
+		border-radius: 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 18px;
+		font-weight: 600;
+		border: 1px solid rgba(124, 179, 66, 0.2);
+	}
+
+	@media (max-width: 768px) {
+		.hero-metrics-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.primary-metrics-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.chart-title {
+			font-size: 20px;
+		}
+
+		.chart-placeholder {
+			height: 200px;
+			font-size: 16px;
+		}
+	}
+
+	.tab-navigation {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.tab-button {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 12px 20px;
+		background: transparent;
+		border: none;
+		border-radius: 12px 12px 0 0;
+		color: #6b7280;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		border-bottom: 2px solid transparent;
+	}
+
+	.tab-button:hover {
+		background: rgba(255, 255, 255, 0.1);
+		color: #1a1a1a;
+	}
+
+	.tab-button.active {
+		background: rgba(124, 179, 66, 0.1);
+		color: #7CB342;
+		border-bottom-color: #7CB342;
+	}
+
+	.tab-icon {
+		font-size: 16px;
+	}
+
+	.tab-count {
+		background: rgba(124, 179, 66, 0.2);
+		color: #558B2F;
+		padding: 2px 8px;
+		border-radius: 12px;
+		font-size: 12px;
+		font-weight: 600;
+	}
+
+	.tab-button.active .tab-count {
+		background: #7CB342;
+		color: white;
+	}
+
+	.view-header {
+		text-align: center;
+		margin-bottom: 1.5rem;
+	}
+
+	.truck-card {
+		transition: all 0.2s ease;
+	}
+
+	.truck-card:hover {
+		transform: translateY(-2px);
+	}
+
+	.status-badge {
+		font-size: 11px;
+		font-weight: 600;
+		padding: 4px 8px;
+		border-radius: 6px;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.btn-sm {
+		font-size: 12px;
+		font-weight: 500;
+		transition: all 0.2s ease;
+	}
+
+	.btn-sm:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	}
+
+	.table-header {
+		font-size: 14px;
+	}
+
+	.table-row {
+		font-size: 14px;
+		transition: all 0.2s ease;
+	}
+
+	.detail-row {
+		font-size: 13px;
+	}
+
+	.trend-indicator {
+		font-size: 16px;
+		font-weight: 600;
+	}
+
+	@media (max-width: 768px) {
+		.dashboard {
+			padding: 1rem;
+		}
+
+		.metrics-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.charts-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.trucks-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.table-header, .table-row {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+
+		.tab-button {
+			padding: 8px 12px;
+			font-size: 14px;
+		}
+	}
+
+	/* Role-Based Navigation Styles */
+	.role-navigation {
+		margin-bottom: 2rem;
+	}
+
+	.nav-tabs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+		padding-bottom: 1rem;
+	}
+
+	.nav-tab {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 12px 20px;
+		background: rgba(255, 255, 255, 0.1);
+		border: 2px solid transparent;
+		border-radius: 12px;
+		color: #6b7280;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		backdrop-filter: blur(10px);
+	}
+
+	.nav-tab:hover {
+		background: rgba(255, 255, 255, 0.2);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+	}
+
+	.nav-tab.active {
+		background: var(--primary-color, #7CB342);
+		color: white;
+		border-color: var(--primary-color, #7CB342);
+		box-shadow: 0 8px 25px rgba(124, 179, 66, 0.3);
+	}
+
+	.tab-icon {
+		font-size: 16px;
+	}
+
+	.tab-label {
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.tab-content {
+		animation: fadeIn 0.3s ease-in-out;
+	}
+
+	@keyframes fadeIn {
+		from { opacity: 0; transform: translateY(10px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+
+	/* Status Badges */
+	.status-badge {
+		padding: 4px 12px;
+		border-radius: 20px;
+		font-size: 12px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.status-loading {
+		background: #fef3c7;
+		color: #d97706;
+	}
+
+	.status-transit {
+		background: #dbeafe;
+		color: #2563eb;
+	}
+
+	.status-offloading {
+		background: #d1fae5;
+		color: #059669;
+	}
+
+	.status-completed {
+		background: #d1fae5;
+		color: #059669;
+	}
+
+	.status-in-progress {
+		background: #dbeafe;
+		color: #2563eb;
+	}
+
+	.status-scheduled {
+		background: #f3f4f6;
+		color: #6b7280;
+	}
+
+	/* Priority Badges */
+	.priority-badge {
+		padding: 2px 8px;
+		border-radius: 12px;
+		font-size: 10px;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+
+	.priority-high {
+		background: #fee2e2;
+		color: #dc2626;
+	}
+
+	.priority-medium {
+		background: #fef3c7;
+		color: #d97706;
+	}
+
+	.priority-low {
+		background: #f3f4f6;
+		color: #6b7280;
+	}
+
+	/* Alert Styles */
+	.alert-item {
+		border-left-width: 4px;
+	}
+
+	.alert-critical {
+		background: #fef2f2;
+		border-left-color: #dc2626;
+	}
+
+	.alert-warning {
+		background: #fffbeb;
+		border-left-color: #d97706;
+	}
+
+	.alert-info {
+		background: #eff6ff;
+		border-left-color: #2563eb;
+	}
+
+	/* Time Badge */
+	.time-badge {
+		background: rgba(124, 179, 66, 0.1);
+		color: #558B2F;
+		padding: 8px 12px;
+		border-radius: 8px;
+		font-weight: 600;
+		min-width: 60px;
+		text-align: center;
+	}
+
+	/* Charts Grid */
+	.charts-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+		gap: 24px;
+	}
+
+	/* Hero Metrics Grid */
+	.hero-metrics-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 20px;
+		margin-bottom: 2rem;
+	}
+
+	/* Responsive Design */
+	@media (max-width: 768px) {
+		.nav-tabs {
+			flex-direction: column;
+		}
+
+		.nav-tab {
+			justify-content: center;
+			padding: 10px 16px;
+		}
+
+		.charts-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.hero-metrics-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.tab-label {
+			font-size: 14px;
+		}
+	}
+
+	/* Filter Selects */
+	.filter-select {
+		padding: 8px 12px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(10px);
+		color: #1a1a1a;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.filter-select:hover {
+		background: rgba(255, 255, 255, 0.2);
+		border-color: rgba(124, 179, 66, 0.3);
+	}
+
+	.filter-select:focus {
+		outline: none;
+		border-color: #7CB342;
+		box-shadow: 0 0 0 3px rgba(124, 179, 66, 0.1);
+	}
+
+	/* Metric Items */
+	.metric-item {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.metric-label {
+		font-size: 12px;
+		color: #6b7280;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.metric-value {
+		font-size: 16px;
+		font-weight: 700;
+		color: #1a1a1a;
+	}
+
+	/* Time Badge Small */
+	.time-badge-small {
+		background: rgba(124, 179, 66, 0.1);
+		color: #558B2F;
+		padding: 4px 8px;
+		border-radius: 6px;
+		font-weight: 600;
+		min-width: 50px;
+		text-align: center;
+		font-size: 11px;
+	}
+
+	/* Status Badge Small */
+	.status-badge-small {
+		padding: 2px 8px;
+		border-radius: 12px;
+		font-size: 10px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	/* Truck and Driver Detail Cards */
+	.truck-detail-card,
+	.driver-detail-card {
+		transition: all 0.3s ease;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.truck-detail-card:hover,
+	.driver-detail-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+		border-color: rgba(124, 179, 66, 0.3);
+	}
+
+	/* Yard Fleet and Driver Cards */
+	.yard-fleet-card,
+	.yard-driver-card {
+		transition: all 0.2s ease;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.yard-fleet-card:hover,
+	.yard-driver-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+		border-color: rgba(124, 179, 66, 0.2);
+	}
+
+	/* Utilization Bar */
+	.utilization-bar {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	/* Bay Status */
+	.bay-status {
+		transition: all 0.2s ease;
+	}
+
+	.bay-status:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
+
+	/* Maintenance and Inventory Items */
+	.maintenance-item,
+	.inventory-item {
+		transition: all 0.2s ease;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+	}
+
+	.maintenance-item:hover,
+	.inventory-item:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		border-color: rgba(124, 179, 66, 0.2);
+	}
+
+	/* Status Categories */
+	.status-category {
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 12px;
+		padding: 16px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	/* Additional Status Badge Styles */
+	.status-active {
+		background: #d1fae5;
+		color: #059669;
+	}
+
+	.status-maintenance {
+		background: #fef3c7;
+		color: #d97706;
+	}
+
+	.status-available {
+		background: #f3f4f6;
+		color: #6b7280;
+	}
+	
+	/* System Overview Styles */
+	.metrics-grid {
+		display: grid;
+		gap: 1.5rem;
+	}
+	
+	.chart-container {
+		background: rgba(255, 255, 255, 0.95);
+		backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 16px;
+		padding: 20px;
+		box-shadow: 
+			0 8px 32px rgba(0, 0, 0, 0.1),
+			0 2px 8px rgba(0, 0, 0, 0.05);
+		transition: all 0.3s ease;
+		min-height: 440px; /* Ensure enough space for 400px charts */
+	}
+	
+	.chart-container:hover {
+		transform: translateY(-2px);
+		box-shadow: 
+			0 12px 40px rgba(0, 0, 0, 0.15),
+			0 4px 12px rgba(0, 0, 0, 0.08);
+	}
+	
+	.gauge-container {
+		background: rgba(255, 255, 255, 0.95);
+		backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 16px;
+		padding: 20px;
+		box-shadow: 
+			0 8px 32px rgba(0, 0, 0, 0.1),
+			0 2px 8px rgba(0, 0, 0, 0.05);
+		transition: all 0.3s ease;
+	}
+	
+	.gauge-container:hover {
+		transform: translateY(-2px);
+		box-shadow: 
+			0 12px 40px rgba(0, 0, 0, 0.15),
+			0 4px 12px rgba(0, 0, 0, 0.08);
+	}
+	
+	.section-header {
+		text-align: center;
+		margin-bottom: 2rem;
+	}
+	
+	.hauls-section {
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 20px;
+		padding: 2rem;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	
+	.hauls-grid {
+		display: grid;
+		gap: 1.5rem;
+	}
+	
+	@media (max-width: 768px) {
+		.metrics-grid {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
 		
-		<div class="space-y-3 sm:space-y-4">
-			<div class="text-center p-3 sm:p-4 bg-white/30 rounded-xl">
-				<div class="metric-display text-oil-orange text-xl sm:text-2xl mb-1">{completedToday}</div>
-				<div class="text-oil-gray text-xs sm:text-sm">Completed Hauls</div>
-			</div>
-			
-			<div class="text-center p-3 sm:p-4 bg-white/30 rounded-xl">
-				<div class="metric-display text-oil-blue text-xl sm:text-2xl mb-1">{$drivers.length}</div>
-				<div class="text-oil-gray text-xs sm:text-sm">Active Drivers</div>
-			</div>
-			
-			<div class="text-center p-3 sm:p-4 bg-white/30 rounded-xl">
-				<div class="metric-display text-emerald-600 text-xl sm:text-2xl mb-1">98.2%</div>
-				<div class="text-oil-gray text-xs sm:text-sm">System Uptime</div>
-			</div>
-		</div>
-	</div>
-</div>
+		.charts-grid {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+		
+		.gauges-grid {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+		
+		.hauls-grid {
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+		
+		.hauls-section {
+			padding: 1rem;
+		}
+	}
+
+	/* Gauge Chart Styles */
+	.gauge-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.gauge-chart {
+		position: relative;
+		width: 200px;
+		height: 120px;
+	}
+	
+	/* Haul Ticket Styles */
+	.haul-ticket-section {
+		background: rgba(255, 255, 255, 0.95);
+		backdrop-filter: blur(20px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 20px;
+		box-shadow: 
+			0 8px 32px rgba(0, 0, 0, 0.1),
+			0 2px 8px rgba(0, 0, 0, 0.05),
+			inset 0 1px 0 rgba(255, 255, 255, 0.8);
+		padding: 24px;
+		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+	}
+
+	.section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 24px;
+		padding-bottom: 16px;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	}
+
+	.section-header h2 {
+		font-size: 24px;
+		font-weight: 700;
+		color: #1e293b;
+		margin: 0;
+	}
+
+	.haul-controls {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.haul-nav-btn {
+		background: rgba(59, 130, 246, 0.1);
+		border: 1px solid rgba(59, 130, 246, 0.2);
+		border-radius: 10px;
+		color: #3b82f6;
+		padding: 8px 12px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		transition: all 0.2s ease;
+	}
+
+	.haul-nav-btn:hover {
+		background: rgba(59, 130, 246, 0.2);
+		transform: translateY(-1px);
+	}
+
+	.haul-counter {
+		font-size: 14px;
+		color: #64748b;
+		font-weight: 500;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.haul-ticket-container {
+		background: white;
+		border: 1px solid rgba(226, 232, 240, 0.8);
+		border-radius: 16px;
+		overflow: hidden;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	}
+
+	.ticket-header {
+		background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+		color: white;
+		padding: 20px 24px;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+	}
+
+	.ticket-info h3 {
+		font-size: 20px;
+		font-weight: 700;
+		margin: 0 0 4px 0;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.ticket-status {
+		padding: 4px 12px;
+		border-radius: 20px;
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.5px;
+		margin-bottom: 8px;
+		display: inline-block;
+	}
+
+	.ticket-status.in-transit {
+		background: rgba(245, 158, 11, 0.2);
+		color: #f59e0b;
+		border: 1px solid rgba(245, 158, 11, 0.3);
+	}
+
+	.ticket-info small {
+		color: rgba(255, 255, 255, 0.8);
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.ticket-time {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		text-align: right;
+		font-size: 14px;
+		color: rgba(255, 255, 255, 0.9);
+	}
+
+	.ticket-content {
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	.ticket-section {
+		border-bottom: 1px solid #e2e8f0;
+		padding-bottom: 20px;
+	}
+
+	.ticket-section:last-child {
+		border-bottom: none;
+		padding-bottom: 0;
+	}
+
+	.ticket-section h4 {
+		font-size: 16px;
+		font-weight: 600;
+		color: #334155;
+		margin: 0 0 12px 0;
+	}
+
+	.route-info {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		gap: 20px;
+		align-items: center;
+	}
+
+	.location {
+		padding: 16px;
+		background: rgba(248, 250, 252, 0.8);
+		border-radius: 12px;
+		border: 1px solid rgba(226, 232, 240, 0.8);
+	}
+
+	.location strong {
+		color: #1e293b;
+		font-weight: 600;
+	}
+
+	.location small {
+		color: #64748b;
+		font-size: 13px;
+		line-height: 1.4;
+	}
+
+	.route-arrow {
+		font-size: 20px;
+		color: #94a3b8;
+		font-weight: bold;
+		text-align: center;
+	}
+
+	.ticket-metrics {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+		gap: 16px;
+	}
+
+	.metric-item {
+		text-align: center;
+		padding: 16px;
+		background: rgba(248, 250, 252, 0.8);
+		border-radius: 12px;
+		border: 1px solid rgba(226, 232, 240, 0.8);
+	}
+
+	.metric-item label {
+		display: block;
+		font-size: 12px;
+		color: #64748b;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin-bottom: 6px;
+	}
+
+	.metric-value {
+		font-size: 18px;
+		font-weight: 600;
+		color: #1e293b;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.metric-value.safe {
+		color: #059669;
+	}
+
+	.product-details {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+	}
+
+	.product-details span {
+		font-size: 14px;
+		color: #475569;
+	}
+
+	.equipment-details {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.equipment-item span {
+		font-size: 14px;
+		color: #475569;
+		display: block;
+	}
+
+	.safety-indicators {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	.safety-item {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 12px;
+		background: rgba(220, 252, 231, 0.8);
+		color: #065f46;
+		border-radius: 8px;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.safety-item.completed {
+		background: rgba(220, 252, 231, 0.8);
+		color: #065f46;
+	}
+
+	.measurement-financial {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 20px;
+	}
+
+	.measurement-data,
+	.financial-data {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 16px;
+		background: rgba(248, 250, 252, 0.8);
+		border-radius: 12px;
+		border: 1px solid rgba(226, 232, 240, 0.8);
+	}
+
+	.measurement-data span,
+	.financial-data span {
+		font-size: 14px;
+		color: #475569;
+	}
+
+	.document-status {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	.doc-item {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 6px 12px;
+		background: rgba(220, 252, 231, 0.8);
+		color: #065f46;
+		border-radius: 8px;
+		font-size: 13px;
+		font-weight: 500;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.ticket-actions {
+		padding: 20px 24px;
+		background: rgba(248, 250, 252, 0.8);
+		border-top: 1px solid #e2e8f0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	.action-btn {
+		padding: 10px 16px;
+		border-radius: 10px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		border: 1px solid;
+	}
+
+	.action-btn.primary {
+		background: #3b82f6;
+		color: white;
+		border-color: #3b82f6;
+	}
+
+	.action-btn.primary:hover {
+		background: #2563eb;
+		transform: translateY(-1px);
+	}
+
+	.action-btn.secondary {
+		background: rgba(59, 130, 246, 0.1);
+		color: #3b82f6;
+		border-color: rgba(59, 130, 246, 0.2);
+	}
+
+	.action-btn.secondary:hover {
+		background: rgba(59, 130, 246, 0.2);
+		transform: translateY(-1px);
+	}
+
+	.action-btn.danger {
+		background: rgba(239, 68, 68, 0.1);
+		color: #ef4444;
+		border-color: rgba(239, 68, 68, 0.2);
+	}
+
+	.action-btn.danger:hover {
+		background: rgba(239, 68, 68, 0.2);
+		transform: translateY(-1px);
+	}
+
+	/* Mobile Responsiveness for Haul Tickets */
+	@media (max-width: 768px) {
+		.section-header {
+			flex-direction: column;
+			gap: 16px;
+			align-items: flex-start;
+		}
+
+		.haul-controls {
+			width: 100%;
+			justify-content: space-between;
+		}
+
+		.ticket-header {
+			flex-direction: column;
+			gap: 16px;
+		}
+
+		.ticket-time {
+			text-align: left;
+		}
+
+		.route-info {
+			grid-template-columns: 1fr;
+			gap: 12px;
+		}
+
+		.route-arrow {
+			transform: rotate(90deg);
+		}
+
+		.ticket-metrics {
+			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+		}
+
+		.measurement-financial {
+			grid-template-columns: 1fr;
+		}
+
+		.ticket-actions {
+			flex-direction: column;
+		}
+
+		.action-btn {
+			text-align: center;
+		}
+	}
+</style>

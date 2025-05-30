@@ -1,140 +1,565 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { Menu, X, Home, Truck, FileText, BarChart3, Settings, Users, MapPin, AlertTriangle, Wrench, DollarSign, Clock, Shield } from 'lucide-svelte';
 	import DryDriveLogo from './DryDriveLogo.svelte';
-	
-	interface NavItem {
-		href: string;
-		label: string;
-		icon: string;
-	}
-	
-	const navItems: NavItem[] = [
-		{ href: '/', label: 'Dashboard', icon: '📊' },
-		{ href: '/fleet', label: 'Fleet Operations', icon: '🚛' },
-		{ href: '/documents', label: 'Documents', icon: '📄' },
-		{ href: '/hauls', label: 'Haul History', icon: '📋' },
-		{ href: '/admin', label: 'Analytics', icon: '📈' }
+
+	let mobileMenuOpen = $state(false);
+
+	// Comprehensive navigation structure
+	const navigationSections = [
+		{
+			title: 'Operations',
+			items: [
+				{ href: '/', label: 'Dashboard', icon: Home, description: 'Main operations center' },
+				{ href: '/hauls', label: 'Live Hauls', icon: Truck, description: 'Active haul monitoring' },
+				{ href: '/dispatch', label: 'Dispatch Center', icon: MapPin, description: 'Fleet coordination' },
+				{ href: '/yard', label: 'Yard Management', icon: Wrench, description: 'Equipment & maintenance' }
+			]
+		},
+		{
+			title: 'Fleet & Assets',
+			items: [
+				{ href: '/fleet', label: 'Fleet Overview', icon: Truck, description: 'Trucks & drivers' },
+				{ href: '/drivers', label: 'Driver Management', icon: Users, description: 'Driver profiles & performance' },
+				{ href: '/equipment', label: 'Equipment Status', icon: Wrench, description: 'Maintenance & diagnostics' },
+				{ href: '/routes', label: 'Route Planning', icon: MapPin, description: 'Optimization & tracking' }
+			]
+		},
+		{
+			title: 'Data & Analytics',
+			items: [
+				{ href: '/analytics', label: 'Performance Analytics', icon: BarChart3, description: 'KPIs & insights' },
+				{ href: '/reports', label: 'Reports', icon: FileText, description: 'Custom reporting' },
+				{ href: '/financial', label: 'Financial Dashboard', icon: DollarSign, description: 'Revenue & costs' },
+				{ href: '/efficiency', label: 'Efficiency Metrics', icon: Clock, description: 'Operational efficiency' }
+			]
+		},
+		{
+			title: 'Compliance & Safety',
+			items: [
+				{ href: '/documents', label: 'Document Management', icon: FileText, description: 'Compliance documents' },
+				{ href: '/safety', label: 'Safety Monitoring', icon: Shield, description: 'Safety metrics & alerts' },
+				{ href: '/alerts', label: 'Alert Center', icon: AlertTriangle, description: 'System notifications' },
+				{ href: '/audit', label: 'Audit Trail', icon: FileText, description: 'Compliance tracking' }
+			]
+		},
+		{
+			title: 'Administration',
+			items: [
+				{ href: '/admin', label: 'System Admin', icon: Settings, description: 'System configuration' },
+				{ href: '/users', label: 'User Management', icon: Users, description: 'Access control' },
+				{ href: '/integrations', label: 'Integrations', icon: Settings, description: 'Third-party systems' },
+				{ href: '/support', label: 'Support Center', icon: AlertTriangle, description: 'Help & documentation' }
+			]
+		}
 	];
-	
-	let mobileMenuOpen = false;
-	
-	function isActive(href: string): boolean {
+
+	function isActiveRoute(href: string): boolean {
 		if (href === '/') {
 			return $page.url.pathname === '/';
 		}
 		return $page.url.pathname.startsWith(href);
 	}
-	
+
 	function toggleMobileMenu() {
 		mobileMenuOpen = !mobileMenuOpen;
 	}
-	
+
 	function closeMobileMenu() {
 		mobileMenuOpen = false;
 	}
 </script>
 
-<!-- Desktop Navigation -->
-<nav class="nav-glass bg-white/80 backdrop-blur-md border-b border-white/20 sticky top-0 z-50 px-3 sm:px-6 py-2 sm:py-4">
-	<div class="flex items-center justify-between">
-		<!-- Logo and Brand -->
-		<div class="flex items-center space-x-2 sm:space-x-3">
-			<div class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center">
-				<DryDriveLogo size={32} />
-			</div>
-			<div class="flex flex-col">
-				<h1 class="text-sm sm:text-lg font-bold text-oil-black leading-tight">DryDrive</h1>
-				<p class="text-xs text-oil-gray leading-tight hidden sm:block">Oil Field Monitoring</p>
-			</div>
+<nav class="navigation-container">
+	<!-- Desktop Navigation -->
+	<div class="desktop-nav">
+		<div class="nav-header">
+			<a href="/" class="logo-container">
+				<DryDriveLogo size={120} />
+				<div class="logo-text">
+					<span class="brand-name">DryDrive</span>
+					<span class="brand-tagline">Oil Transport Operations</span>
+				</div>
+			</a>
 		</div>
 
-		<!-- Desktop Navigation Links -->
-		<div class="hidden md:flex items-center space-x-1 lg:space-x-2">
-			{#each navItems as item}
-				<a 
-					href={item.href}
-					class="flex items-center space-x-2 px-3 lg:px-4 py-2 rounded-xl font-medium text-sm lg:text-base transition-all duration-200
-						{isActive(item.href) 
-							? 'bg-drydrive-green text-white shadow-lg' 
-							: 'text-oil-gray hover:bg-white/40 hover:text-oil-black'}"
-				>
-					<span class="text-base lg:text-lg">{item.icon}</span>
-					<span class="hidden lg:block">{item.label}</span>
-				</a>
+		<div class="nav-sections">
+			{#each navigationSections as section}
+				<div class="nav-section">
+					<h3 class="section-title">{section.title}</h3>
+					<div class="section-items">
+						{#each section.items as item}
+							<a 
+								href={item.href} 
+								class="nav-item"
+								class:active={isActiveRoute(item.href)}
+								title={item.description}
+							>
+								<div class="nav-item-icon">
+									<svelte:component this={item.icon} size={18} />
+								</div>
+								<div class="nav-item-content">
+									<span class="nav-item-label">{item.label}</span>
+									<span class="nav-item-description">{item.description}</span>
+								</div>
+							</a>
+						{/each}
+					</div>
+				</div>
 			{/each}
 		</div>
 
-		<!-- Mobile Menu Button -->
-		<button 
-			onclick={toggleMobileMenu}
-			class="md:hidden p-2 rounded-xl bg-white/20 hover:bg-white/30 transition-colors touch-manipulation"
-			aria-label="Toggle mobile menu"
-		>
-			<svg class="w-5 h-5 text-oil-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-			</svg>
-		</button>
+		<div class="nav-footer">
+			<div class="system-status">
+				<div class="status-indicator online"></div>
+				<span class="status-text">System Online</span>
+			</div>
+			<div class="version-info">v2.1.0</div>
+		</div>
+	</div>
+
+	<!-- Mobile Navigation -->
+	<div class="mobile-nav">
+		<div class="mobile-header">
+			<a href="/" class="mobile-logo">
+				<DryDriveLogo size={80} />
+				<span class="mobile-brand">DryDrive</span>
+			</a>
+			<button 
+				class="mobile-menu-toggle"
+				onclick={toggleMobileMenu}
+				aria-label="Toggle navigation menu"
+			>
+				{#if mobileMenuOpen}
+					<X size={24} />
+				{:else}
+					<Menu size={24} />
+				{/if}
+			</button>
+		</div>
+
+		{#if mobileMenuOpen}
+			<div class="mobile-menu" role="dialog" aria-modal="true">
+				<div class="mobile-menu-content">
+					{#each navigationSections as section}
+						<div class="mobile-section">
+							<h3 class="mobile-section-title">{section.title}</h3>
+							<div class="mobile-section-items">
+								{#each section.items as item}
+									<a 
+										href={item.href} 
+										class="mobile-nav-item"
+										class:active={isActiveRoute(item.href)}
+										onclick={closeMobileMenu}
+									>
+										<svelte:component this={item.icon} size={20} />
+										<div class="mobile-item-content">
+											<span class="mobile-item-label">{item.label}</span>
+											<span class="mobile-item-description">{item.description}</span>
+										</div>
+									</a>
+								{/each}
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
 	</div>
 </nav>
 
-<!-- Mobile Navigation Menu -->
-{#if mobileMenuOpen}
-	<div 
-		class="md:hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" 
-		role="dialog"
-		aria-modal="true"
-		aria-labelledby="mobile-menu-title"
-		tabindex="0"
-		onclick={closeMobileMenu}
-		onkeydown={(e) => e.key === 'Escape' && closeMobileMenu()}
-	>
-		<div 
-			class="absolute top-0 right-0 w-72 h-full bg-white/95 backdrop-blur-xl shadow-2xl" 
-			role="document"
-			onclick={(e) => e.stopPropagation()}
-			onkeydown={(e) => e.stopPropagation()}
-		>
-			<!-- Mobile Menu Header -->
-			<div class="flex items-center justify-between p-4 border-b border-gray-200">
-				<div class="flex items-center space-x-3">
-					<div class="w-8 h-8 flex items-center justify-center">
-						<DryDriveLogo size={32} />
-					</div>
-					<div>
-						<h2 id="mobile-menu-title" class="text-lg font-bold text-oil-black">DryDrive</h2>
-						<p class="text-xs text-oil-gray">Oil Field Monitoring</p>
-					</div>
-				</div>
-				<button 
-					onclick={closeMobileMenu}
-					class="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors touch-manipulation"
-					aria-label="Close mobile menu"
-				>
-					<svg class="w-5 h-5 text-oil-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-					</svg>
-				</button>
-			</div>
+<style>
+	.navigation-container {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 100vh;
+		width: 280px;
+		background: rgba(255, 255, 255, 0.95);
+		backdrop-filter: blur(24px);
+		border-right: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 
+			0 8px 32px rgba(0, 0, 0, 0.1),
+			0 2px 8px rgba(0, 0, 0, 0.05);
+		z-index: 1000;
+		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+		overflow: hidden;
+	}
 
-			<!-- Mobile Menu Items -->
-			<div class="p-4 space-y-2">
-				{#each navItems as item}
-					<a 
-						href={item.href}
-						onclick={closeMobileMenu}
-						class="flex items-center space-x-3 px-4 py-4 rounded-xl font-medium text-base transition-all duration-200 touch-manipulation
-							{isActive(item.href) 
-								? 'bg-drydrive-green text-white shadow-lg' 
-								: 'text-oil-gray hover:bg-white/40 hover:text-oil-black'}"
-					>
-						<span class="text-xl">{item.icon}</span>
-						<span>{item.label}</span>
-					</a>
-				{/each}
-			</div>
-		</div>
-	</div>
-{/if}
+	.desktop-nav {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		padding: 0;
+	}
 
-<!-- Spacer to prevent content overlap -->
-<div class="h-16"></div> 
+	.nav-header {
+		padding: 20px;
+		border-bottom: 1px solid rgba(124, 179, 66, 0.1);
+		background: linear-gradient(135deg, rgba(124, 179, 66, 0.05) 0%, rgba(85, 139, 47, 0.02) 100%);
+	}
+
+	.logo-container {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		text-decoration: none;
+		transition: all 0.3s ease;
+	}
+
+	.logo-container:hover {
+		transform: translateY(-1px);
+	}
+
+	.logo-text {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.brand-name {
+		font-size: 18px;
+		font-weight: 700;
+		color: #0f172a;
+		line-height: 1.2;
+	}
+
+	.brand-tagline {
+		font-size: 11px;
+		font-weight: 500;
+		color: #7CB342;
+		line-height: 1.2;
+	}
+
+	.nav-sections {
+		flex: 1;
+		overflow-y: auto;
+		padding: 16px 0;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
+	}
+
+	.nav-sections::-webkit-scrollbar {
+		display: none;
+	}
+
+	.nav-section {
+		margin-bottom: 24px;
+	}
+
+	.section-title {
+		font-size: 12px;
+		font-weight: 600;
+		color: #6b7280;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin: 0 20px 12px 20px;
+		padding-bottom: 4px;
+		border-bottom: 1px solid rgba(124, 179, 66, 0.1);
+	}
+
+	.section-items {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.nav-item {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 12px 20px;
+		margin: 0 8px;
+		border-radius: 12px;
+		text-decoration: none;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+		position: relative;
+		overflow: hidden;
+	}
+
+	.nav-item::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		width: 3px;
+		background: linear-gradient(135deg, #7CB342 0%, #558B2F 100%);
+		transform: scaleY(0);
+		transition: transform 0.2s ease;
+	}
+
+	.nav-item:hover {
+		background: rgba(124, 179, 66, 0.08);
+		transform: translateX(4px);
+	}
+
+	.nav-item:hover::before {
+		transform: scaleY(1);
+	}
+
+	.nav-item.active {
+		background: linear-gradient(135deg, rgba(124, 179, 66, 0.15) 0%, rgba(85, 139, 47, 0.1) 100%);
+		border: 1px solid rgba(124, 179, 66, 0.2);
+		transform: translateX(4px);
+	}
+
+	.nav-item.active::before {
+		transform: scaleY(1);
+	}
+
+	.nav-item-icon {
+		color: #6b7280;
+		transition: color 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.nav-item:hover .nav-item-icon,
+	.nav-item.active .nav-item-icon {
+		color: #558B2F;
+	}
+
+	.nav-item-content {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		flex: 1;
+		min-width: 0;
+	}
+
+	.nav-item-label {
+		font-size: 14px;
+		font-weight: 600;
+		color: #1f2937;
+		line-height: 1.2;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.nav-item.active .nav-item-label {
+		color: #558B2F;
+		font-weight: 700;
+	}
+
+	.nav-item-description {
+		font-size: 11px;
+		font-weight: 400;
+		color: #9ca3af;
+		line-height: 1.2;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.nav-footer {
+		padding: 16px 20px;
+		border-top: 1px solid rgba(124, 179, 66, 0.1);
+		background: rgba(124, 179, 66, 0.02);
+	}
+
+	.system-status {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 8px;
+	}
+
+	.status-indicator {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: #10b981;
+		animation: pulse 2s infinite;
+	}
+
+	.status-indicator.online {
+		background: #10b981;
+	}
+
+	@keyframes pulse {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
+	}
+
+	.status-text {
+		font-size: 12px;
+		font-weight: 500;
+		color: #374151;
+	}
+
+	.version-info {
+		font-size: 10px;
+		font-weight: 400;
+		color: #9ca3af;
+	}
+
+	/* Mobile Navigation */
+	.mobile-nav {
+		display: none;
+	}
+
+	@media (max-width: 1024px) {
+		.navigation-container {
+			position: relative;
+			width: 100%;
+			height: auto;
+		}
+
+		.desktop-nav {
+			display: none;
+		}
+
+		.mobile-nav {
+			display: block;
+		}
+
+		.mobile-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 12px 16px;
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(24px);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+		}
+
+		.mobile-logo {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			text-decoration: none;
+		}
+
+		.mobile-brand {
+			font-size: 16px;
+			font-weight: 700;
+			color: #0f172a;
+		}
+
+		.mobile-menu-toggle {
+			background: none;
+			border: none;
+			color: #374151;
+			cursor: pointer;
+			padding: 8px;
+			border-radius: 8px;
+			transition: all 0.2s ease;
+		}
+
+		.mobile-menu-toggle:hover {
+			background: rgba(124, 179, 66, 0.1);
+			color: #558B2F;
+		}
+
+		.mobile-menu {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			background: rgba(255, 255, 255, 0.98);
+			backdrop-filter: blur(24px);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+			max-height: 80vh;
+			overflow-y: auto;
+			z-index: 1001;
+		}
+
+		.mobile-menu-content {
+			padding: 16px;
+		}
+
+		.mobile-section {
+			margin-bottom: 20px;
+		}
+
+		.mobile-section-title {
+			font-size: 12px;
+			font-weight: 600;
+			color: #6b7280;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin-bottom: 8px;
+			padding-bottom: 4px;
+			border-bottom: 1px solid rgba(124, 179, 66, 0.1);
+		}
+
+		.mobile-section-items {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+		}
+
+		.mobile-nav-item {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 12px;
+			border-radius: 12px;
+			text-decoration: none;
+			transition: all 0.2s ease;
+			color: #374151;
+		}
+
+		.mobile-nav-item:hover {
+			background: rgba(124, 179, 66, 0.08);
+			color: #558B2F;
+		}
+
+		.mobile-nav-item.active {
+			background: linear-gradient(135deg, rgba(124, 179, 66, 0.15) 0%, rgba(85, 139, 47, 0.1) 100%);
+			color: #558B2F;
+			border: 1px solid rgba(124, 179, 66, 0.2);
+		}
+
+		.mobile-item-content {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+		}
+
+		.mobile-item-label {
+			font-size: 14px;
+			font-weight: 600;
+			line-height: 1.2;
+		}
+
+		.mobile-item-description {
+			font-size: 11px;
+			font-weight: 400;
+			color: #9ca3af;
+			line-height: 1.2;
+		}
+	}
+
+	/* Dark mode support */
+	@media (prefers-color-scheme: dark) {
+		.navigation-container {
+			background: rgba(30, 30, 30, 0.95);
+			border-right-color: rgba(255, 255, 255, 0.1);
+		}
+
+		.brand-name,
+		.nav-item-label,
+		.status-text {
+			color: #f3f4f6;
+		}
+
+		.nav-item-description {
+			color: #6b7280;
+		}
+
+		.mobile-header,
+		.mobile-menu {
+			background: rgba(30, 30, 30, 0.98);
+		}
+
+		.mobile-brand {
+			color: #f3f4f6;
+		}
+	}
+</style> 
