@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { selectedRole, isRoleView, availableRoles, clearRoleView } from '$lib/stores/roleStore';
+	import { selectedRole, isRoleView, availableRoles, clearRoleView, setRole } from '$lib/stores/roleStore';
 	import { ChevronDown } from 'lucide-svelte';
 
 	let isOpen = false;
@@ -9,7 +9,7 @@
 	}
 
 	function selectRole(role: typeof $availableRoles[0]) {
-		selectedRole.set(role);
+		setRole(role.id);
 		isOpen = false;
 	}
 
@@ -58,10 +58,7 @@
 				aria-expanded={isOpen}
 			>
 				<span class="trigger-text">Select Your Role</span>
-				<ChevronDown 
-					size={18} 
-					class="transition-transform duration-200 {isOpen ? 'rotate-180' : ''} text-gray-600 flex-shrink-0" 
-				/>
+				<ChevronDown size={18} class="chevron {isOpen ? 'rotated' : ''}" />
 			</button>
 
 			{#if isOpen}
@@ -70,7 +67,7 @@
 						<h3>Choose your role to see a customized dashboard</h3>
 					</div>
 					<div class="role-options">
-						{#each $availableRoles as role}
+						{#each $availableRoles.filter(role => role.id !== 'overview') as role}
 							<button 
 								class="role-option tap-target"
 								style="--primary-color: {role.colorScheme.primary}; --secondary-color: {role.colorScheme.secondary}"
@@ -255,6 +252,16 @@
 		.trigger-text {
 			font-size: 18px;
 		}
+	}
+
+	.chevron {
+		transition: transform 0.2s ease;
+		color: #6b7280;
+		flex-shrink: 0;
+	}
+
+	.chevron.rotated {
+		transform: rotate(180deg);
 	}
 
 	.dropdown-menu {

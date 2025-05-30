@@ -8,7 +8,10 @@
 	import DryDriveLogo from '$lib/components/ui/DryDriveLogo.svelte';
 	import HaulCard from '$lib/components/dashboard/HaulCard.svelte';
 	import RoleSelector from '$lib/components/shared/RoleSelector.svelte';
-	import ThemeToggle from '$lib/components/ui/ThemeToggle.svelte';
+	import PreTripInspection from '$lib/components/driver/PreTripInspection.svelte';
+	import DriverSchedule from '$lib/components/driver/DriverSchedule.svelte';
+	import JobDetailModal from '$lib/components/driver/JobDetailModal.svelte';
+	import JobMapView from '$lib/components/driver/JobMapView.svelte';
 	import { activeHauls, completedHauls, scadaStatus, drivers, trucks } from '$lib/stores/haulStore';
 	import { selectedRole, isRoleView, type RoleId } from '$lib/stores/roleStore';
 	import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-svelte';
@@ -42,7 +45,7 @@
 
 	// Role-based navigation state
 	let executiveTab = 'overview';
-	let driverTab = 'performance';
+	let driverTab = 'pre-trip';
 	let dispatchTab = 'active-hauls';
 	let yardTab = 'truck-overview';
 	let regionalTab = 'yards-overview';
@@ -55,8 +58,9 @@
 	];
 
 	const driverTabs = [
-		{ id: 'performance', label: 'My Performance', icon: '📊' },
+		{ id: 'pre-trip', label: 'Pre-Trip Inspection', icon: '✅' },
 		{ id: 'schedule', label: 'Schedule & Routes', icon: '📅' },
+		{ id: 'performance', label: 'My Performance', icon: '📊' },
 		{ id: 'safety', label: 'Safety Record', icon: '🛡️' },
 		{ id: 'earnings', label: 'Earnings & Bonuses', icon: '💰' }
 	];
@@ -138,6 +142,36 @@
 		counts[haul.status] = (counts[haul.status] || 0) + 1;
 		return counts;
 	}, {} as Record<string, number>);
+
+	// Driver workflow state
+	let selectedJob: any = null;
+	let showJobModal = false;
+	let showMapView = false;
+	let inspectionCompleted = false;
+
+	function handleJobSelected(event: CustomEvent) {
+		selectedJob = event.detail.job;
+		showJobModal = true;
+	}
+
+	function handleJobStart(event: CustomEvent) {
+		selectedJob = event.detail.job;
+		showJobModal = false;
+		showMapView = true;
+	}
+
+	function handleInspectionComplete(event: CustomEvent) {
+		const inspectionData = event.detail.inspectionData;
+		inspectionCompleted = true;
+		console.log('Inspection completed:', inspectionData);
+		// Switch to schedule tab after inspection
+		driverTab = 'schedule';
+	}
+
+	function handleExitMap() {
+		showMapView = false;
+		selectedJob = null;
+	}
 </script>
 
 <!-- Header -->
@@ -149,10 +183,9 @@
 	<p class="text-xs sm:text-sm md:text-base text-oil-gray px-2">Real-time SCADA monitoring and fleet management platform</p>
 </div>
 
-<!-- Role Selector and Theme Toggle -->
-<div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-4 sm:mb-6 lg:mb-8 px-4">
+<!-- Role Selector -->
+<div class="flex justify-center mb-4 sm:mb-6 lg:mb-8 px-4">
 	<RoleSelector />
-	<ThemeToggle />
 </div>
 
 <!-- Role-Based Dashboard Content -->
@@ -382,7 +415,17 @@
 			</div>
 
 			<!-- Driver Tab Content -->
-			{#if driverTab === 'performance'}
+			{#if driverTab === 'pre-trip'}
+				<div class="tab-content">
+					<PreTripInspection on:inspection-complete={handleInspectionComplete} />
+				</div>
+			
+			{:else if driverTab === 'schedule'}
+				<div class="tab-content">
+					<DriverSchedule on:job-selected={handleJobSelected} />
+				</div>
+			
+			{:else if driverTab === 'performance'}
 				<div class="tab-content">
 					<div class="driver-metrics grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 						<MetricCard 
@@ -425,34 +468,6 @@
 							trendValue="+0.5%"
 							color="emerald"
 						/>
-					</div>
-				</div>
-			{:else if driverTab === 'schedule'}
-				<div class="tab-content">
-					<div class="schedule-view glass-card p-6">
-						<h3 class="text-xl font-bold mb-4">Today's Schedule</h3>
-						<div class="schedule-items space-y-4">
-							{#each [
-								{ time: '06:00', location: 'Permian Basin Yard', type: 'Pickup', status: 'completed' },
-								{ time: '08:30', location: 'Midland Refinery', type: 'Delivery', status: 'completed' },
-								{ time: '11:00', location: 'Eagle Ford Site', type: 'Pickup', status: 'in-progress' },
-								{ time: '14:30', location: 'Houston Terminal', type: 'Delivery', status: 'scheduled' },
-								{ time: '17:00', location: 'Return to Yard', type: 'End Shift', status: 'scheduled' }
-							] as item}
-								<div class="schedule-item flex items-center gap-4 p-4 bg-white/50 rounded-lg">
-									<div class="time-badge">
-										<span class="font-mono text-sm">{item.time}</span>
-									</div>
-									<div class="flex-1">
-										<h4 class="font-semibold">{item.location}</h4>
-										<p class="text-sm text-oil-gray">{item.type}</p>
-									</div>
-									<div class="status-badge status-{item.status}">
-										{item.status.replace('-', ' ')}
-									</div>
-								</div>
-							{/each}
-						</div>
 					</div>
 				</div>
 			{:else if driverTab === 'safety'}
@@ -1178,13 +1193,13 @@
 							color="orange"
 						/>
 						<MetricCard 
-							title="Turnaround Time" 
-							value="2.3" 
-							unit="hrs" 
-							icon="⏱️" 
+							title="Fleet Usage Rate" 
+							value="87.5" 
+							unit="%" 
+							icon="🚛" 
 							status="normal"
-							trend="down"
-							trendValue="-0.4"
+							trend="up"
+							trendValue="+2.1%"
 							color="emerald"
 						/>
 						<MetricCard 
@@ -2008,6 +2023,24 @@
 			</div>
 		{/if}
 	</div>
+{/if}
+
+<!-- Job Detail Modal -->
+{#if showJobModal && selectedJob}
+	<JobDetailModal 
+		job={selectedJob}
+		isOpen={showJobModal}
+		on:close={() => showJobModal = false}
+		on:start-job={handleJobStart}
+	/>
+{/if}
+
+<!-- Map View -->
+{#if showMapView && selectedJob}
+	<JobMapView 
+		job={selectedJob}
+		on:exit-map={handleExitMap}
+	/>
 {/if}
 
 <style>

@@ -4,22 +4,6 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<script>
-			// Initialize theme before page loads to prevent flash
-			(function() {
-				const theme = localStorage.getItem('theme-mode') || 'system';
-				let resolvedTheme = theme;
-				
-				if (theme === 'system') {
-					resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-				}
-				
-				if (resolvedTheme === 'dark') {
-					document.documentElement.classList.add('dark');
-				}
-				document.documentElement.setAttribute('data-theme', resolvedTheme);
-			})();
-		</script>
 		<title>DryDrive - Oil Field Temperature Tracker</title>
 		<meta name="description" content="Professional oil field temperature tracking and fleet management system" />
 		%sveltekit.head%

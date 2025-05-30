@@ -328,7 +328,7 @@ export const roles: Role[] = [
 		title: 'Yard Manager',
 		description: 'Equipment management and maintenance optimization',
 		icon: '🏗️',
-		focus: 'Equipment uptime, maintenance costs, and turnaround efficiency',
+		focus: 'Equipment uptime, maintenance costs, and fleet usage efficiency',
 		metrics: [
 			{
 				id: 'equipment-uptime',
@@ -353,15 +353,15 @@ export const roles: Role[] = [
 				description: 'Cost optimization improves bottom line'
 			},
 			{
-				id: 'turnaround-time',
-				label: 'Avg Turnaround',
-				value: '2.3',
-				unit: 'hours',
-				trend: 'down',
-				trendValue: '-0.4h',
+				id: 'fleet-usage',
+				label: 'Fleet Usage Rate',
+				value: '87.5',
+				unit: '%',
+				trend: 'up',
+				trendValue: '+2.1%',
 				priority: 'hero',
 				impact: 'high',
-				description: 'Faster turnaround increases throughput'
+				description: 'Higher utilization maximizes fleet efficiency'
 			},
 			{
 				id: 'yard-capacity',
@@ -392,7 +392,7 @@ export const roles: Role[] = [
 			}
 		],
 		layout: {
-			heroMetrics: ['equipment-uptime', 'maintenance-cost', 'turnaround-time'],
+			heroMetrics: ['equipment-uptime', 'maintenance-cost', 'fleet-usage'],
 			primaryMetrics: ['yard-capacity'],
 			secondaryMetrics: [],
 			heroCharts: ['equipment-status'],
@@ -491,8 +491,8 @@ export const roles: Role[] = [
 ];
 
 // Create the store
-export const selectedRole = writable<Role>(roles[1]); // Default to executive (roles[1])
-export const isRoleView = writable<boolean>(true); // Start with role view enabled
+export const selectedRole = writable<Role>(roles[0]); // Default to overview (roles[0])
+export const isRoleView = writable<boolean>(false); // Start with main dashboard view
 
 // Export available roles
 export const availableRoles = writable<Role[]>(roles);
@@ -511,7 +511,8 @@ export function setRole(roleId: RoleId): void {
 }
 
 export function clearRoleView(): void {
-	isRoleView.set(false);
+	// Go back to overview, not just hide role view
+	setRole('overview');
 }
 
 export function resetToOverview(): void {

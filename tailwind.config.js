@@ -1,6 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./src/**/*.{html,js,svelte,ts}'],
+  safelist: [
+    'tap-target',
+    'mobile-container',
+    'mobile-sticky',
+    'mobile-input',
+    'mobile-grid'
+  ],
   theme: {
     extend: {
       colors: {
