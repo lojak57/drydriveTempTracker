@@ -58,7 +58,10 @@
 				aria-expanded={isOpen}
 			>
 				<span class="trigger-text">Select Your Role</span>
-				<ChevronDown size={18} class="chevron {isOpen ? 'rotated' : ''}" />
+				<ChevronDown 
+					size={18} 
+					class="transition-transform duration-200 {isOpen ? 'rotate-180' : ''} text-gray-600 flex-shrink-0" 
+				/>
 			</button>
 
 			{#if isOpen}
@@ -252,16 +255,6 @@
 		.trigger-text {
 			font-size: 18px;
 		}
-	}
-
-	.chevron {
-		transition: transform 0.2s ease;
-		color: #6b7280;
-		flex-shrink: 0;
-	}
-
-	.chevron.rotated {
-		transform: rotate(180deg);
 	}
 
 	.dropdown-menu {
