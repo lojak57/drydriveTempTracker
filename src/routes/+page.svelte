@@ -8,6 +8,7 @@
 	import DryDriveLogo from '$lib/components/ui/DryDriveLogo.svelte';
 	import HaulCard from '$lib/components/dashboard/HaulCard.svelte';
 	import RoleSelector from '$lib/components/shared/RoleSelector.svelte';
+	import ThemeToggle from '$lib/components/ui/ThemeToggle.svelte';
 	import { activeHauls, completedHauls, scadaStatus, drivers, trucks } from '$lib/stores/haulStore';
 	import { selectedRole, isRoleView, type RoleId } from '$lib/stores/roleStore';
 	import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-svelte';
@@ -148,9 +149,10 @@
 	<p class="text-xs sm:text-sm md:text-base text-oil-gray px-2">Real-time SCADA monitoring and fleet management platform</p>
 </div>
 
-<!-- Role Selector -->
-<div class="flex justify-center mb-4 sm:mb-6 lg:mb-8 px-4">
+<!-- Role Selector and Theme Toggle -->
+<div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-4 sm:mb-6 lg:mb-8 px-4">
 	<RoleSelector />
+	<ThemeToggle />
 </div>
 
 <!-- Role-Based Dashboard Content -->
