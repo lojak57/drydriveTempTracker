@@ -34,6 +34,7 @@ export interface LayoutConfig {
 export interface Role {
 	id: RoleId;
 	name: string;
+	title: string;
 	description: string;
 	icon: string;
 	focus: string;
@@ -52,6 +53,7 @@ export const roles: Role[] = [
 	{
 		id: 'overview',
 		name: 'System Overview',
+		title: 'System Overview',
 		description: 'Complete operational dashboard',
 		icon: '🏭',
 		focus: 'Overall system performance and monitoring',
@@ -74,6 +76,7 @@ export const roles: Role[] = [
 	{
 		id: 'executive',
 		name: 'Executive',
+		title: 'Executive',
 		description: 'Strategic oversight and financial performance',
 		icon: '👔',
 		focus: 'Profit margins, ROI, and strategic growth targets',
@@ -156,6 +159,7 @@ export const roles: Role[] = [
 	{
 		id: 'driver',
 		name: 'Driver',
+		title: 'Driver',
 		description: 'Personal performance and safety metrics',
 		icon: '🚛',
 		focus: 'Safety scores, efficiency ratings, and performance tracking',
@@ -238,6 +242,7 @@ export const roles: Role[] = [
 	{
 		id: 'dispatch',
 		name: 'Dispatch',
+		title: 'Dispatch',
 		description: 'Fleet coordination and scheduling optimization',
 		icon: '📡',
 		focus: 'On-time delivery rates, resource utilization, and cost efficiency',
@@ -320,6 +325,7 @@ export const roles: Role[] = [
 	{
 		id: 'yard-manager',
 		name: 'Yard Manager',
+		title: 'Yard Manager',
 		description: 'Equipment management and maintenance optimization',
 		icon: '🏗️',
 		focus: 'Equipment uptime, maintenance costs, and turnaround efficiency',
@@ -402,6 +408,7 @@ export const roles: Role[] = [
 	{
 		id: 'regional-manager',
 		name: 'Regional Manager',
+		title: 'Regional Manager',
 		description: 'Multi-site performance and growth management',
 		icon: '🗺️',
 		focus: 'Regional growth targets, cross-site efficiency, and market expansion',
@@ -487,6 +494,9 @@ export const roles: Role[] = [
 export const selectedRole = writable<Role>(roles[1]); // Default to executive (roles[1])
 export const isRoleView = writable<boolean>(true); // Start with role view enabled
 
+// Export available roles
+export const availableRoles = writable<Role[]>(roles);
+
 // Helper functions
 export function getRoleById(id: RoleId): Role | undefined {
 	return roles.find(role => role.id === id);
@@ -498,6 +508,10 @@ export function setRole(roleId: RoleId): void {
 		selectedRole.set(role);
 		isRoleView.set(roleId !== 'overview');
 	}
+}
+
+export function clearRoleView(): void {
+	isRoleView.set(false);
 }
 
 export function resetToOverview(): void {

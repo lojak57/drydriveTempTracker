@@ -140,16 +140,16 @@
 </script>
 
 <!-- Header -->
-<div class="text-center mb-4 sm:mb-8">
+<div class="text-center mb-4 sm:mb-8 mobile-sticky px-4">
 	<div class="flex justify-center mb-3 sm:mb-4">
-		<DryDriveLogo size={240} />
+		<DryDriveLogo size={$isRoleView ? 160 : 240} />
 	</div>
-	<h1 class="text-xl sm:text-2xl lg:text-4xl font-bold tracking-tight text-oil-black mb-2">Oil Transport Operations Center</h1>
-	<p class="text-xs sm:text-base text-oil-gray">Real-time SCADA monitoring and fleet management platform</p>
+	<h1 class="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold tracking-tight text-oil-black mb-2 px-2">Oil Transport Operations Center</h1>
+	<p class="text-xs sm:text-sm md:text-base text-oil-gray px-2">Real-time SCADA monitoring and fleet management platform</p>
 </div>
 
 <!-- Role Selector -->
-<div class="flex justify-center mb-6 sm:mb-8">
+<div class="flex justify-center mb-4 sm:mb-6 lg:mb-8 px-4">
 	<RoleSelector />
 </div>
 
@@ -175,11 +175,11 @@
 		<!-- Executive Dashboard with Navigation -->
 		<div class="executive-dashboard">
 			<!-- Executive Navigation -->
-			<div class="role-navigation mb-6">
-				<div class="nav-tabs">
+			<div class="role-navigation mb-4 sm:mb-6">
+				<div class="nav-tabs mobile-grid">
 					{#each executiveTabs as tab}
 						<button 
-							class="nav-tab {executiveTab === tab.id ? 'active' : ''}"
+							class="nav-tab tap-target {executiveTab === tab.id ? 'active' : ''}"
 							style="--primary-color: {$selectedRole.colorScheme.primary}"
 							on:click={() => executiveTab = tab.id}
 						>
@@ -193,7 +193,7 @@
 			<!-- Executive Tab Content -->
 			{#if executiveTab === 'overview'}
 				<div class="tab-content">
-					<div class="hero-metrics-grid mb-8">
+					<div class="mobile-grid">
 						{#each $selectedRole.layout.heroMetrics as metricId}
 							{@const metric = $selectedRole.metrics.find(m => m.id === metricId)}
 							{#if metric}
@@ -574,17 +574,19 @@
 		</div>
 		
 		<!-- Active Haul Ticket -->
-		<div class="haul-ticket-section mb-8">
+		<div class="haul-ticket-section mb-6 sm:mb-8">
 			<div class="section-header">
 				<h2>Dispatch Haul Management</h2>
 				<div class="haul-controls">
-					<button class="haul-nav-btn">
+					<button class="haul-nav-btn tap-target">
 						<ChevronLeft size={16} />
-						Previous
+						<span class="mobile-hide">Previous</span>
+						<span class="mobile-show">Prev</span>
 					</button>
 					<span class="haul-counter">1 of 47</span>
-					<button class="haul-nav-btn">
-						Next
+					<button class="haul-nav-btn tap-target">
+						<span class="mobile-hide">Next</span>
+						<span class="mobile-show">Next</span>
 						<ChevronRight size={16} />
 					</button>
 				</div>
@@ -679,10 +681,10 @@
 				</div>
 				
 				<div class="ticket-actions">
-					<button class="action-btn primary">Reassign Driver</button>
-					<button class="action-btn secondary">View Full Details</button>
-					<button class="action-btn secondary">Contact Driver</button>
-					<button class="action-btn danger">Emergency Stop</button>
+					<button class="action-btn primary tap-target">Reassign Driver</button>
+					<button class="action-btn secondary tap-target">View Full Details</button>
+					<button class="action-btn secondary tap-target">Contact Driver</button>
+					<button class="action-btn danger tap-target">Emergency Stop</button>
 				</div>
 			</div>
 		</div>
@@ -2675,55 +2677,120 @@
 		height: 120px;
 	}
 	
-	/* Haul Ticket Styles */
+	/* Haul Ticket Styles - Mobile First */
 	.haul-ticket-section {
 		background: rgba(255, 255, 255, 0.95);
 		backdrop-filter: blur(20px);
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 20px;
+		border-radius: 16px;
 		box-shadow: 
-			0 8px 32px rgba(0, 0, 0, 0.1),
-			0 2px 8px rgba(0, 0, 0, 0.05),
+			0 4px 16px rgba(0, 0, 0, 0.08),
+			0 1px 4px rgba(0, 0, 0, 0.04),
 			inset 0 1px 0 rgba(255, 255, 255, 0.8);
-		padding: 24px;
+		padding: 16px;
 		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+	}
+
+	@media (min-width: 768px) {
+		.haul-ticket-section {
+			border-radius: 20px;
+			box-shadow: 
+				0 8px 32px rgba(0, 0, 0, 0.1),
+				0 2px 8px rgba(0, 0, 0, 0.05),
+				inset 0 1px 0 rgba(255, 255, 255, 0.8);
+			padding: 24px;
+		}
 	}
 
 	.section-header {
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 24px;
-		padding-bottom: 16px;
+		flex-direction: column;
+		gap: 12px;
+		margin-bottom: 16px;
+		padding-bottom: 12px;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 	}
 
+	@media (min-width: 640px) {
+		.section-header {
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+			gap: 16px;
+			margin-bottom: 20px;
+			padding-bottom: 16px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.section-header {
+			margin-bottom: 24px;
+		}
+	}
+
 	.section-header h2 {
-		font-size: 24px;
+		font-size: 18px;
 		font-weight: 700;
 		color: #1e293b;
 		margin: 0;
+		text-align: center;
+	}
+
+	@media (min-width: 640px) {
+		.section-header h2 {
+			font-size: 20px;
+			text-align: left;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.section-header h2 {
+			font-size: 24px;
+		}
 	}
 
 	.haul-controls {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		justify-content: center;
+		gap: 8px;
+		width: 100%;
+	}
+
+	@media (min-width: 640px) {
+		.haul-controls {
+			gap: 12px;
+			width: auto;
+			justify-content: flex-end;
+		}
 	}
 
 	.haul-nav-btn {
 		background: rgba(59, 130, 246, 0.1);
 		border: 1px solid rgba(59, 130, 246, 0.2);
-		border-radius: 10px;
+		border-radius: 8px;
 		color: #3b82f6;
 		padding: 8px 12px;
-		font-size: 14px;
+		font-size: 13px;
 		font-weight: 500;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
-		gap: 6px;
+		gap: 4px;
 		transition: all 0.2s ease;
+		min-height: 44px;
+		min-width: 44px;
+		justify-content: center;
+	}
+
+	@media (min-width: 640px) {
+		.haul-nav-btn {
+			border-radius: 10px;
+			padding: 8px 12px;
+			font-size: 14px;
+			gap: 6px;
+			min-width: auto;
+		}
 	}
 
 	.haul-nav-btn:hover {
@@ -2732,44 +2799,95 @@
 	}
 
 	.haul-counter {
-		font-size: 14px;
+		font-size: 13px;
 		color: #64748b;
 		font-weight: 500;
 		font-family: 'JetBrains Mono', monospace;
+		padding: 0 8px;
+	}
+
+	@media (min-width: 640px) {
+		.haul-counter {
+			font-size: 14px;
+		}
 	}
 
 	.haul-ticket-container {
 		background: white;
 		border: 1px solid rgba(226, 232, 240, 0.8);
-		border-radius: 16px;
+		border-radius: 12px;
 		overflow: hidden;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+	}
+
+	@media (min-width: 768px) {
+		.haul-ticket-container {
+			border-radius: 16px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		}
 	}
 
 	.ticket-header {
 		background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
 		color: white;
-		padding: 20px 24px;
+		padding: 16px 20px;
 		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	@media (min-width: 640px) {
+		.ticket-header {
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: flex-start;
+			gap: 16px;
+			padding: 18px 24px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.ticket-header {
+			padding: 20px 24px;
+		}
 	}
 
 	.ticket-info h3 {
-		font-size: 20px;
+		font-size: 16px;
 		font-weight: 700;
 		margin: 0 0 4px 0;
 		font-family: 'JetBrains Mono', monospace;
 	}
 
+	@media (min-width: 640px) {
+		.ticket-info h3 {
+			font-size: 18px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.ticket-info h3 {
+			font-size: 20px;
+		}
+	}
+
 	.ticket-status {
-		padding: 4px 12px;
-		border-radius: 20px;
-		font-size: 12px;
+		padding: 3px 8px;
+		border-radius: 16px;
+		font-size: 11px;
 		font-weight: 600;
 		letter-spacing: 0.5px;
-		margin-bottom: 8px;
+		margin-bottom: 6px;
 		display: inline-block;
+	}
+
+	@media (min-width: 640px) {
+		.ticket-status {
+			padding: 4px 12px;
+			border-radius: 20px;
+			font-size: 12px;
+			margin-bottom: 8px;
+		}
 	}
 
 	.ticket-status.in-transit {
@@ -2780,29 +2898,55 @@
 
 	.ticket-info small {
 		color: rgba(255, 255, 255, 0.8);
-		font-size: 14px;
+		font-size: 12px;
 		font-weight: 500;
+	}
+
+	@media (min-width: 640px) {
+		.ticket-info small {
+			font-size: 14px;
+		}
 	}
 
 	.ticket-time {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
-		text-align: right;
-		font-size: 14px;
+		gap: 3px;
+		font-size: 12px;
 		color: rgba(255, 255, 255, 0.9);
 	}
 
+	@media (min-width: 640px) {
+		.ticket-time {
+			text-align: right;
+			font-size: 14px;
+			gap: 4px;
+		}
+	}
+
 	.ticket-content {
-		padding: 24px;
+		padding: 16px;
 		display: flex;
 		flex-direction: column;
-		gap: 24px;
+		gap: 16px;
+	}
+
+	@media (min-width: 768px) {
+		.ticket-content {
+			padding: 24px;
+			gap: 24px;
+		}
 	}
 
 	.ticket-section {
 		border-bottom: 1px solid #e2e8f0;
-		padding-bottom: 20px;
+		padding-bottom: 16px;
+	}
+
+	@media (min-width: 768px) {
+		.ticket-section {
+			padding-bottom: 20px;
+		}
 	}
 
 	.ticket-section:last-child {
@@ -2811,184 +2955,339 @@
 	}
 
 	.ticket-section h4 {
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: 600;
 		color: #334155;
-		margin: 0 0 12px 0;
+		margin: 0 0 8px 0;
+	}
+
+	@media (min-width: 640px) {
+		.ticket-section h4 {
+			font-size: 15px;
+			margin: 0 0 10px 0;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.ticket-section h4 {
+			font-size: 16px;
+			margin: 0 0 12px 0;
+		}
 	}
 
 	.route-info {
 		display: grid;
-		grid-template-columns: 1fr auto 1fr;
-		gap: 20px;
-		align-items: center;
+		grid-template-columns: 1fr;
+		gap: 12px;
+	}
+
+	@media (min-width: 640px) {
+		.route-info {
+			grid-template-columns: 1fr auto 1fr;
+			gap: 16px;
+			align-items: center;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.route-info {
+			gap: 20px;
+		}
 	}
 
 	.location {
-		padding: 16px;
+		padding: 12px;
 		background: rgba(248, 250, 252, 0.8);
-		border-radius: 12px;
+		border-radius: 8px;
 		border: 1px solid rgba(226, 232, 240, 0.8);
+	}
+
+	@media (min-width: 768px) {
+		.location {
+			padding: 16px;
+			border-radius: 12px;
+		}
 	}
 
 	.location strong {
 		color: #1e293b;
 		font-weight: 600;
+		font-size: 13px;
+	}
+
+	@media (min-width: 640px) {
+		.location strong {
+			font-size: 14px;
+		}
 	}
 
 	.location small {
 		color: #64748b;
-		font-size: 13px;
+		font-size: 11px;
 		line-height: 1.4;
 	}
 
+	@media (min-width: 640px) {
+		.location small {
+			font-size: 12px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.location small {
+			font-size: 13px;
+		}
+	}
+
 	.route-arrow {
-		font-size: 20px;
+		font-size: 16px;
 		color: #94a3b8;
 		font-weight: bold;
 		text-align: center;
+		transform: rotate(90deg);
+	}
+
+	@media (min-width: 640px) {
+		.route-arrow {
+			font-size: 18px;
+			transform: none;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.route-arrow {
+			font-size: 20px;
+		}
 	}
 
 	.ticket-metrics {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-		gap: 16px;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 8px;
+	}
+
+	@media (min-width: 640px) {
+		.ticket-metrics {
+			grid-template-columns: repeat(4, 1fr);
+			gap: 12px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.ticket-metrics {
+			grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+			gap: 16px;
+		}
 	}
 
 	.metric-item {
 		text-align: center;
-		padding: 16px;
+		padding: 12px 8px;
 		background: rgba(248, 250, 252, 0.8);
-		border-radius: 12px;
+		border-radius: 8px;
 		border: 1px solid rgba(226, 232, 240, 0.8);
+	}
+
+	@media (min-width: 768px) {
+		.metric-item {
+			padding: 16px;
+			border-radius: 12px;
+		}
 	}
 
 	.metric-item label {
 		display: block;
-		font-size: 12px;
+		font-size: 10px;
 		color: #64748b;
 		font-weight: 500;
+		margin-bottom: 4px;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
-		margin-bottom: 6px;
+	}
+
+	@media (min-width: 640px) {
+		.metric-item label {
+			font-size: 11px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.metric-item label {
+			font-size: 12px;
+		}
 	}
 
 	.metric-value {
-		font-size: 18px;
+		font-size: 14px;
 		font-weight: 600;
 		color: #1e293b;
 		font-family: 'JetBrains Mono', monospace;
+		line-height: 1.2;
+	}
+
+	@media (min-width: 640px) {
+		.metric-value {
+			font-size: 16px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.metric-value {
+			font-size: 18px;
+		}
 	}
 
 	.metric-value.safe {
 		color: #059669;
 	}
 
-	.product-details {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 16px;
-	}
-
-	.product-details span {
-		font-size: 14px;
-		color: #475569;
-	}
-
-	.equipment-details {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-
-	.equipment-item span {
-		font-size: 14px;
-		color: #475569;
-		display: block;
-	}
-
-	.safety-indicators {
-		display: flex;
-		flex-wrap: wrap;
+	.measurement-financial {
+		display: grid;
+		grid-template-columns: 1fr;
 		gap: 12px;
 	}
 
-	.safety-item {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		padding: 8px 12px;
-		background: rgba(220, 252, 231, 0.8);
-		color: #065f46;
-		border-radius: 8px;
-		font-size: 14px;
-		font-weight: 500;
+	@media (min-width: 640px) {
+		.measurement-financial {
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+		}
 	}
 
-	.safety-item.completed {
-		background: rgba(220, 252, 231, 0.8);
-		color: #065f46;
-	}
-
-	.measurement-financial {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 20px;
+	@media (min-width: 768px) {
+		.measurement-financial {
+			gap: 20px;
+		}
 	}
 
 	.measurement-data,
 	.financial-data {
 		display: flex;
 		flex-direction: column;
-		gap: 8px;
-		padding: 16px;
+		gap: 6px;
+		padding: 12px;
 		background: rgba(248, 250, 252, 0.8);
-		border-radius: 12px;
+		border-radius: 8px;
 		border: 1px solid rgba(226, 232, 240, 0.8);
+	}
+
+	@media (min-width: 768px) {
+		.measurement-data,
+		.financial-data {
+			gap: 8px;
+			padding: 16px;
+			border-radius: 12px;
+		}
 	}
 
 	.measurement-data span,
 	.financial-data span {
-		font-size: 14px;
+		font-size: 12px;
 		color: #475569;
+	}
+
+	@media (min-width: 640px) {
+		.measurement-data span,
+		.financial-data span {
+			font-size: 13px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.measurement-data span,
+		.financial-data span {
+			font-size: 14px;
+		}
 	}
 
 	.document-status {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 12px;
+		gap: 8px;
+	}
+
+	@media (min-width: 768px) {
+		.document-status {
+			gap: 12px;
+		}
 	}
 
 	.doc-item {
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		padding: 6px 12px;
+		gap: 4px;
+		padding: 6px 8px;
 		background: rgba(220, 252, 231, 0.8);
 		color: #065f46;
-		border-radius: 8px;
-		font-size: 13px;
+		border-radius: 6px;
+		font-size: 11px;
 		font-weight: 500;
 		font-family: 'JetBrains Mono', monospace;
 	}
 
+	@media (min-width: 640px) {
+		.doc-item {
+			gap: 6px;
+			padding: 6px 10px;
+			font-size: 12px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.doc-item {
+			padding: 6px 12px;
+			border-radius: 8px;
+			font-size: 13px;
+		}
+	}
+
 	.ticket-actions {
-		padding: 20px 24px;
+		padding: 16px;
 		background: rgba(248, 250, 252, 0.8);
 		border-top: 1px solid #e2e8f0;
 		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	@media (min-width: 640px) {
+		.ticket-actions {
+			flex-direction: row;
+			flex-wrap: wrap;
+			gap: 10px;
+			padding: 18px 20px;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.ticket-actions {
+			gap: 12px;
+			padding: 20px 24px;
+		}
 	}
 
 	.action-btn {
-		padding: 10px 16px;
-		border-radius: 10px;
+		padding: 12px 16px;
+		border-radius: 8px;
 		font-size: 14px;
 		font-weight: 500;
 		cursor: pointer;
 		transition: all 0.2s ease;
 		border: 1px solid;
+		min-height: 44px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+	}
+
+	@media (min-width: 640px) {
+		.action-btn {
+			padding: 10px 16px;
+			border-radius: 10px;
+			min-height: auto;
+			flex: 1;
+		}
 	}
 
 	.action-btn.primary {
@@ -3022,53 +3321,5 @@
 	.action-btn.danger:hover {
 		background: rgba(239, 68, 68, 0.2);
 		transform: translateY(-1px);
-	}
-
-	/* Mobile Responsiveness for Haul Tickets */
-	@media (max-width: 768px) {
-		.section-header {
-			flex-direction: column;
-			gap: 16px;
-			align-items: flex-start;
-		}
-
-		.haul-controls {
-			width: 100%;
-			justify-content: space-between;
-		}
-
-		.ticket-header {
-			flex-direction: column;
-			gap: 16px;
-		}
-
-		.ticket-time {
-			text-align: left;
-		}
-
-		.route-info {
-			grid-template-columns: 1fr;
-			gap: 12px;
-		}
-
-		.route-arrow {
-			transform: rotate(90deg);
-		}
-
-		.ticket-metrics {
-			grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-		}
-
-		.measurement-financial {
-			grid-template-columns: 1fr;
-		}
-
-		.ticket-actions {
-			flex-direction: column;
-		}
-
-		.action-btn {
-			text-align: center;
-		}
 	}
 </style>
