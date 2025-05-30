@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { completedHauls, drivers, trucks } from '$lib/stores/haulStore';
+	import { completedHauls, drivers, trucks, type Haul } from '$lib/stores/haulStore';
 	import HaulCard from '$lib/components/dashboard/HaulCard.svelte';
+	import HaulDetailView from '$lib/components/dashboard/HaulDetailView.svelte';
 
 	// Filter and sort options
 	let searchTerm = '';
@@ -13,6 +14,9 @@
 	let currentPage = 1;
 	let itemsPerPage = 12;
 
+	// Selected haul for detailed view
+	let selectedHaul: Haul | null = null;
+
 	// Get truck and driver info
 	function getTruckInfo(truckId: string) {
 		return $trucks.find(truck => truck.id === truckId);
@@ -20,6 +24,15 @@
 
 	function getDriverInfo(driverId: string) {
 		return $drivers.find(driver => driver.id === driverId);
+	}
+
+	// Handle haul selection
+	function handleHaulSelect(haul: Haul) {
+		selectedHaul = haul;
+	}
+
+	function closeDetailView() {
+		selectedHaul = null;
 	}
 
 	// Filter and sort hauls
@@ -165,11 +178,14 @@
 		{@const truck = getTruckInfo(haul.truckId)}
 		{@const driver = getDriverInfo(haul.driverId)}
 		
-		<HaulCard 
-			{haul}
-			truck={truck}
-			driver={driver}
-		/>
+		{#if truck && driver}
+			<HaulCard 
+				{haul}
+				{truck}
+				{driver}
+				on:select={() => handleHaulSelect(haul)}
+			/>
+		{/if}
 	{/each}
 </div>
 
@@ -213,4 +229,35 @@
 		<h3 class="text-xl font-semibold text-oil-black mb-2">No Hauls Found</h3>
 		<p class="text-oil-gray">Try adjusting your search criteria or filters.</p>
 	</div>
+{/if}
+
+<!-- Haul Detail Modal -->
+{#if selectedHaul}
+	{@const selectedTruck = getTruckInfo(selectedHaul.truckId)}
+	{@const selectedDriver = getDriverInfo(selectedHaul.driverId)}
+	
+	{#if selectedTruck && selectedDriver}
+		<div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+			<div class="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+				<div class="p-6 border-b border-gray-200 flex items-center justify-between">
+					<h2 class="text-2xl font-bold text-oil-black">Haul Details - {selectedHaul.id.slice(-8)}</h2>
+					<button 
+						onclick={closeDetailView}
+						class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+					>
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+						</svg>
+					</button>
+				</div>
+				<div class="overflow-y-auto max-h-[calc(90vh-120px)]">
+					<HaulDetailView 
+						haul={selectedHaul}
+						truck={selectedTruck}
+						driver={selectedDriver}
+					/>
+				</div>
+			</div>
+		</div>
+	{/if}
 {/if} 

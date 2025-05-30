@@ -24,10 +24,12 @@
 	onMount(() => {
 		if (browser) {
 			screenWidth = window.innerWidth;
+			chartOptions = createChartOptions();
 			
 			// Update screen width on resize
 			const handleResize = () => {
 				screenWidth = window.innerWidth;
+				chartOptions = createChartOptions(); // Recreate options with new screen width
 			};
 			window.addEventListener('resize', handleResize);
 			
@@ -138,81 +140,85 @@
 		}
 	}
 
-	// Responsive chart options
-	$: chartOptions = {
-		responsive: true,
-		maintainAspectRatio: false,
-		plugins: {
-			legend: {
-				display: false
-			},
-			tooltip: {
-				mode: 'index',
-				intersect: false,
-				backgroundColor: 'rgba(255, 255, 255, 0.95)',
-				titleColor: '#1a1a1a',
-				bodyColor: '#6b7280',
-				borderColor: color,
-				borderWidth: 1,
-				cornerRadius: 8,
-				padding: 8,
-				titleFont: {
-					size: screenWidth < 640 ? 11 : 12,
-					weight: '600'
+	// Responsive chart options - moved to function to avoid SSR issues
+	let chartOptions: any = null;
+	
+	function createChartOptions() {
+		return {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: {
+					display: false
 				},
-				bodyFont: {
-					size: screenWidth < 640 ? 10 : 11
-				},
-				callbacks: {
-					label: function(context: any) {
-						return `${context.parsed.y.toFixed(1)}${unit}`;
-					}
-				}
-			}
-		},
-		interaction: {
-			mode: 'nearest',
-			axis: 'x',
-			intersect: false
-		},
-		scales: {
-			x: {
-				display: true,
-				grid: {
-					display: showGrid,
-					color: 'rgba(0, 78, 137, 0.1)'
-				},
-				ticks: {
-					maxTicksLimit: screenWidth < 640 ? 3 : screenWidth < 1024 ? 4 : 6,
-					color: '#6b7280',
-					font: {
-						size: screenWidth < 640 ? 9 : screenWidth < 1024 ? 10 : 11
-					}
-				}
-			},
-			y: {
-				display: true,
-				grid: {
-					display: showGrid,
-					color: 'rgba(0, 78, 137, 0.1)'
-				},
-				ticks: {
-					maxTicksLimit: screenWidth < 640 ? 4 : 6,
-					color: '#6b7280',
-					font: {
-						size: screenWidth < 640 ? 9 : screenWidth < 1024 ? 10 : 11
+				tooltip: {
+					mode: 'index',
+					intersect: false,
+					backgroundColor: 'rgba(255, 255, 255, 0.95)',
+					titleColor: '#1a1a1a',
+					bodyColor: '#6b7280',
+					borderColor: color,
+					borderWidth: 1,
+					cornerRadius: 8,
+					padding: 8,
+					titleFont: {
+						size: screenWidth < 640 ? 11 : 12,
+						weight: '600'
 					},
-					callback: function(value: any) {
-						return value + unit;
+					bodyFont: {
+						size: screenWidth < 640 ? 10 : 11
+					},
+					callbacks: {
+						label: function(context: any) {
+							return `${context.parsed.y.toFixed(1)}${unit}`;
+						}
 					}
 				}
-			}
-		},
-		animation: animated ? {
-			duration: 750,
-			easing: 'easeInOutQuart'
-		} : false
-	};
+			},
+			interaction: {
+				mode: 'nearest',
+				axis: 'x',
+				intersect: false
+			},
+			scales: {
+				x: {
+					display: true,
+					grid: {
+						display: showGrid,
+						color: 'rgba(0, 78, 137, 0.1)'
+					},
+					ticks: {
+						maxTicksLimit: screenWidth < 640 ? 3 : screenWidth < 1024 ? 4 : 6,
+						color: '#6b7280',
+						font: {
+							size: screenWidth < 640 ? 9 : screenWidth < 1024 ? 10 : 11
+						}
+					}
+				},
+				y: {
+					display: true,
+					grid: {
+						display: showGrid,
+						color: 'rgba(0, 78, 137, 0.1)'
+					},
+					ticks: {
+						maxTicksLimit: screenWidth < 640 ? 4 : 6,
+						color: '#6b7280',
+						font: {
+							size: screenWidth < 640 ? 9 : screenWidth < 1024 ? 10 : 11
+						},
+						callback: function(value: any) {
+							return value + unit;
+						}
+					}
+				}
+			},
+			animation: animated ? {
+				duration: 750,
+				easing: 'easeInOutQuart'
+			} : false
+		};
+	}
 </script>
 
 <div class="realtime-chart">
@@ -224,7 +230,7 @@
 		</div>
 	</div>
 	
-	{#if chartData && chartData.datasets && chartData.datasets.length > 0}
+	{#if chartData && chartData.datasets && chartData.datasets.length > 0 && chartOptions}
 		<Chart 
 			type="line" 
 			data={chartData}
