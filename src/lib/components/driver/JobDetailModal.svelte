@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { 
-		X, MapPin, Clock, Gauge, Phone, AlertCircle, Navigation, 
+		X, MapPin, Clock, Gauge, Phone, AlertCircle, 
 		Thermometer, Shield, FileText, User, Truck, CheckCircle, Database, BarChart3 
 	} from 'lucide-svelte';
 
@@ -51,12 +51,6 @@
 	function callCustomer() {
 		// In production: initiate phone call
 		console.log('Calling customer:', job.customerContact.phone);
-	}
-
-	function openNavigation() {
-		// In production: open navigation app with destination
-		const destination = `${job.pickupLocation.coordinates.lat},${job.pickupLocation.coordinates.lng}`;
-		console.log('Opening navigation to:', destination);
 	}
 
 	function formatTime(date: Date) {
@@ -253,9 +247,9 @@
 					</div>
 				{/if}
 
-				<!-- Customer Contact -->
+				<!-- Emergency Contact -->
 				<div class="contact-section">
-					<h4 class="section-title">Customer Contact</h4>
+					<h4 class="section-title">Emergency Contact</h4>
 					<div class="contact-card">
 						<div class="contact-info">
 							<User size={18} />
@@ -293,10 +287,6 @@
 
 			<!-- Modal Actions -->
 			<div class="modal-actions">
-				<button class="navigation-btn tap-target" on:click={openNavigation}>
-					<Navigation size={18} />
-					<span>Navigate</span>
-				</button>
 				<button 
 					class="start-btn tap-target {isJobReady() ? 'enabled' : 'disabled'}"
 					disabled={!isJobReady()}
@@ -765,7 +755,7 @@
 		flex-shrink: 0;
 	}
 
-	.navigation-btn, .start-btn {
+	.start-btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -778,17 +768,6 @@
 		transition: all 0.2s ease;
 		border: 1px solid;
 		flex: 1;
-	}
-
-	.navigation-btn {
-		background: white;
-		color: #3b82f6;
-		border-color: #3b82f6;
-	}
-
-	.navigation-btn:hover {
-		background: #eff6ff;
-		transform: translateY(-1px);
 	}
 
 	.start-btn.enabled {
@@ -839,7 +818,7 @@
 			flex-direction: column;
 		}
 
-		.navigation-btn, .start-btn {
+		.start-btn {
 			flex: none;
 		}
 	}

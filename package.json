@@ -37,6 +37,7 @@
 		"chart.js": "^4.4.9",
 		"chartjs-adapter-date-fns": "^3.0.0",
 		"date-fns": "^4.1.0",
-		"lucide-svelte": "^0.511.0"
+		"lucide-svelte": "^0.511.0",
+		"maplibre-gl": "^5.5.0"
 	}
 }

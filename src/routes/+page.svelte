@@ -12,6 +12,7 @@
 	import DriverSchedule from '$lib/components/driver/DriverSchedule.svelte';
 	import JobDetailModal from '$lib/components/driver/JobDetailModal.svelte';
 	import JobMapView from '$lib/components/driver/JobMapView.svelte';
+	import InTransitView from '$lib/components/driver/InTransitView.svelte';
 	import { activeHauls, completedHauls, scadaStatus, drivers, trucks } from '$lib/stores/haulStore';
 	import { selectedRole, isRoleView, type RoleId } from '$lib/stores/roleStore';
 	import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-svelte';
@@ -147,6 +148,7 @@
 	let selectedJob: any = null;
 	let showJobModal = false;
 	let showMapView = false;
+	let showTransitView = false;
 	let inspectionCompleted = false;
 
 	function handleJobSelected(event: CustomEvent) {
@@ -170,6 +172,17 @@
 
 	function handleExitMap() {
 		showMapView = false;
+		selectedJob = null;
+	}
+
+	function handleStartTransit(event: CustomEvent) {
+		selectedJob = event.detail.job;
+		showMapView = false;
+		showTransitView = true;
+	}
+
+	function handleExitTransit() {
+		showTransitView = false;
 		selectedJob = null;
 	}
 </script>
@@ -2040,6 +2053,15 @@
 	<JobMapView 
 		job={selectedJob}
 		on:exit-map={handleExitMap}
+		on:start-transit={handleStartTransit}
+	/>
+{/if}
+
+<!-- In-Transit View -->
+{#if showTransitView && selectedJob}
+	<InTransitView 
+		job={selectedJob}
+		on:exit-transit={handleExitTransit}
 	/>
 {/if}
 

@@ -1,13 +1,18 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 	import { 
 		X, MapPin, Clock, Navigation, Phone, AlertCircle, 
 		Gauge, Thermometer, Truck, CheckCircle, ArrowLeft, BarChart3 
 	} from 'lucide-svelte';
+	import maplibregl from 'maplibre-gl';
 
 	const dispatch = createEventDispatcher();
 
 	export let job: any; // Job details from parent
+
+	// Map container and instance
+	let mapContainer: HTMLDivElement;
+	let map: maplibregl.Map;
 
 	// Mock current location and progress
 	let currentStep = 'driving-to-pickup'; // 'driving-to-pickup' | 'at-pickup' | 'loading' | 'driving-to-delivery' | 'at-delivery' | 'unloading' | 'completed'
@@ -31,6 +36,184 @@
 		{ id: 'unloading', label: 'Unload Tank', status: 'pending', eta: '11:30 AM' },
 		{ id: 'completed', label: 'Job Complete', status: 'pending', eta: '12:00 PM' }
 	];
+
+	// Map initialization
+	onMount(() => {
+		if (mapContainer && job) {
+			// Initialize map with light styling suitable for oil field operations
+			map = new maplibregl.Map({
+				container: mapContainer,
+				style: {
+					"version": 8,
+					"sources": {
+						"carto-light": {
+							"type": "raster",
+							"tiles": [
+								"https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+								"https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+								"https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+							],
+							"tileSize": 256,
+							"attribution": "© CartoDB © OpenStreetMap contributors"
+						}
+					},
+					"layers": [
+						{
+							"id": "carto-light-layer",
+							"type": "raster",
+							"source": "carto-light",
+							"minzoom": 0,
+							"maxzoom": 22
+						}
+					]
+				},
+				center: [currentLocation.lng, currentLocation.lat],
+				zoom: 10,
+				attributionControl: false
+			});
+
+			// Add navigation controls
+			map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+			// Add markers and route when map loads
+			map.on('load', () => {
+				addMarkersAndRoute();
+			});
+		}
+	});
+
+	onDestroy(() => {
+		if (map) {
+			map.remove();
+		}
+	});
+
+	function addMarkersAndRoute() {
+		if (!map || !job) return;
+
+		// Current location marker (truck)
+		const currentMarker = new maplibregl.Marker({
+			color: '#8b5cf6',
+			scale: 1.2
+		})
+		.setLngLat([currentLocation.lng, currentLocation.lat])
+		.setPopup(new maplibregl.Popup().setHTML(`
+			<div style="text-align: center; padding: 8px;">
+				<strong style="color: #8b5cf6;">Current Location</strong><br>
+				<span style="font-size: 12px; color: #666;">${currentLocation.address}</span>
+			</div>
+		`))
+		.addTo(map);
+
+		// Pickup location marker
+		const pickupMarker = new maplibregl.Marker({
+			color: '#059669',
+			scale: 1.0
+		})
+		.setLngLat([job.pickupLocation.coordinates.lng, job.pickupLocation.coordinates.lat])
+		.setPopup(new maplibregl.Popup().setHTML(`
+			<div style="text-align: center; padding: 8px;">
+				<strong style="color: #059669;">Pickup Location</strong><br>
+				<span style="font-size: 12px; color: #666;">${job.pickupLocation.name}</span><br>
+				<span style="font-size: 11px; color: #999;">${job.pickupLocation.tankNumber}</span>
+			</div>
+		`))
+		.addTo(map);
+
+		// Delivery location marker
+		const deliveryMarker = new maplibregl.Marker({
+			color: '#3b82f6',
+			scale: 1.0
+		})
+		.setLngLat([job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat])
+		.setPopup(new maplibregl.Popup().setHTML(`
+			<div style="text-align: center; padding: 8px;">
+				<strong style="color: #3b82f6;">Delivery Location</strong><br>
+				<span style="font-size: 12px; color: #666;">${job.deliveryLocation.name}</span>
+			</div>
+		`))
+		.addTo(map);
+
+		// Add route lines
+		map.addSource('route', {
+			'type': 'geojson',
+			'data': {
+				'type': 'Feature',
+				'properties': {},
+				'geometry': {
+					'type': 'LineString',
+					'coordinates': [
+						[currentLocation.lng, currentLocation.lat],
+						[job.pickupLocation.coordinates.lng, job.pickupLocation.coordinates.lat],
+						[job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat]
+					]
+				}
+			}
+		});
+
+		// Current to pickup route (active)
+		map.addLayer({
+			'id': 'active-route',
+			'type': 'line',
+			'source': 'route',
+			'layout': {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			'paint': {
+				'line-color': '#059669',
+				'line-width': 4,
+				'line-opacity': 0.8
+			}
+		});
+
+		// Pickup to delivery route (planned)
+		map.addSource('planned-route', {
+			'type': 'geojson',
+			'data': {
+				'type': 'Feature',
+				'properties': {},
+				'geometry': {
+					'type': 'LineString',
+					'coordinates': [
+						[job.pickupLocation.coordinates.lng, job.pickupLocation.coordinates.lat],
+						[job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat]
+					]
+				}
+			}
+		});
+
+		map.addLayer({
+			'id': 'planned-route',
+			'type': 'line',
+			'source': 'planned-route',
+			'layout': {
+				'line-join': 'round',
+				'line-cap': 'round'
+			},
+			'paint': {
+				'line-color': '#3b82f6',
+				'line-width': 3,
+				'line-opacity': 0.6,
+				'line-dasharray': [2, 2]
+			}
+		});
+
+		// Fit map to show all points with padding
+		const coordinates: [number, number][] = [
+			[currentLocation.lng, currentLocation.lat],
+			[job.pickupLocation.coordinates.lng, job.pickupLocation.coordinates.lat],
+			[job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat]
+		];
+
+		const bounds = new maplibregl.LngLatBounds();
+		coordinates.forEach(coord => bounds.extend(coord));
+
+		map.fitBounds(bounds, {
+			padding: 50,
+			maxZoom: 12
+		});
+	}
 
 	function exitMapView() {
 		dispatch('exit-map');
@@ -62,6 +245,13 @@
 			minute: '2-digit',
 			hour12: true 
 		});
+	}
+
+	function openNavigation() {
+		// In production: open native navigation app
+		const destination = `${job.pickupLocation.coordinates.lat},${job.pickupLocation.coordinates.lng}`;
+		const url = `https://maps.apple.com/?daddr=${destination}`;
+		window.open(url, '_blank');
 	}
 </script>
 
@@ -188,52 +378,41 @@
 					<CheckCircle size={16} />
 					<span>Next Step</span>
 				</button>
+				<button class="action-btn transit tap-target" on:click={() => dispatch('start-transit', { job })}>
+					<Truck size={16} />
+					<span>Start Transit</span>
+				</button>
 			</div>
 		</div>
 	</div>
 
-	<!-- Right Panel - Map -->
+	<!-- Right Panel - Interactive Map -->
 	<div class="map-panel">
 		<div class="map-container">
-			<!-- Mock Google Maps Interface -->
+			<!-- Map Header with Navigation Controls -->
 			<div class="map-header">
 				<div class="route-info">
 					<span class="route-distance">{job.distance} miles</span>
 					<span class="route-time">{Math.round(job.estimatedDuration * 60)} min</span>
 				</div>
 				<div class="map-controls">
-					<button class="map-btn tap-target">
+					<button class="map-btn tap-target" on:click={openNavigation} title="Open in Navigation App">
 						<Navigation size={16} />
+						<span class="btn-text">Navigate</span>
 					</button>
 				</div>
 			</div>
 			
-			<div class="map-mockup">
-				<!-- Mock map background -->
-				<div class="map-background">
-					<div class="route-line"></div>
-					<div class="location-marker start" style="top: 70%; left: 20%;">
-						<div class="marker-dot"></div>
-						<span class="marker-label">Current Location</span>
-					</div>
-					<div class="location-marker pickup" style="top: 40%; left: 60%;">
-						<div class="marker-dot pickup-marker"></div>
-						<span class="marker-label">Pickup: {job.pickupLocation.name}</span>
-					</div>
-					<div class="location-marker delivery" style="top: 20%; left: 80%;">
-						<div class="marker-dot delivery-marker"></div>
-						<span class="marker-label">Delivery: {job.deliveryLocation.name}</span>
-					</div>
-				</div>
-				
-				<!-- Navigation overlay -->
-				<div class="nav-overlay">
-					<div class="next-turn">
-						<Navigation size={24} />
-						<div class="turn-info">
-							<span class="turn-distance">In 2.3 miles</span>
-							<span class="turn-instruction">Continue on I-45 North</span>
-						</div>
+			<!-- MapLibre GL Container -->
+			<div class="map-gl-container" bind:this={mapContainer}></div>
+
+			<!-- Navigation overlay -->
+			<div class="nav-overlay">
+				<div class="next-turn">
+					<Navigation size={24} />
+					<div class="turn-info">
+						<span class="turn-distance">In 2.3 miles</span>
+						<span class="turn-instruction">Continue on I-45 North</span>
 					</div>
 				</div>
 			</div>
@@ -256,6 +435,8 @@
 </div>
 
 <style>
+	@import 'maplibre-gl/dist/maplibre-gl.css';
+
 	.map-view-container {
 		position: fixed;
 		top: 0;
@@ -578,6 +759,12 @@
 		color: #059669;
 	}
 
+	.action-btn.transit {
+		background: rgba(59, 130, 246, 0.1);
+		border-color: rgba(59, 130, 246, 0.2);
+		color: #3b82f6;
+	}
+
 	.action-btn:hover {
 		transform: translateY(-1px);
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -604,6 +791,7 @@
 		justify-content: space-between;
 		align-items: center;
 		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		z-index: 10;
 	}
 
 	.route-info {
@@ -621,93 +809,50 @@
 		color: #3b82f6;
 	}
 
+	.map-controls {
+		display: flex;
+		gap: 8px;
+	}
+
 	.map-btn {
+		display: flex;
+		align-items: center;
+		gap: 6px;
 		background: rgba(59, 130, 246, 0.1);
 		border: 1px solid rgba(59, 130, 246, 0.2);
 		border-radius: 6px;
 		color: #3b82f6;
-		padding: 6px;
+		padding: 8px 12px;
 		cursor: pointer;
 		transition: all 0.2s ease;
+		font-size: 13px;
+		font-weight: 500;
 	}
 
-	.map-mockup {
+	.map-btn:hover {
+		background: rgba(59, 130, 246, 0.2);
+		transform: translateY(-1px);
+	}
+
+	.btn-text {
+		font-size: 13px;
+	}
+
+	/* MapLibre GL Container */
+	.map-gl-container {
 		flex: 1;
 		position: relative;
-		background: linear-gradient(45deg, #e5e7eb 25%, transparent 25%), 
-		            linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), 
-		            linear-gradient(45deg, transparent 75%, #e5e7eb 75%), 
-		            linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
-		background-size: 20px 20px;
-		background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-		background-color: #f3f4f6;
+		min-height: 0;
 	}
 
-	.map-background {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: 
-			radial-gradient(circle at 30% 60%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
-			radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-			linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%);
-	}
-
-	.route-line {
-		position: absolute;
-		top: 70%;
-		left: 20%;
-		width: 65%;
-		height: 2px;
-		background: linear-gradient(45deg, #059669 0%, #3b82f6 100%);
-		transform: rotate(-25deg);
-		transform-origin: left center;
-		border-radius: 1px;
-	}
-
-	.location-marker {
-		position: absolute;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 4px;
-	}
-
-	.marker-dot {
-		width: 12px;
-		height: 12px;
-		background: #1e293b;
-		border: 2px solid white;
-		border-radius: 50%;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
-
-	.pickup-marker {
-		background: #059669;
-	}
-
-	.delivery-marker {
-		background: #3b82f6;
-	}
-
-	.marker-label {
-		font-size: 10px;
-		font-weight: 500;
-		color: #374151;
-		background: rgba(255, 255, 255, 0.9);
-		padding: 2px 6px;
-		border-radius: 4px;
-		white-space: nowrap;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-	}
-
+	/* Navigation overlay */
 	.nav-overlay {
 		position: absolute;
 		top: 20px;
 		left: 20px;
 		right: 20px;
+		z-index: 5;
+		pointer-events: none;
 	}
 
 	.next-turn {
@@ -719,6 +864,7 @@
 		align-items: center;
 		gap: 12px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		pointer-events: auto;
 	}
 
 	.next-turn svg {
@@ -749,6 +895,7 @@
 		backdrop-filter: blur(20px);
 		padding: 16px 20px;
 		border-top: 1px solid rgba(0, 0, 0, 0.1);
+		z-index: 10;
 	}
 
 	.route-step {
@@ -801,5 +948,38 @@
 		.action-buttons {
 			grid-template-columns: 1fr;
 		}
+
+		.map-btn .btn-text {
+			display: none;
+		}
+	}
+
+	/* MapLibre GL Popup Customization */
+	:global(.maplibregl-popup-content) {
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		border: 1px solid rgba(0, 0, 0, 0.1);
+		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+	}
+
+	:global(.maplibregl-popup-anchor-bottom .maplibregl-popup-tip),
+	:global(.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip),
+	:global(.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip) {
+		border-top-color: #ffffff;
+	}
+
+	:global(.maplibregl-popup-anchor-top .maplibregl-popup-tip),
+	:global(.maplibregl-popup-anchor-top-left .maplibregl-popup-tip),
+	:global(.maplibregl-popup-anchor-top-right .maplibregl-popup-tip) {
+		border-bottom-color: #ffffff;
+	}
+
+	:global(.maplibregl-ctrl-group) {
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+
+	:global(.maplibregl-ctrl-group button) {
+		border-radius: 4px;
 	}
 </style> 

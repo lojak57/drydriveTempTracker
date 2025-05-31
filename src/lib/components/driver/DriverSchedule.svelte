@@ -209,7 +209,7 @@
 
 	function formatTime(date: Date) {
 		return date.toLocaleTimeString('en-US', { 
-			hour: 'numeric', 
+			hour: '2-digit', 
 			minute: '2-digit',
 			hour12: true 
 		});
@@ -335,20 +335,20 @@
 				>
 					<!-- Job Header -->
 					<div class="job-header">
-						<div class="time-priority">
+						<div class="time-section">
 							<div class="scheduled-time">{formatTime(job.scheduledTime)}</div>
 							<div class="priority-badge {getPriorityColor(job.priority)}">
 								<svelte:component this={getPriorityIcon(job.priority)} size={10} />
 							</div>
 						</div>
-						<div class="job-meta">
-							<div class="account-badge" style="background-color: {job.accountColor}">
+						<div class="company-section">
+							<div class="account-badge">
 								<span class="account-name">{job.accountName}</span>
 							</div>
-							<div class="barrels-info">
-								<span class="barrels-value">{job.estimatedBarrels}</span>
-								<span class="barrels-label">bbls</span>
-							</div>
+						</div>
+						<div class="barrels-section">
+							<div class="barrels-value">{job.estimatedBarrels}</div>
+							<div class="barrels-label">bbls</div>
 						</div>
 					</div>
 
@@ -388,8 +388,8 @@
 							<Clock size={12} />
 							<span>{formatDuration(job.estimatedDuration)}</span>
 						</div>
-						<div class="status-indicator {getJobStatusColor(job.status)}">
-							{job.status.replace('-', ' ').toUpperCase()}
+						<div class="route-time">
+							{getTimeUntilJob(job.scheduledTime)}
 						</div>
 						<div class="tap-indicator">
 							<span>View Details</span>
@@ -419,6 +419,13 @@
 </div>
 
 <style>
+	/* Global box-sizing for better layout control */
+	.driver-schedule *,
+	.driver-schedule *::before,
+	.driver-schedule *::after {
+		box-sizing: border-box;
+	}
+
 	.driver-schedule {
 		min-height: 100vh;
 		background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 50%, #e8f5e8 100%);
@@ -433,8 +440,8 @@
 
 	@media (min-width: 768px) {
 		.mobile-container {
-			max-width: 768px;
-			padding: 0 16px;
+			max-width: 800px;
+			padding: 0 12px;
 		}
 	}
 
@@ -529,7 +536,7 @@
 
 	/* Summary Cards */
 	.summary-section {
-		padding: 16px;
+		padding: 16px 12px;
 	}
 
 	.summary-cards {
@@ -605,11 +612,12 @@
 
 	/* Jobs Section */
 	.jobs-section {
-		padding: 0 16px 16px;
+		padding: 0 12px 16px;
 	}
 
 	.section-header {
 		margin-bottom: 16px;
+		padding: 0 4px;
 	}
 
 	.section-title {
@@ -642,6 +650,8 @@
 		position: relative;
 		overflow: hidden;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		width: 100%;
+		max-width: none;
 	}
 
 	.job-card:hover {
@@ -660,19 +670,37 @@
 
 	.job-header {
 		display: flex;
-		justify-content: space-between;
+		flex-wrap: wrap;
 		align-items: flex-start;
+		justify-content: space-between;
+		gap: 12px;
 		padding: 16px 16px 12px;
 		background: rgba(0, 0, 0, 0.02);
 		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-		gap: 12px;
 	}
 
-	.time-priority {
+	.time-section,
+	.barrels-section {
+		width: auto;
+		flex: 0 0 auto;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 6px;
+	}
+
+	.barrels-section {
+		align-items: flex-end;
+	}
+
+	.company-section {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		flex: 1;
+		min-width: 0;
 	}
 
 	.scheduled-time {
@@ -680,6 +708,8 @@
 		font-weight: 700;
 		color: #1e293b;
 		font-family: 'JetBrains Mono', monospace;
+		text-align: left;
+		width: 100%;
 	}
 
 	.priority-badge {
@@ -715,37 +745,30 @@
 		color: #374151;
 	}
 
-	.job-meta {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 6px;
-	}
-
 	.account-badge {
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		gap: 8px;
-		padding: 6px 10px;
+		padding: 6px 12px;
 		border-radius: 4px;
 		border: 1px solid rgba(0, 0, 0, 0.12);
 		background: rgba(0, 0, 0, 0.02);
-		flex: 1;
-		min-width: 0;
+		width: 100%;
+		max-width: 140px;
+		text-align: center;
 	}
 
-	.account-name {
+	.account-name,
+	.location-name {
 		font-weight: 600;
 		color: #1e293b;
 		font-size: 14px;
-		truncate: true;
-	}
-
-	.barrels-info {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 2px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		text-align: center;
+		width: 100%;
 	}
 
 	.barrels-value {
@@ -762,7 +785,6 @@
 		letter-spacing: 0.5px;
 	}
 
-	/* Route Section */
 	.route-section {
 		padding: 16px;
 		background: rgba(0, 0, 0, 0.01);
@@ -771,7 +793,9 @@
 
 	.route-flow {
 		display: flex;
-		align-items: flex-start;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
 		gap: 12px;
 	}
 
@@ -800,6 +824,7 @@
 		gap: 4px;
 		min-width: 0;
 		flex: 1;
+		max-width: 100%;
 	}
 
 	.location-name {
@@ -807,6 +832,10 @@
 		color: #1e293b;
 		font-size: 14px;
 		line-height: 1.2;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 100%;
 	}
 
 	.tank-number {
@@ -830,6 +859,10 @@
 		gap: 4px;
 		margin: 0 8px;
 		position: relative;
+		min-width: 60px;
+		max-width: 80px;
+		text-align: center;
+		word-break: keep-all;
 	}
 
 	.arrow-line {
@@ -873,16 +906,12 @@
 		color: #6b7280;
 	}
 
-	.status-indicator {
-		font-size: 9px;
-		font-weight: 700;
-		padding: 4px 8px;
-		border-radius: 3px;
-		border: 1px solid rgba(0, 0, 0, 0.12);
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		background: rgba(0, 0, 0, 0.04);
+	.route-time {
+		font-size: 12px;
+		font-weight: 600;
 		color: #6b7280;
+		font-family: 'JetBrains Mono', monospace;
+		text-align: center;
 	}
 
 	.tap-indicator {

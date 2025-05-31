@@ -13,6 +13,7 @@
 <style>
 	.app-layout {
 		display: flex;
+		flex-direction: column;
 		min-height: 100vh;
 		background: linear-gradient(135deg, 
 			rgba(248, 250, 252, 0.8) 0%, 
@@ -22,23 +23,31 @@
 
 	.main-content {
 		flex: 1;
-		margin-left: 280px;
-		padding: 24px;
+		padding: 12px;
+		padding-top: 76px; /* Account for fixed mobile header */
 		min-height: 100vh;
 		overflow-x: auto;
 		overflow-y: auto;
 	}
 
-	@media (max-width: 1024px) {
+	/* Desktop styles - enhance for larger screens */
+	@media (min-width: 1025px) {
+		.app-layout {
+			flex-direction: row;
+		}
+
 		.main-content {
-			margin-left: 0;
-			padding: 16px;
+			margin-left: 280px;
+			padding: 24px;
+			padding-top: 24px; /* Remove mobile header offset */
 		}
 	}
 
-	@media (max-width: 640px) {
+	/* Tablet adjustments */
+	@media (min-width: 641px) and (max-width: 1024px) {
 		.main-content {
-			padding: 12px;
+			padding: 16px;
+			padding-top: 76px;
 		}
 	}
 </style>

@@ -19,38 +19,38 @@
 	// Pre-trip checklist items based on DOT requirements
 	let inspectionItems: InspectionItem[] = [
 		// Vehicle Exterior
-		{ id: 'tires', category: 'Exterior', description: 'Tires (tread depth, air pressure, damage)', status: 'pending', critical: true },
-		{ id: 'wheels', category: 'Exterior', description: 'Wheels and rims (cracks, loose lugs)', status: 'pending', critical: true },
-		{ id: 'lights', category: 'Exterior', description: 'All lights and reflectors working', status: 'pending', critical: true },
-		{ id: 'mirrors', category: 'Exterior', description: 'Mirrors clean and properly adjusted', status: 'pending' },
-		{ id: 'windshield', category: 'Exterior', description: 'Windshield and windows (cracks, chips)', status: 'pending' },
-		{ id: 'hood', category: 'Exterior', description: 'Hood latched securely', status: 'pending' },
+		{ id: 'tires', category: 'Exterior', description: 'Tires (tread depth, air pressure, damage)', status: 'pass', critical: true },
+		{ id: 'wheels', category: 'Exterior', description: 'Wheels and rims (cracks, loose lugs)', status: 'pass', critical: true },
+		{ id: 'lights', category: 'Exterior', description: 'All lights and reflectors working', status: 'pass', critical: true },
+		{ id: 'mirrors', category: 'Exterior', description: 'Mirrors clean and properly adjusted', status: 'pass' },
+		{ id: 'windshield', category: 'Exterior', description: 'Windshield and windows (cracks, chips)', status: 'pass' },
+		{ id: 'hood', category: 'Exterior', description: 'Hood latched securely', status: 'pass' },
 		
 		// Engine Compartment
-		{ id: 'oil-level', category: 'Engine', description: 'Engine oil level and condition', status: 'pending', critical: true },
-		{ id: 'coolant', category: 'Engine', description: 'Coolant level and condition', status: 'pending', critical: true },
-		{ id: 'belts', category: 'Engine', description: 'Drive belts (wear, tension)', status: 'pending' },
-		{ id: 'hoses', category: 'Engine', description: 'Hoses and connections', status: 'pending' },
-		{ id: 'battery', category: 'Engine', description: 'Battery secured and terminals clean', status: 'pending' },
+		{ id: 'oil-level', category: 'Engine', description: 'Engine oil level and condition', status: 'pass', critical: true },
+		{ id: 'coolant', category: 'Engine', description: 'Coolant level and condition', status: 'pass', critical: true },
+		{ id: 'belts', category: 'Engine', description: 'Drive belts (wear, tension)', status: 'pass' },
+		{ id: 'hoses', category: 'Engine', description: 'Hoses and connections', status: 'pass' },
+		{ id: 'battery', category: 'Engine', description: 'Battery secured and terminals clean', status: 'pass' },
 		
 		// Cab Interior
-		{ id: 'seat-belts', category: 'Interior', description: 'Seat belts functional', status: 'pending', critical: true },
-		{ id: 'horn', category: 'Interior', description: 'Horn working', status: 'pending' },
-		{ id: 'gauges', category: 'Interior', description: 'All gauges and warning lights', status: 'pending', critical: true },
-		{ id: 'wipers', category: 'Interior', description: 'Windshield wipers and washers', status: 'pending' },
-		{ id: 'heater-defrost', category: 'Interior', description: 'Heater and defroster working', status: 'pending' },
+		{ id: 'seat-belts', category: 'Interior', description: 'Seat belts functional', status: 'pass', critical: true },
+		{ id: 'horn', category: 'Interior', description: 'Horn working', status: 'pass' },
+		{ id: 'gauges', category: 'Interior', description: 'All gauges and warning lights', status: 'pass', critical: true },
+		{ id: 'wipers', category: 'Interior', description: 'Windshield wipers and washers', status: 'pass' },
+		{ id: 'heater-defrost', category: 'Interior', description: 'Heater and defroster working', status: 'pass' },
 		
 		// Braking System
-		{ id: 'brake-pedal', category: 'Brakes', description: 'Brake pedal feel and travel', status: 'pending', critical: true },
-		{ id: 'parking-brake', category: 'Brakes', description: 'Parking brake operation', status: 'pending', critical: true },
-		{ id: 'air-pressure', category: 'Brakes', description: 'Air pressure build-up and leaks', status: 'pending', critical: true },
+		{ id: 'brake-pedal', category: 'Brakes', description: 'Brake pedal feel and travel', status: 'pass', critical: true },
+		{ id: 'parking-brake', category: 'Brakes', description: 'Parking brake operation', status: 'pass', critical: true },
+		{ id: 'air-pressure', category: 'Brakes', description: 'Air pressure build-up and leaks', status: 'pass', critical: true },
 		
 		// Trailer/Tank Specific
-		{ id: 'coupling', category: 'Coupling', description: 'Fifth wheel and kingpin secure', status: 'pending', critical: true },
-		{ id: 'air-lines', category: 'Coupling', description: 'Air lines connected and secure', status: 'pending', critical: true },
-		{ id: 'electrical', category: 'Coupling', description: 'Electrical connections working', status: 'pending' },
-		{ id: 'tank-valves', category: 'Tank', description: 'Tank valves closed and secure', status: 'pending', critical: true },
-		{ id: 'emergency-kit', category: 'Safety', description: 'Emergency kit and spill response', status: 'pending', critical: true },
+		{ id: 'coupling', category: 'Coupling', description: 'Fifth wheel and kingpin secure', status: 'pass', critical: true },
+		{ id: 'air-lines', category: 'Coupling', description: 'Air lines connected and secure', status: 'pass', critical: true },
+		{ id: 'electrical', category: 'Coupling', description: 'Electrical connections working', status: 'pass' },
+		{ id: 'tank-valves', category: 'Tank', description: 'Tank valves closed and secure', status: 'pass', critical: true },
+		{ id: 'emergency-kit', category: 'Safety', description: 'Emergency kit and spill response', status: 'pass', critical: true },
 		{ id: 'placards', category: 'Safety', description: 'Proper placards displayed', status: 'pending', critical: true }
 	];
 
