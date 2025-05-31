@@ -1,15 +1,31 @@
 <script lang="ts">
 	import { fleetStats, costBreakdown, fleetData } from '$lib/stores/calibrationData';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	let animatedCalibrationsAvoided = 0;
 	let animatedMoneySaved = 0;
 	let isAnimating = false;
+	let animationTimeouts: number[] = [];
+	let lastAnimatedValues = { avoided: 0, saved: 0 };
 
-	// Animation for counters
-	function animateCounter(start: number, end: number, duration: number, callback: (value: number) => void) {
+	// Clean up function
+	function cleanupAnimations() {
+		animationTimeouts.forEach(timeout => clearTimeout(timeout));
+		animationTimeouts = [];
+		isAnimating = false;
+	}
+
+	// Animation for counters with proper cleanup
+	function animateCounter(
+		start: number, 
+		end: number, 
+		duration: number, 
+		callback: (value: number) => void,
+		onComplete?: () => void
+	) {
 		const startTime = performance.now();
 		const diff = end - start;
+		let animationId: number;
 		
 		function update(currentTime: number) {
 			const elapsed = currentTime - startTime;
@@ -22,28 +38,100 @@
 			callback(Math.round(current));
 			
 			if (progress < 1) {
-				requestAnimationFrame(update);
+				animationId = requestAnimationFrame(update);
+			} else {
+				onComplete?.();
 			}
 		}
 		
-		requestAnimationFrame(update);
+		animationId = requestAnimationFrame(update);
+		
+		// Return cleanup function
+		return () => {
+			if (animationId) {
+				cancelAnimationFrame(animationId);
+			}
+		};
 	}
 
-	// React to fleet stats changes
-	$: if ($fleetStats && !isAnimating) {
-		isAnimating = true;
+	// Debounced animation trigger
+	let animationTimeout: number;
+	function triggerAnimations() {
+		if (!$fleetStats || isAnimating) return;
 		
-		animateCounter(animatedCalibrationsAvoided, $fleetStats.calibrationsAvoided, 1500, (value) => {
-			animatedCalibrationsAvoided = value;
-		});
+		// Clear any pending animation
+		if (animationTimeout) {
+			clearTimeout(animationTimeout);
+		}
 		
-		animateCounter(animatedMoneySaved, $fleetStats.moneySaved, 2000, (value) => {
-			animatedMoneySaved = value;
-			if (value === $fleetStats.moneySaved) {
-				isAnimating = false;
+		// Debounce animations to prevent rapid firing
+		animationTimeout = setTimeout(() => {
+			// Check if values actually changed to avoid unnecessary animations
+			const valuesChanged = 
+				lastAnimatedValues.avoided !== $fleetStats.calibrationsAvoided ||
+				lastAnimatedValues.saved !== $fleetStats.moneySaved;
+				
+			if (!valuesChanged) return;
+			
+			cleanupAnimations();
+			isAnimating = true;
+			
+			let completedAnimations = 0;
+			const totalAnimations = 2;
+			
+			function onAnimationComplete() {
+				completedAnimations++;
+				if (completedAnimations === totalAnimations) {
+					isAnimating = false;
+					// Store last animated values
+					lastAnimatedValues = {
+						avoided: $fleetStats.calibrationsAvoided,
+						saved: $fleetStats.moneySaved
+					};
+				}
 			}
-		});
+
+			// Start animations with cleanup tracking
+			const cleanup1 = animateCounter(animatedCalibrationsAvoided, $fleetStats.calibrationsAvoided, 1500, (value) => {
+				animatedCalibrationsAvoided = value;
+			}, onAnimationComplete);
+			
+			const cleanup2 = animateCounter(animatedMoneySaved, $fleetStats.moneySaved, 2000, (value) => {
+				animatedMoneySaved = value;
+			}, onAnimationComplete);
+			
+			// Store cleanup functions
+			animationTimeouts.push(
+				setTimeout(cleanup1, 1600),
+				setTimeout(cleanup2, 2100)
+			);
+		}, 100); // 100ms debounce
 	}
+
+	// React to fleet stats changes with debouncing
+	$: if ($fleetStats) {
+		triggerAnimations();
+	}
+
+	// Initialize animated values on mount
+	onMount(() => {
+		if ($fleetStats) {
+			animatedCalibrationsAvoided = $fleetStats.calibrationsAvoided;
+			animatedMoneySaved = $fleetStats.moneySaved;
+			lastAnimatedValues = {
+				avoided: $fleetStats.calibrationsAvoided,
+				saved: $fleetStats.moneySaved
+			};
+		}
+	});
+
+	// Clean up on destroy
+	onDestroy(() => {
+		cleanupAnimations();
+		if (animationTimeout) {
+			clearTimeout(animationTimeout);
+		}
+	});
 
 	// Get next recommended calibrations
 	$: nextRecommendations = $fleetData

@@ -1,16 +1,32 @@
 <script lang="ts">
 	import { costBreakdown, calibrationConfig } from '$lib/stores/calibrationData';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	let animatedMonthly = 0;
 	let animatedAnnual = 0;
 	let animatedSavings = 0;
 	let animationRunning = false;
+	let animationTimeouts: number[] = [];
+	let lastAnimatedValues = { monthly: 0, annual: 0, savings: 0 };
 
-	// Animation utility
-	function animateValue(start: number, end: number, duration: number, callback: (value: number) => void) {
+	// Clean up function
+	function cleanupAnimations() {
+		animationTimeouts.forEach(timeout => clearTimeout(timeout));
+		animationTimeouts = [];
+		animationRunning = false;
+	}
+
+	// Animation utility with proper cleanup
+	function animateValue(
+		start: number, 
+		end: number, 
+		duration: number, 
+		callback: (value: number) => void,
+		onComplete?: () => void
+	) {
 		const startTime = performance.now();
 		const diff = end - start;
+		let animationId: number;
 		
 		function update(currentTime: number) {
 			const elapsed = currentTime - startTime;
@@ -23,32 +39,109 @@
 			callback(Math.round(current));
 			
 			if (progress < 1) {
-				requestAnimationFrame(update);
+				animationId = requestAnimationFrame(update);
+			} else {
+				onComplete?.();
 			}
 		}
 		
-		requestAnimationFrame(update);
+		animationId = requestAnimationFrame(update);
+		
+		// Return cleanup function
+		return () => {
+			if (animationId) {
+				cancelAnimationFrame(animationId);
+			}
+		};
 	}
 
-	// React to cost changes and animate
-	$: if ($costBreakdown && !animationRunning) {
-		animationRunning = true;
+	// Debounced animation trigger
+	let animationTimeout: number;
+	function triggerAnimations() {
+		if (!$costBreakdown || animationRunning) return;
 		
-		animateValue(animatedMonthly, $costBreakdown.monthlyTotal, 1200, (value) => {
-			animatedMonthly = value;
-		});
+		// Clear any pending animation
+		if (animationTimeout) {
+			clearTimeout(animationTimeout);
+		}
 		
-		animateValue(animatedAnnual, $costBreakdown.annualTotal, 1500, (value) => {
-			animatedAnnual = value;
-		});
-		
-		animateValue(animatedSavings, $costBreakdown.annualSavings, 1800, (value) => {
-			animatedSavings = value;
-			if (value === $costBreakdown.annualSavings) {
-				animationRunning = false;
+		// Debounce animations to prevent rapid firing
+		animationTimeout = setTimeout(() => {
+			// Check if values actually changed to avoid unnecessary animations
+			const valuesChanged = 
+				lastAnimatedValues.monthly !== $costBreakdown.monthlyTotal ||
+				lastAnimatedValues.annual !== $costBreakdown.annualTotal ||
+				lastAnimatedValues.savings !== $costBreakdown.annualSavings;
+				
+			if (!valuesChanged) return;
+			
+			cleanupAnimations();
+			animationRunning = true;
+			
+			let completedAnimations = 0;
+			const totalAnimations = 3;
+			
+			function onAnimationComplete() {
+				completedAnimations++;
+				if (completedAnimations === totalAnimations) {
+					animationRunning = false;
+					// Store last animated values
+					lastAnimatedValues = {
+						monthly: $costBreakdown.monthlyTotal,
+						annual: $costBreakdown.annualTotal,
+						savings: $costBreakdown.annualSavings
+					};
+				}
 			}
-		});
+
+			// Start animations with cleanup tracking
+			const cleanup1 = animateValue(animatedMonthly, $costBreakdown.monthlyTotal, 1200, (value) => {
+				animatedMonthly = value;
+			}, onAnimationComplete);
+			
+			const cleanup2 = animateValue(animatedAnnual, $costBreakdown.annualTotal, 1500, (value) => {
+				animatedAnnual = value;
+			}, onAnimationComplete);
+			
+			const cleanup3 = animateValue(animatedSavings, $costBreakdown.annualSavings, 1800, (value) => {
+				animatedSavings = value;
+			}, onAnimationComplete);
+			
+			// Store cleanup functions
+			animationTimeouts.push(
+				setTimeout(cleanup1, 1300),
+				setTimeout(cleanup2, 1600),
+				setTimeout(cleanup3, 1900)
+			);
+		}, 100); // 100ms debounce
 	}
+
+	// React to cost changes with debouncing
+	$: if ($costBreakdown) {
+		triggerAnimations();
+	}
+
+	// Initialize animated values on mount
+	onMount(() => {
+		if ($costBreakdown) {
+			animatedMonthly = $costBreakdown.monthlyTotal;
+			animatedAnnual = $costBreakdown.annualTotal;
+			animatedSavings = $costBreakdown.annualSavings;
+			lastAnimatedValues = {
+				monthly: $costBreakdown.monthlyTotal,
+				annual: $costBreakdown.annualTotal,
+				savings: $costBreakdown.annualSavings
+			};
+		}
+	});
+
+	// Clean up on destroy
+	onDestroy(() => {
+		cleanupAnimations();
+		if (animationTimeout) {
+			clearTimeout(animationTimeout);
+		}
+	});
 
 	function formatCurrency(amount: number): string {
 		return new Intl.NumberFormat('en-US', {
