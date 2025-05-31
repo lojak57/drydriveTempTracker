@@ -392,8 +392,15 @@
 			<!-- Map Header with Navigation Controls -->
 			<div class="map-header">
 				<div class="route-info">
-					<span class="route-distance">{job.distance} miles</span>
-					<span class="route-time">{Math.round(job.estimatedDuration * 60)} min</span>
+					<div class="route-badge primary">
+						<span class="route-distance">{job.distance} miles</span>
+						<span class="route-separator">•</span>
+						<span class="route-time">{Math.round(job.estimatedDuration * 60)} min</span>
+					</div>
+					<div class="route-status">
+						<span class="status-label">Route to Pickup</span>
+						<span class="eta-info">ETA: {formatTime(estimatedArrival)}</span>
+					</div>
 				</div>
 				<div class="map-controls">
 					<button class="map-btn tap-target" on:click={openNavigation} title="Open in Navigation App">
@@ -406,28 +413,39 @@
 			<!-- MapLibre GL Container -->
 			<div class="map-gl-container" bind:this={mapContainer}></div>
 
-			<!-- Navigation overlay -->
+			<!-- Enhanced Navigation overlay -->
 			<div class="nav-overlay">
 				<div class="next-turn">
-					<Navigation size={24} />
+					<div class="turn-icon">
+						<Navigation size={20} />
+					</div>
 					<div class="turn-info">
 						<span class="turn-distance">In 2.3 miles</span>
-						<span class="turn-instruction">Continue on I-45 North</span>
+						<span class="turn-instruction">Continue on I-45 North toward Pickup</span>
+					</div>
+					<div class="turn-status">
+						<span class="current-road">Currently on US-290 West</span>
 					</div>
 				</div>
 			</div>
 
-			<!-- Bottom route summary -->
+			<!-- Enhanced Bottom route summary -->
 			<div class="route-summary">
-				<div class="route-step">
-					<MapPin size={14} />
-					<span>Current → Pickup</span>
-					<span class="step-distance">{distanceRemaining} mi</span>
+				<div class="summary-header">
+					<h4>Route Summary</h4>
+					<span class="total-time">{Math.round((job.estimatedDuration + (distanceRemaining / 45)) * 60)} min total</span>
 				</div>
-				<div class="route-step">
-					<MapPin size={14} />
-					<span>Pickup → Delivery</span>
-					<span class="step-distance">{job.distance} mi</span>
+				<div class="route-steps">
+					<div class="route-step active">
+						<div class="step-indicator current"></div>
+						<span class="step-label">Current → Pickup</span>
+						<span class="step-distance">{distanceRemaining} mi</span>
+					</div>
+					<div class="route-step planned">
+						<div class="step-indicator planned"></div>
+						<span class="step-label">Pickup → Delivery</span>
+						<span class="step-distance">{job.distance} mi</span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -796,17 +814,62 @@
 
 	.route-info {
 		display: flex;
-		gap: 16px;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.route-badge {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 12px;
+		background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+		border: 1px solid rgba(0, 0, 0, 0.1);
+		border-radius: 8px;
 		font-family: 'JetBrains Mono', monospace;
 		font-weight: 600;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+	}
+
+	.route-badge.primary {
+		background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+		border-color: rgba(59, 130, 246, 0.3);
 	}
 
 	.route-distance {
 		color: #059669;
+		font-size: 14px;
+	}
+
+	.route-separator {
+		color: #6b7280;
+		font-weight: 400;
 	}
 
 	.route-time {
 		color: #3b82f6;
+		font-size: 14px;
+	}
+
+	.route-status {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	.status-label {
+		font-size: 12px;
+		color: #6b7280;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		font-weight: 500;
+	}
+
+	.eta-info {
+		font-size: 13px;
+		color: #374151;
+		font-weight: 600;
+		font-family: 'JetBrains Mono', monospace;
 	}
 
 	.map-controls {
@@ -818,20 +881,22 @@
 		display: flex;
 		align-items: center;
 		gap: 6px;
-		background: rgba(59, 130, 246, 0.1);
-		border: 1px solid rgba(59, 130, 246, 0.2);
-		border-radius: 6px;
-		color: #3b82f6;
-		padding: 8px 12px;
+		background: linear-gradient(135deg, #3b82f6, #2563eb);
+		border: 1px solid rgba(59, 130, 246, 0.3);
+		border-radius: 8px;
+		color: white;
+		padding: 10px 14px;
 		cursor: pointer;
 		transition: all 0.2s ease;
 		font-size: 13px;
-		font-weight: 500;
+		font-weight: 600;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	}
 
 	.map-btn:hover {
-		background: rgba(59, 130, 246, 0.2);
+		background: linear-gradient(135deg, #2563eb, #1d4ed8);
 		transform: translateY(-1px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 	}
 
 	.btn-text {
@@ -845,7 +910,7 @@
 		min-height: 0;
 	}
 
-	/* Navigation overlay */
+	/* Enhanced Navigation overlay */
 	.nav-overlay {
 		position: absolute;
 		top: 20px;
@@ -861,35 +926,61 @@
 		border-radius: 12px;
 		padding: 16px;
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		gap: 12px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		border: 1px solid rgba(0, 0, 0, 0.1);
 		pointer-events: auto;
 	}
 
-	.next-turn svg {
-		color: #3b82f6;
+	.turn-icon {
+		background: linear-gradient(135deg, #3b82f6, #2563eb);
+		color: white;
+		padding: 8px;
+		border-radius: 8px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		flex-shrink: 0;
 	}
 
 	.turn-info {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 4px;
+		flex: 1;
 	}
 
 	.turn-distance {
 		font-size: 12px;
 		color: #6b7280;
 		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
 	}
 
 	.turn-instruction {
 		font-size: 14px;
 		font-weight: 600;
 		color: #1e293b;
+		line-height: 1.3;
 	}
 
+	.turn-status {
+		margin-top: 6px;
+	}
+
+	.current-road {
+		font-size: 11px;
+		color: #9ca3af;
+		font-family: 'JetBrains Mono', monospace;
+		background: rgba(0, 0, 0, 0.04);
+		padding: 2px 6px;
+		border-radius: 4px;
+		border: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	/* Enhanced Route Summary */
 	.route-summary {
 		background: rgba(255, 255, 255, 0.95);
 		backdrop-filter: blur(20px);
@@ -898,35 +989,102 @@
 		z-index: 10;
 	}
 
+	.summary-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 12px;
+		padding-bottom: 8px;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	}
+
+	.summary-header h4 {
+		font-size: 14px;
+		font-weight: 600;
+		color: #1e293b;
+		margin: 0;
+	}
+
+	.total-time {
+		font-size: 12px;
+		color: #6b7280;
+		font-family: 'JetBrains Mono', monospace;
+		background: rgba(16, 185, 129, 0.1);
+		padding: 4px 8px;
+		border-radius: 4px;
+		border: 1px solid rgba(16, 185, 129, 0.2);
+		font-weight: 600;
+	}
+
+	.route-steps {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
 	.route-step {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		font-size: 12px;
-		color: #6b7280;
-		margin-bottom: 4px;
+		gap: 10px;
+		padding: 8px 12px;
+		border-radius: 6px;
+		transition: all 0.2s ease;
 	}
 
-	.route-step:last-child {
-		margin-bottom: 0;
+	.route-step.active {
+		background: rgba(16, 185, 129, 0.1);
+		border: 1px solid rgba(16, 185, 129, 0.2);
+	}
+
+	.route-step.planned {
+		background: rgba(59, 130, 246, 0.05);
+		border: 1px solid rgba(59, 130, 246, 0.1);
+	}
+
+	.step-indicator {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+
+	.step-indicator.current {
+		background: #10b981;
+		box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+	}
+
+	.step-indicator.planned {
+		background: #3b82f6;
+		opacity: 0.6;
+	}
+
+	.step-label {
+		font-size: 12px;
+		color: #374151;
+		font-weight: 500;
+		flex: 1;
+	}
+
+	.route-step.active .step-label {
+		color: #065f46;
+		font-weight: 600;
 	}
 
 	.step-distance {
-		margin-left: auto;
 		font-family: 'JetBrains Mono', monospace;
 		font-weight: 600;
-		color: #3b82f6;
+		font-size: 12px;
+		color: #6b7280;
+		background: rgba(0, 0, 0, 0.04);
+		padding: 3px 6px;
+		border-radius: 4px;
+		border: 1px solid rgba(0, 0, 0, 0.06);
 	}
 
-	@keyframes pulse {
-		0%, 100% {
-			transform: scale(1);
-			opacity: 1;
-		}
-		50% {
-			transform: scale(1.1);
-			opacity: 0.8;
-		}
+	.route-step.active .step-distance {
+		color: #10b981;
+		background: rgba(16, 185, 129, 0.1);
+		border-color: rgba(16, 185, 129, 0.2);
 	}
 
 	/* Mobile responsiveness */

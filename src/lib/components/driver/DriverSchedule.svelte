@@ -643,54 +643,50 @@
 	.job-card {
 		background: rgba(255, 255, 255, 0.95);
 		border: 1px solid rgba(0, 0, 0, 0.12);
-		border-radius: 8px;
+		border-radius: 12px;
 		padding: 0;
 		cursor: pointer;
 		transition: all 0.2s ease;
 		position: relative;
 		overflow: hidden;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 		width: 100%;
 		max-width: none;
 	}
 
 	.job-card:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 		border-color: rgba(0, 0, 0, 0.2);
 	}
 
 	.job-card.overdue {
 		border-left: 4px solid #dc2626;
+		background: rgba(254, 242, 242, 0.95);
 	}
 
 	.job-card.soon {
 		border-left: 4px solid #f59e0b;
+		background: rgba(255, 251, 235, 0.95);
 	}
 
 	.job-header {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: flex-start;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
 		gap: 12px;
-		padding: 16px 16px 12px;
+		padding: 16px;
 		background: rgba(0, 0, 0, 0.02);
 		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+		min-height: 70px;
 	}
 
-	.time-section,
-	.barrels-section {
-		width: auto;
-		flex: 0 0 auto;
+	.time-section {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 6px;
-	}
-
-	.barrels-section {
-		align-items: flex-end;
+		min-width: 80px;
 	}
 
 	.company-section {
@@ -698,9 +694,17 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 6px;
-		flex: 1;
+		gap: 4px;
 		min-width: 0;
+		overflow: hidden;
+	}
+
+	.barrels-section {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 4px;
+		min-width: 60px;
 	}
 
 	.scheduled-time {
@@ -708,192 +712,222 @@
 		font-weight: 700;
 		color: #1e293b;
 		font-family: 'JetBrains Mono', monospace;
-		text-align: left;
-		width: 100%;
+		line-height: 1.2;
+		white-space: nowrap;
 	}
 
 	.priority-badge {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 3px;
 		color: #374151;
 		background: rgba(0, 0, 0, 0.06);
 		border: 1px solid rgba(0, 0, 0, 0.12);
 		font-size: 9px;
 		font-weight: 600;
-		padding: 4px 8px;
+		padding: 3px 6px;
 		border-radius: 4px;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+		white-space: nowrap;
 	}
 
 	.priority-badge.bg-red-500 {
+		background: rgba(220, 38, 38, 0.1);
 		border-color: rgba(220, 38, 38, 0.3);
 		color: #dc2626;
 	}
 
 	.priority-badge.bg-orange-500 {
+		background: rgba(245, 158, 11, 0.1);
 		border-color: rgba(245, 158, 11, 0.3);
 		color: #f59e0b;
-	}
-
-	.priority-badge.bg-blue-500 {
-		color: #374151;
-	}
-
-	.priority-badge.bg-gray-500 {
-		color: #374151;
 	}
 
 	.account-badge {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
-		padding: 6px 12px;
-		border-radius: 4px;
+		padding: 8px 12px;
+		border-radius: 6px;
 		border: 1px solid rgba(0, 0, 0, 0.12);
 		background: rgba(0, 0, 0, 0.02);
 		width: 100%;
-		max-width: 140px;
-		text-align: center;
+		max-width: 160px;
+		min-height: 36px;
 	}
 
-	.account-name,
-	.location-name {
+	.account-name {
 		font-weight: 600;
 		color: #1e293b;
-		font-size: 14px;
+		font-size: 13px;
+		text-align: center;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		text-align: center;
 		width: 100%;
 	}
 
 	.barrels-value {
-		font-size: 16px;
+		font-size: 18px;
 		font-weight: 700;
 		color: #1e293b;
 		font-family: 'JetBrains Mono', monospace;
+		line-height: 1.2;
 	}
 
 	.barrels-label {
-		font-size: 11px;
+		font-size: 10px;
 		color: #6b7280;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+		font-weight: 500;
 	}
 
+	/* Route Section - Enhanced for Mobile */
 	.route-section {
 		padding: 16px;
 		background: rgba(0, 0, 0, 0.01);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 	}
 
 	.route-flow {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
 		align-items: center;
 		gap: 12px;
+		width: 100%;
 	}
 
 	.location-point {
 		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	.location-point.pickup {
+		justify-self: start;
+		text-align: left;
 		align-items: flex-start;
-		gap: 8px;
+	}
+
+	.location-point.delivery {
+		justify-self: end;
+		text-align: right;
+		align-items: flex-end;
 	}
 
 	.location-icon {
-		width: 28px;
-		height: 28px;
-		border-radius: 4px;
+		width: 32px;
+		height: 32px;
+		border-radius: 8px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(0, 0, 0, 0.08);
-		color: #6b7280;
+		color: white;
 		flex-shrink: 0;
-		border: 1px solid rgba(0, 0, 0, 0.12);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	}
+
+	.location-point.pickup .location-icon {
+		background: linear-gradient(135deg, #059669, #10b981);
+	}
+
+	.location-point.delivery .location-icon {
+		background: linear-gradient(135deg, #3b82f6, #2563eb);
 	}
 
 	.location-info {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: 2px;
 		min-width: 0;
-		flex: 1;
-		max-width: 100%;
+		overflow: hidden;
+		max-width: 120px;
 	}
 
 	.location-name {
-		font-weight: 700;
+		font-weight: 600;
 		color: #1e293b;
-		font-size: 14px;
-		line-height: 1.2;
-		white-space: nowrap;
+		font-size: 13px;
+		line-height: 1.3;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 100%;
+		white-space: nowrap;
+		width: 100%;
 	}
 
 	.tank-number {
 		font-size: 11px;
 		color: #6b7280;
+		font-family: 'JetBrains Mono', monospace;
 		font-weight: 600;
 		background: rgba(0, 0, 0, 0.04);
-		border: 1px solid rgba(0, 0, 0, 0.12);
 		padding: 2px 6px;
 		border-radius: 3px;
-		display: inline-block;
-		width: fit-content;
-		font-family: 'JetBrains Mono', monospace;
+		border: 1px solid rgba(0, 0, 0, 0.08);
+		white-space: nowrap;
+		align-self: flex-start;
+	}
+
+	.location-point.delivery .tank-number {
+		align-self: flex-end;
 	}
 
 	.route-arrow {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
 		gap: 4px;
-		margin: 0 8px;
-		position: relative;
-		min-width: 60px;
-		max-width: 80px;
-		text-align: center;
-		word-break: keep-all;
+		justify-self: center;
 	}
 
 	.arrow-line {
-		width: 2px;
-		height: 20px;
-		background: #d1d5db;
+		width: 40px;
+		height: 2px;
+		background: linear-gradient(to right, #10b981, #3b82f6);
 		border-radius: 1px;
+		position: relative;
+	}
+
+	.arrow-line::after {
+		content: '';
+		position: absolute;
+		right: -4px;
+		top: -2px;
+		width: 0;
+		height: 0;
+		border-left: 6px solid #3b82f6;
+		border-top: 3px solid transparent;
+		border-bottom: 3px solid transparent;
 	}
 
 	.distance-badge {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 3px;
 		font-size: 10px;
 		color: #6b7280;
 		font-weight: 600;
 		padding: 3px 6px;
-		background: rgba(0, 0, 0, 0.03);
+		background: rgba(0, 0, 0, 0.04);
 		border: 1px solid rgba(0, 0, 0, 0.12);
-		border-radius: 3px;
+		border-radius: 4px;
 		font-family: 'JetBrains Mono', monospace;
+		white-space: nowrap;
 	}
 
-	/* Job Footer */
+	/* Job Footer - Enhanced */
 	.job-footer {
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
 		align-items: center;
 		gap: 12px;
-		padding: 12px 16px;
+		padding: 14px 16px;
 		background: rgba(0, 0, 0, 0.02);
+		border-top: 1px solid rgba(0, 0, 0, 0.06);
 	}
 
 	.duration-info {
@@ -904,6 +938,7 @@
 		font-weight: 600;
 		font-family: 'JetBrains Mono', monospace;
 		color: #6b7280;
+		white-space: nowrap;
 	}
 
 	.route-time {
@@ -912,6 +947,7 @@
 		color: #6b7280;
 		font-family: 'JetBrains Mono', monospace;
 		text-align: center;
+		justify-self: center;
 	}
 
 	.tap-indicator {
@@ -919,18 +955,20 @@
 		align-items: center;
 		gap: 4px;
 		color: #1e293b;
-		background: rgba(0, 0, 0, 0.04);
-		border: 1px solid rgba(0, 0, 0, 0.12);
+		background: rgba(59, 130, 246, 0.08);
+		border: 1px solid rgba(59, 130, 246, 0.2);
 		padding: 6px 10px;
-		border-radius: 4px;
+		border-radius: 6px;
 		font-size: 11px;
 		font-weight: 600;
 		transition: all 0.2s ease;
+		white-space: nowrap;
+		justify-self: end;
 	}
 
 	.tap-indicator:hover {
-		background: rgba(0, 0, 0, 0.08);
-		border-color: rgba(0, 0, 0, 0.2);
+		background: rgba(59, 130, 246, 0.12);
+		border-color: rgba(59, 130, 246, 0.3);
 	}
 
 	/* Quick Actions */
@@ -1012,72 +1050,163 @@
 			font-size: 18px;
 		}
 
-		.route-flow {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 8px;
+		.job-header {
+			padding: 14px;
+			grid-template-columns: auto 1fr auto;
+			gap: 10px;
+			min-height: 65px;
 		}
 
-		.route-arrow {
-			flex-direction: row;
-			margin: 4px 0;
+		.time-section {
+			min-width: 75px;
+		}
+
+		.scheduled-time {
+			font-size: 15px;
+		}
+
+		.priority-badge {
+			font-size: 8px;
+			padding: 2px 5px;
+		}
+
+		.account-badge {
+			max-width: 140px;
+			min-height: 32px;
+			padding: 6px 10px;
+		}
+
+		.account-name {
+			font-size: 12px;
+		}
+
+		.barrels-section {
+			min-width: 55px;
+		}
+
+		.barrels-value {
+			font-size: 16px;
+		}
+
+		.barrels-label {
+			font-size: 9px;
+		}
+
+		.route-section {
+			padding: 14px;
+		}
+
+		.route-flow {
+			grid-template-columns: 1fr auto 1fr;
+			gap: 10px;
+		}
+
+		.location-icon {
+			width: 28px;
+			height: 28px;
+		}
+
+		.location-info {
+			max-width: 100px;
+		}
+
+		.location-name {
+			font-size: 12px;
+		}
+
+		.tank-number {
+			font-size: 10px;
+			padding: 1px 4px;
 		}
 
 		.arrow-line {
-			width: 20px;
-			height: 2px;
+			width: 35px;
+		}
+
+		.distance-badge {
+			font-size: 9px;
+			padding: 2px 5px;
+		}
+
+		.job-footer {
+			padding: 12px 14px;
+			gap: 10px;
+		}
+
+		.duration-info {
+			font-size: 11px;
+		}
+
+		.route-time {
+			font-size: 11px;
+		}
+
+		.tap-indicator {
+			font-size: 10px;
+			padding: 5px 8px;
+		}
+	}
+
+	@media (min-width: 481px) and (max-width: 640px) {
+		.job-header {
+			padding: 15px;
+			min-height: 68px;
+		}
+
+		.scheduled-time {
+			font-size: 16px;
+		}
+
+		.barrels-value {
+			font-size: 17px;
 		}
 
 		.location-name {
 			font-size: 13px;
 		}
 
-		.barrels-value {
-			font-size: 14px;
-		}
-
-		.job-header {
-			padding: 12px;
-		}
-
-		.route-section {
-			padding: 12px;
-		}
-
-		.job-footer {
-			padding: 10px 12px;
+		.account-name {
+			font-size: 13px;
 		}
 	}
 
+	/* Ensure critical info is always visible on mobile */
 	@media (max-width: 640px) {
+		.job-card {
+			border-radius: 10px;
+			box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+		}
+
+		.job-card:hover {
+			transform: translateY(-1px);
+			box-shadow: 0 5px 16px rgba(0, 0, 0, 0.15);
+		}
+
 		.scheduled-time {
-			font-size: 16px !important;
-		}
-		
-		.barrels-value {
-			font-size: 18px !important;
-		}
-		
-		.location-name {
-			font-size: 15px !important;
-		}
-	}
-
-	/* Critical info - larger fonts for mobile */
-	.scheduled-time, .barrels-value {
-		font-size: 14px;
-		font-weight: 700;
-		color: #1e293b;
-	}
-
-	@media (max-width: 640px) {
-		.scheduled-time, .barrels-value {
-			font-size: 16px !important;
-		}
-		
-		.location-name {
-			font-size: 15px !important;
 			font-weight: 800 !important;
+		}
+
+		.barrels-value {
+			font-weight: 800 !important;
+		}
+
+		.location-name {
+			font-weight: 700 !important;
+		}
+
+		.account-name {
+			font-weight: 700 !important;
+		}
+
+		/* Enhanced visibility for overdue/soon jobs */
+		.job-card.overdue {
+			border-left-width: 5px;
+			background: rgba(254, 242, 242, 0.98);
+		}
+
+		.job-card.soon {
+			border-left-width: 5px;
+			background: rgba(255, 251, 235, 0.98);
 		}
 	}
 </style> 
