@@ -1,0 +1,180 @@
+/* Driver Dashboard Styles */
+.driver-content-container {
+	position: relative;
+	min-height: calc(100vh - 80px);
+}
+
+.driver-section {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 50%, #e8f5e8 100%);
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.driver-section.section-visible {
+	display: block;
+	position: relative;
+}
+
+.section-header {
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(20px);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	padding: 16px 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	position: sticky;
+	top: 0;
+	z-index: 100;
+}
+
+.section-title {
+	font-size: 20px;
+	font-weight: 700;
+	color: #1e293b;
+	margin: 0;
+}
+
+.back-to-overview-btn {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: rgba(59, 130, 246, 0.1);
+	border: 1px solid rgba(59, 130, 246, 0.2);
+	border-radius: 8px;
+	color: #3b82f6;
+	padding: 8px 12px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.back-to-overview-btn:hover {
+	background: rgba(59, 130, 246, 0.2);
+	transform: translateY(-1px);
+}
+
+.scrollable-content {
+	padding: 20px;
+	max-height: calc(100vh - 140px);
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.overview-cards {
+	gap: 16px;
+	margin-bottom: 32px;
+}
+
+.overview-card {
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 16px;
+	padding: 24px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	gap: 16px;
+	min-height: 140px;
+}
+
+.overview-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+	border-color: rgba(59, 130, 246, 0.3);
+}
+
+.overview-card .card-icon {
+	font-size: 48px;
+	line-height: 1;
+}
+
+.overview-card .card-content h3 {
+	font-size: 18px;
+	font-weight: 700;
+	color: #1e293b;
+	margin: 0 0 8px 0;
+}
+
+.overview-card .card-content p {
+	font-size: 14px;
+	color: #6b7280;
+	margin: 0;
+}
+
+.routes-redirect {
+	text-align: center;
+	padding: 40px 20px;
+}
+
+.routes-redirect p {
+	font-size: 16px;
+	color: #6b7280;
+	margin-bottom: 20px;
+}
+
+.schedule-redirect-btn {
+	background: #3b82f6;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	padding: 12px 24px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.schedule-redirect-btn:hover {
+	background: #2563eb;
+	transform: translateY(-1px);
+}
+
+/* Mobile responsiveness for driver dashboard */
+@media (max-width: 768px) {
+	.section-header {
+		padding: 12px 16px;
+	}
+
+	.section-title {
+		font-size: 18px;
+	}
+
+	.back-to-overview-btn {
+		padding: 6px 10px;
+		font-size: 13px;
+	}
+
+	.scrollable-content {
+		padding: 16px;
+		max-height: calc(100vh - 120px);
+	}
+
+	.overview-card {
+		padding: 20px;
+		min-height: 120px;
+	}
+
+	.overview-card .card-icon {
+		font-size: 36px;
+	}
+
+	.overview-card .card-content h3 {
+		font-size: 16px;
+	}
+
+	.overview-card .card-content p {
+		font-size: 13px;
+	}
+} 
