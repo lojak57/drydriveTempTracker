@@ -289,14 +289,20 @@
 						<span class="status-label">Distance Remaining</span>
 					</div>
 				</div>
-				<div class="status-card">
-					<div class="status-icon eta">
-						<Clock size={20} />
-					</div>
-					<div class="status-details">
-						<span class="status-value">{formatTime(estimatedArrival)}</span>
-						<span class="status-label">Estimated Arrival</span>
-					</div>
+			</div>
+		</div>
+
+		<!-- Route Information - Separate Box -->
+		<div class="route-info-section">
+			<div class="route-info-card">
+				<div class="route-badge primary">
+					<span class="route-distance">{job.distance} miles</span>
+					<span class="route-separator">•</span>
+					<span class="route-time">{Math.round(job.estimatedDuration * 60)} min</span>
+				</div>
+				<div class="route-status">
+					<span class="status-label">Route to Pickup</span>
+					<span class="eta-info">ETA: {formatTime(estimatedArrival)}</span>
 				</div>
 			</div>
 		</div>
@@ -606,7 +612,7 @@
 
 	.status-cards {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(2, 1fr);
 		gap: 12px;
 	}
 
@@ -641,10 +647,6 @@
 		background: linear-gradient(135deg, #3b82f6, #2563eb);
 	}
 
-	.status-icon.eta {
-		background: linear-gradient(135deg, #f59e0b, #f97316);
-	}
-
 	.status-value {
 		font-size: 14px;
 		font-weight: 700;
@@ -657,6 +659,71 @@
 		color: #6b7280;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+	}
+
+	/* Route Information Section - New Distinct Box */
+	.route-info-section {
+		padding: 20px;
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+	}
+
+	.route-info-card {
+		background: rgba(59, 130, 246, 0.08);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(59, 130, 246, 0.2);
+		border-radius: 12px;
+		padding: 16px;
+		text-align: center;
+	}
+
+	.route-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background: rgba(59, 130, 246, 0.15);
+		border: 1px solid rgba(59, 130, 246, 0.3);
+		border-radius: 8px;
+		padding: 8px 12px;
+		margin-bottom: 12px;
+	}
+
+	.route-distance {
+		font-size: 14px;
+		font-weight: 700;
+		color: #1e40af;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.route-separator {
+		color: #60a5fa;
+		font-weight: 300;
+	}
+
+	.route-time {
+		font-size: 14px;
+		font-weight: 600;
+		color: #1e40af;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	.route-status {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.route-status .status-label {
+		font-size: 11px;
+		color: #6b7280;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.eta-info {
+		font-size: 16px;
+		font-weight: 700;
+		color: #1e40af;
+		font-family: 'JetBrains Mono', monospace;
 	}
 
 	/* Load Section */
@@ -1099,8 +1166,73 @@
 			height: 50vh;
 		}
 
+		/* Enhanced mobile styling for distinct boxes */
+		.status-section {
+			padding: 16px;
+			margin: 12px;
+			background: rgba(255, 255, 255, 0.95);
+			border-radius: 16px;
+			border: 1px solid rgba(0, 0, 0, 0.08);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		}
+
+		.route-info-section {
+			padding: 16px;
+			margin: 12px;
+			background: rgba(255, 255, 255, 0.95);
+			border-radius: 16px;
+			border: 1px solid rgba(59, 130, 246, 0.2);
+			box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+		}
+
+		.route-info-card {
+			background: rgba(59, 130, 246, 0.1);
+			border: 1px solid rgba(59, 130, 246, 0.25);
+			border-radius: 12px;
+			padding: 20px;
+		}
+
 		.status-cards {
-			grid-template-columns: 1fr;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+		}
+
+		.status-card {
+			padding: 16px 12px;
+			border-radius: 12px;
+			background: rgba(255, 255, 255, 0.9);
+			border: 1px solid rgba(0, 0, 0, 0.1);
+			box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+		}
+
+		.status-value {
+			font-size: 18px;
+			font-weight: 800;
+		}
+
+		.status-label {
+			font-size: 10px;
+			margin-top: 4px;
+		}
+
+		.route-badge {
+			padding: 12px 16px;
+			margin-bottom: 16px;
+			border-radius: 10px;
+			background: rgba(59, 130, 246, 0.2);
+			border: 1px solid rgba(59, 130, 246, 0.35);
+		}
+
+		.route-distance,
+		.route-time {
+			font-size: 16px;
+			font-weight: 800;
+		}
+
+		.eta-info {
+			font-size: 20px;
+			font-weight: 800;
+			margin-top: 8px;
 		}
 
 		.action-buttons {
@@ -1109,6 +1241,25 @@
 
 		.map-btn .btn-text {
 			display: none;
+		}
+
+		/* Hide other sections on mobile to focus on the two main boxes */
+		.progress-section,
+		.load-section,
+		.instructions-section,
+		.actions-section {
+			display: none;
+		}
+
+		/* Adjust section titles for mobile */
+		.section-title {
+			font-size: 14px;
+			font-weight: 700;
+			color: #1e293b;
+			margin-bottom: 12px;
+			text-align: center;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
 		}
 	}
 
