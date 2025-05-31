@@ -17,6 +17,12 @@
 			]
 		},
 		{
+			title: 'Monitoring',
+			items: [
+				{ href: '/monitoring/truck-diagram', label: 'Live Truck Monitoring', icon: BarChart3, description: 'Interactive valve and sensor monitoring' }
+			]
+		},
+		{
 			title: 'Calibration',
 			items: [
 				{ href: '/calibration/cost-visualizer', label: 'Cost Visualizer', icon: DollarSign, description: 'Fleet calibration cost analysis' },
