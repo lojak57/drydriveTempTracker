@@ -452,37 +452,62 @@
 				on:navigate={handleNavigation}
 			/>
 
-			<!-- Pre-Trip Section -->
-			<section id="pretrip" class="pt-16">
-				{#if driverTab === 'pre-trip'}
-					<div class="tab-content">
+			<!-- Driver Dashboard Content Container with proper scrolling -->
+			<div class="driver-content-container">
+				<!-- Pre-Trip Section -->
+				<section id="pretrip" class="driver-section" class:section-visible={driverTab === 'pre-trip'}>
+					<div class="section-header">
+						<h2 class="section-title">Pre-Trip Inspection</h2>
+						<button class="back-to-overview-btn" on:click={() => { driverTab = 'overview'; activeNavSection = 'overview'; }}>
+							← Back to Overview
+						</button>
+					</div>
+					<div class="tab-content scrollable-content">
 						<PreTripInspection on:inspection-complete={handleInspectionComplete} />
 					</div>
-				{/if}
-			</section>
-			
-			<!-- Schedule Section -->
-			<section id="schedule" class="pt-16">
-				{#if driverTab === 'schedule'}
-					<div class="tab-content">
+				</section>
+				
+				<!-- Schedule Section -->
+				<section id="schedule" class="driver-section" class:section-visible={driverTab === 'schedule'}>
+					<div class="section-header">
+						<h2 class="section-title">Schedule & Routes</h2>
+						<button class="back-to-overview-btn" on:click={() => { driverTab = 'overview'; activeNavSection = 'overview'; }}>
+							← Back to Overview
+						</button>
+					</div>
+					<div class="tab-content scrollable-content">
 						<DriverSchedule on:job-selected={handleJobSelected} />
 					</div>
-				{/if}
-			</section>
-			
-			<!-- Routes Section (shares schedule view) -->
-			<section id="routes" class="pt-16">
-				{#if driverTab === 'schedule'}
-					<div class="tab-content">
-						<!-- Routes are part of schedule view -->
+				</section>
+				
+				<!-- Routes Section (redirect to schedule) -->
+				<section id="routes" class="driver-section" class:section-visible={activeNavSection === 'routes' && driverTab === 'schedule'}>
+					<div class="section-header">
+						<h2 class="section-title">Routes</h2>
+						<button class="back-to-overview-btn" on:click={() => { driverTab = 'overview'; activeNavSection = 'overview'; }}>
+							← Back to Overview
+						</button>
 					</div>
-				{/if}
-			</section>
-			
-			<!-- Performance Section -->
-			<section id="performance" class="pt-16">
-				{#if driverTab === 'performance'}
-					<div class="tab-content">
+					<div class="tab-content scrollable-content">
+						<!-- Routes are part of schedule view -->
+						<div class="routes-redirect">
+							<p>Routes are displayed in the Schedule section.</p>
+							<button class="schedule-redirect-btn" on:click={() => { driverTab = 'schedule'; activeNavSection = 'schedule'; }}>
+								View Schedule
+							</button>
+						</div>
+					</div>
+				</section>
+				
+				<!-- Performance Section -->
+				<section id="performance" class="driver-section" class:section-visible={driverTab === 'performance'}>
+					<div class="section-header">
+						<h2 class="section-title">My Performance</h2>
+						<button class="back-to-overview-btn" on:click={() => { driverTab = 'overview'; activeNavSection = 'overview'; }}>
+							← Back to Overview
+						</button>
+					</div>
+					<div class="tab-content scrollable-content">
 						<div class="driver-metrics grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 							<MetricCard 
 								title="Safety Score" 
@@ -537,81 +562,170 @@
 							<ROIJustificationCard />
 						</div>
 					</div>
-				{/if}
-			</section>
+				</section>
 
-			<!-- Additional driver tabs content -->
-			{#if driverTab === 'safety'}
-				<div class="tab-content">
-					<div class="safety-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-						<MetricCard 
-							title="Days Without Incident" 
-							value="247" 
-							unit="days" 
-							icon="🏆" 
-							status="normal"
-							trend="up"
-							trendValue="+1"
-							color="emerald"
-						/>
-						<MetricCard 
-							title="Safety Training" 
-							value="100" 
-							unit="%" 
-							icon="📚" 
-							status="normal"
-							trend="stable"
-							trendValue="Current"
-							color="blue"
-						/>
-						<MetricCard 
-							title="Vehicle Inspections" 
-							value="23/23" 
-							unit="" 
-							icon="🔍" 
-							status="normal"
-							trend="stable"
-							trendValue="Perfect"
-							color="emerald"
-						/>
+				<!-- Driver Overview Section (default) -->
+				<section id="overview" class="driver-section" class:section-visible={driverTab === 'overview' || (!driverTab)}>
+					<div class="section-header">
+						<h2 class="section-title">Driver Dashboard Overview</h2>
 					</div>
-				</div>
-			{:else if driverTab === 'earnings'}
-				<div class="tab-content">
-					<div class="earnings-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-						<MetricCard 
-							title="This Week" 
-							value="$2,847" 
-							unit="" 
-							icon="💰" 
-							status="normal"
-							trend="up"
-							trendValue="+$312"
-							color="emerald"
-						/>
-						<MetricCard 
-							title="Safety Bonus" 
-							value="$500" 
-							unit="" 
-							icon="🏆" 
-							status="normal"
-							trend="stable"
-							trendValue="Earned"
-							color="blue"
-						/>
-						<MetricCard 
-							title="Efficiency Bonus" 
-							value="$275" 
-							unit="" 
-							icon="⚡" 
-							status="normal"
-							trend="up"
-							trendValue="+$75"
-							color="orange"
-						/>
+					<div class="tab-content scrollable-content">
+						<div class="overview-cards grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+							<div class="overview-card" on:click={() => { driverTab = 'pre-trip'; activeNavSection = 'pretrip'; }}>
+								<div class="card-icon">✅</div>
+								<div class="card-content">
+									<h3>Pre-Trip Inspection</h3>
+									<p>Complete your daily inspection</p>
+								</div>
+							</div>
+							<div class="overview-card" on:click={() => { driverTab = 'schedule'; activeNavSection = 'schedule'; }}>
+								<div class="card-icon">📅</div>
+								<div class="card-content">
+									<h3>Schedule & Routes</h3>
+									<p>View today's hauls and routes</p>
+								</div>
+							</div>
+							<div class="overview-card" on:click={() => { driverTab = 'performance'; activeNavSection = 'performance'; }}>
+								<div class="card-icon">📊</div>
+								<div class="card-content">
+									<h3>Performance</h3>
+									<p>Track your metrics and stats</p>
+								</div>
+							</div>
+							<div class="overview-card" on:click={() => { driverTab = 'safety'; activeNavSection = 'safety'; }}>
+								<div class="card-icon">🛡️</div>
+								<div class="card-content">
+									<h3>Safety Record</h3>
+									<p>View safety stats and training</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Additional quick metrics on overview -->
+						<div class="quick-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+							<MetricCard 
+								title="Today's Progress" 
+								value="3/5" 
+								unit="hauls" 
+								icon="🚛" 
+								status="normal"
+								trend="up"
+								trendValue="+1"
+								color="blue"
+							/>
+							<MetricCard 
+								title="Current Status" 
+								value="Available" 
+								unit="" 
+								icon="✅" 
+								status="normal"
+								trend="stable"
+								trendValue="Ready"
+								color="emerald"
+							/>
+							<MetricCard 
+								title="Next Haul" 
+								value="2:30 PM" 
+								unit="" 
+								icon="⏰" 
+								status="normal"
+								trend="stable"
+								trendValue="Scheduled"
+								color="orange"
+							/>
+						</div>
 					</div>
-				</div>
-			{/if}
+				</section>
+
+				<!-- Additional driver tabs content -->
+				{#if driverTab === 'safety'}
+					<section id="safety" class="driver-section section-visible">
+						<div class="section-header">
+							<h2 class="section-title">Safety Record</h2>
+							<button class="back-to-overview-btn" on:click={() => { driverTab = 'overview'; activeNavSection = 'overview'; }}>
+								← Back to Overview
+							</button>
+						</div>
+						<div class="tab-content scrollable-content">
+							<div class="safety-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+								<MetricCard 
+									title="Days Without Incident" 
+									value="247" 
+									unit="days" 
+									icon="🏆" 
+									status="normal"
+									trend="up"
+									trendValue="+1"
+									color="emerald"
+								/>
+								<MetricCard 
+									title="Safety Training" 
+									value="100" 
+									unit="%" 
+									icon="📚" 
+									status="normal"
+									trend="stable"
+									trendValue="Current"
+									color="blue"
+								/>
+								<MetricCard 
+									title="Vehicle Inspections" 
+									value="23/23" 
+									unit="" 
+									icon="🔍" 
+									status="normal"
+									trend="stable"
+									trendValue="Perfect"
+									color="emerald"
+								/>
+							</div>
+						</div>
+					</section>
+				{:else if driverTab === 'earnings'}
+					<section id="earnings" class="driver-section section-visible">
+						<div class="section-header">
+							<h2 class="section-title">Earnings & Bonuses</h2>
+							<button class="back-to-overview-btn" on:click={() => { driverTab = 'overview'; activeNavSection = 'overview'; }}>
+								← Back to Overview
+							</button>
+						</div>
+						<div class="tab-content scrollable-content">
+							<div class="earnings-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+								<MetricCard 
+									title="This Week" 
+									value="$2,847" 
+									unit="" 
+									icon="💰" 
+									status="normal"
+									trend="up"
+									trendValue="+$312"
+									color="emerald"
+								/>
+								<MetricCard 
+									title="Safety Bonus" 
+									value="$500" 
+									unit="" 
+									icon="🏆" 
+									status="normal"
+									trend="stable"
+									trendValue="Earned"
+									color="blue"
+								/>
+								<MetricCard 
+									title="Efficiency Bonus" 
+									value="$275" 
+									unit="" 
+									icon="⚡" 
+									status="normal"
+									trend="up"
+									trendValue="+$75"
+									color="orange"
+								/>
+							</div>
+						</div>
+					</section>
+				{/if}
+			</div>
 		</div>
 
 	{:else if $selectedRole.id === 'dispatch'}
