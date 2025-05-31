@@ -13,6 +13,10 @@
 	import JobDetailModal from '$lib/components/driver/JobDetailModal.svelte';
 	import JobMapView from '$lib/components/driver/JobMapView.svelte';
 	import InTransitView from '$lib/components/driver/InTransitView.svelte';
+	import QuickNavBar from '$lib/components/ui/QuickNavBar.svelte';
+	import SmartCalChart from '$lib/components/charts/SmartCalChart.svelte';
+	import ROIJustificationCard from '$lib/components/dashboard/ROIJustificationCard.svelte';
+	import StartFromPreTrip from '$lib/components/driver/StartFromPreTrip.svelte';
 	import { activeHauls, completedHauls, scadaStatus, drivers, trucks } from '$lib/stores/haulStore';
 	import { selectedRole, isRoleView, type RoleId } from '$lib/stores/roleStore';
 	import { ChevronLeft, ChevronRight, CheckCircle } from 'lucide-svelte';
@@ -50,6 +54,10 @@
 	let dispatchTab = 'active-hauls';
 	let yardTab = 'truck-overview';
 	let regionalTab = 'yards-overview';
+
+	// Quick nav state
+	let activeNavSection = 'pretrip';
+	let afterPreTripSubmit = false;
 
 	const executiveTabs = [
 		{ id: 'overview', label: 'Executive Overview', icon: '📊' },
@@ -168,6 +176,9 @@
 		console.log('Inspection completed:', inspectionData);
 		// Switch to schedule tab after inspection
 		driverTab = 'schedule';
+		// Trigger post-submit scroll
+		afterPreTripSubmit = true;
+		activeNavSection = 'schedule';
 	}
 
 	function handleExitMap() {
@@ -185,7 +196,31 @@
 		showTransitView = false;
 		selectedJob = null;
 	}
+
+	function handleNavigation(event: CustomEvent) {
+		const section = event.detail.section;
+		activeNavSection = section;
+		
+		// Map quick nav to driver tabs
+		const navToTabMap: Record<string, string> = {
+			'pretrip': 'pre-trip',
+			'schedule': 'schedule',
+			'routes': 'schedule', // Routes shown in schedule tab
+			'performance': 'performance'
+		};
+		
+		const mappedTab = navToTabMap[section];
+		if (mappedTab) {
+			driverTab = mappedTab;
+		}
+	}
 </script>
+
+<!-- Dashboard Top Anchor for Post-Submit Scroll -->
+<div id="dashboard-top"></div>
+
+<!-- Post-Submit Scroll Handler -->
+<StartFromPreTrip {afterPreTripSubmit} targetSection="dashboard-top" />
 
 <!-- Header -->
 <div class="text-center mb-4 sm:mb-8 mobile-sticky px-4">
@@ -411,79 +446,102 @@
 	{:else if $selectedRole.id === 'driver'}
 		<!-- Driver Dashboard with Navigation -->
 		<div class="driver-dashboard">
-			<!-- Driver Navigation -->
-			<div class="role-navigation mb-6">
-				<div class="nav-tabs">
-					{#each driverTabs as tab}
-						<button 
-							class="nav-tab {driverTab === tab.id ? 'active' : ''}"
-							style="--primary-color: {$selectedRole.colorScheme.primary}"
-							on:click={() => driverTab = tab.id}
-						>
-							<span class="tab-icon">{tab.icon}</span>
-							<span class="tab-label">{tab.label}</span>
-						</button>
-					{/each}
-				</div>
-			</div>
+			<!-- Quick Navigation Bar (Sticky) -->
+			<QuickNavBar 
+				activeSection={activeNavSection} 
+				on:navigate={handleNavigation}
+			/>
 
-			<!-- Driver Tab Content -->
-			{#if driverTab === 'pre-trip'}
-				<div class="tab-content">
-					<PreTripInspection on:inspection-complete={handleInspectionComplete} />
-				</div>
-			
-			{:else if driverTab === 'schedule'}
-				<div class="tab-content">
-					<DriverSchedule on:job-selected={handleJobSelected} />
-				</div>
-			
-			{:else if driverTab === 'performance'}
-				<div class="tab-content">
-					<div class="driver-metrics grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-						<MetricCard 
-							title="Safety Score" 
-							value="98.5" 
-							unit="%" 
-							icon="🛡️" 
-							status="normal"
-							trend="up"
-							trendValue="+1.2%"
-							color="emerald"
-						/>
-						<MetricCard 
-							title="Efficiency Rating" 
-							value="94.2" 
-							unit="%" 
-							icon="⚡" 
-							status="normal"
-							trend="up"
-							trendValue="+3.1%"
-							color="blue"
-						/>
-						<MetricCard 
-							title="Hauls This Week" 
-							value="23" 
-							unit="" 
-							icon="📦" 
-							status="normal"
-							trend="up"
-							trendValue="+2"
-							color="orange"
-						/>
-						<MetricCard 
-							title="On-Time Delivery" 
-							value="96.8" 
-							unit="%" 
-							icon="⏰" 
-							status="normal"
-							trend="stable"
-							trendValue="+0.5%"
-							color="emerald"
-						/>
+			<!-- Pre-Trip Section -->
+			<section id="pretrip" class="pt-16">
+				{#if driverTab === 'pre-trip'}
+					<div class="tab-content">
+						<PreTripInspection on:inspection-complete={handleInspectionComplete} />
 					</div>
-				</div>
-			{:else if driverTab === 'safety'}
+				{/if}
+			</section>
+			
+			<!-- Schedule Section -->
+			<section id="schedule" class="pt-16">
+				{#if driverTab === 'schedule'}
+					<div class="tab-content">
+						<DriverSchedule on:job-selected={handleJobSelected} />
+					</div>
+				{/if}
+			</section>
+			
+			<!-- Routes Section (shares schedule view) -->
+			<section id="routes" class="pt-16">
+				{#if driverTab === 'schedule'}
+					<div class="tab-content">
+						<!-- Routes are part of schedule view -->
+					</div>
+				{/if}
+			</section>
+			
+			<!-- Performance Section -->
+			<section id="performance" class="pt-16">
+				{#if driverTab === 'performance'}
+					<div class="tab-content">
+						<div class="driver-metrics grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+							<MetricCard 
+								title="Safety Score" 
+								value="98.5" 
+								unit="%" 
+								icon="🛡️" 
+								status="normal"
+								trend="up"
+								trendValue="+1.2%"
+								color="emerald"
+							/>
+							<MetricCard 
+								title="Efficiency Rating" 
+								value="94.2" 
+								unit="%" 
+								icon="⚡" 
+								status="normal"
+								trend="up"
+								trendValue="+3.1%"
+								color="blue"
+							/>
+							<MetricCard 
+								title="Hauls This Week" 
+								value="23" 
+								unit="" 
+								icon="📦" 
+								status="normal"
+								trend="up"
+								trendValue="+2"
+								color="orange"
+							/>
+							<MetricCard 
+								title="On-Time Delivery" 
+								value="96.8" 
+								unit="%" 
+								icon="⏰" 
+								status="normal"
+								trend="stable"
+								trendValue="+0.5%"
+								color="emerald"
+							/>
+						</div>
+						
+						<!-- Smart Cal Chart with new consistency breakdown -->
+						<div class="mb-8">
+							<h3 class="text-lg font-semibold mb-4">Smart Calibration Overview</h3>
+							<SmartCalChart size="medium" showLabels={true} />
+						</div>
+						
+						<!-- ROI Justification Card -->
+						<div class="mb-8">
+							<ROIJustificationCard />
+						</div>
+					</div>
+				{/if}
+			</section>
+
+			<!-- Additional driver tabs content -->
+			{#if driverTab === 'safety'}
 				<div class="tab-content">
 					<div class="safety-metrics grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 						<MetricCard 
