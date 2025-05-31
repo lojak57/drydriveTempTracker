@@ -5,7 +5,7 @@
 
 	let mobileMenuOpen = $state(false);
 
-	// Comprehensive navigation structure
+	// Clean navigation structure - only working routes
 	const navigationSections = [
 		{
 			title: 'Operations',
@@ -13,7 +13,7 @@
 				{ href: '/', label: 'Dashboard', icon: Home, description: 'Main operations center' },
 				{ href: '/hauls', label: 'Live Hauls', icon: Truck, description: 'Active haul monitoring' },
 				{ href: '/dispatch', label: 'Dispatch Center', icon: MapPin, description: 'Fleet coordination' },
-				{ href: '/yard', label: 'Yard Management', icon: Wrench, description: 'Equipment & maintenance' }
+				{ href: '/fleet', label: 'Fleet Management', icon: Truck, description: 'Vehicle & driver management' }
 			]
 		},
 		{
@@ -30,39 +30,11 @@
 			]
 		},
 		{
-			title: 'Fleet & Assets',
+			title: 'Management',
 			items: [
-				{ href: '/fleet', label: 'Fleet Overview', icon: Truck, description: 'Trucks & drivers' },
-				{ href: '/drivers', label: 'Driver Management', icon: Users, description: 'Driver profiles & performance' },
-				{ href: '/equipment', label: 'Equipment Status', icon: Wrench, description: 'Maintenance & diagnostics' },
-				{ href: '/routes', label: 'Route Planning', icon: MapPin, description: 'Optimization & tracking' }
-			]
-		},
-		{
-			title: 'Data & Analytics',
-			items: [
-				{ href: '/analytics', label: 'Performance Analytics', icon: BarChart3, description: 'KPIs & insights' },
-				{ href: '/reports', label: 'Reports', icon: FileText, description: 'Custom reporting' },
-				{ href: '/financial', label: 'Financial Dashboard', icon: DollarSign, description: 'Revenue & costs' },
-				{ href: '/efficiency', label: 'Efficiency Metrics', icon: Clock, description: 'Operational efficiency' }
-			]
-		},
-		{
-			title: 'Compliance & Safety',
-			items: [
-				{ href: '/documents', label: 'Document Management', icon: FileText, description: 'Compliance documents' },
-				{ href: '/safety', label: 'Safety Monitoring', icon: Shield, description: 'Safety metrics & alerts' },
-				{ href: '/alerts', label: 'Alert Center', icon: AlertTriangle, description: 'System notifications' },
-				{ href: '/audit', label: 'Audit Trail', icon: FileText, description: 'Compliance tracking' }
-			]
-		},
-		{
-			title: 'Administration',
-			items: [
-				{ href: '/admin', label: 'System Admin', icon: Settings, description: 'System configuration' },
-				{ href: '/users', label: 'User Management', icon: Users, description: 'Access control' },
-				{ href: '/integrations', label: 'Integrations', icon: Settings, description: 'Third-party systems' },
-				{ href: '/support', label: 'Support Center', icon: AlertTriangle, description: 'Help & documentation' }
+				{ href: '/drivers', label: 'Driver Portal', icon: Users, description: 'Driver workflows & scheduling' },
+				{ href: '/documents', label: 'Document Center', icon: FileText, description: 'Compliance & file management' },
+				{ href: '/admin', label: 'System Admin', icon: Settings, description: 'Administrative controls' }
 			]
 		}
 	];

@@ -3,9 +3,10 @@
 	
 	const dispatch = createEventDispatcher();
 
-	export let activeSection: string = 'pretrip';
+	export let activeSection: string = 'overview';
 	
 	const navItems = [
+		{ id: 'overview', label: 'Overview', icon: '🏠' },
 		{ id: 'pretrip', label: 'Pre-Trip', icon: '✅' },
 		{ id: 'schedule', label: 'Schedule', icon: '📅' },
 		{ id: 'routes', label: 'Routes', icon: '🗺️' },
