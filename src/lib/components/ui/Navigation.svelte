@@ -17,6 +17,13 @@
 			]
 		},
 		{
+			title: 'Calibration',
+			items: [
+				{ href: '/calibration/cost-visualizer', label: 'Cost Visualizer', icon: DollarSign, description: 'Fleet calibration cost analysis' },
+				{ href: '/calibration/smart-recommender', label: 'Smart Recommender', icon: BarChart3, description: 'AI-powered calibration recommendations' }
+			]
+		},
+		{
 			title: 'Fleet & Assets',
 			items: [
 				{ href: '/fleet', label: 'Fleet Overview', icon: Truck, description: 'Trucks & drivers' },
