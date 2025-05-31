@@ -333,7 +333,7 @@
 					role="button"
 					tabindex="0"
 				>
-					<!-- Time and Priority indicator bar -->
+					<!-- Priority indicator bar -->
 					<div class="priority-bar">
 						<div class="priority-indicator {getPriorityColor(job.priority)}"></div>
 					</div>
@@ -354,37 +354,25 @@
 							</div>
 						</div>
 
-						<!-- Route section -->
+						<!-- Center section: Route and Account -->
 						<div class="route-display">
 							<!-- Account and Load Type -->
-							<div class="job-header-info">
-								<div class="account-info">
-									<div class="account-name">{job.accountName}</div>
-									<div class="load-type-badge {job.loadType}">
-										{job.loadType.toUpperCase()}
-									</div>
-								</div>
-								<div class="job-specs">
-									<div class="tank-level">
-										<span class="spec-label">Tank Level:</span>
-										<span class="spec-value">{job.tankLevelHeight}</span>
-									</div>
-									<div class="temp-range">
-										<span class="spec-label">Temp:</span>
-										<span class="spec-value">{job.expectedTemperature.min}°-{job.expectedTemperature.max}°F</span>
-									</div>
+							<div class="job-header">
+								<div class="account-name">{job.accountName}</div>
+								<div class="load-type-badge {job.loadType}">
+									{job.loadType.toUpperCase()}
 								</div>
 							</div>
 
+							<!-- Route line -->
 							<div class="route-line">
 								<!-- Pickup location -->
 								<div class="location pickup">
 									<div class="location-icon pickup-icon">
-										<Gauge size={14} />
+										<Gauge size={12} />
 									</div>
 									<div class="location-text">
 										<div class="location-name">{job.pickupLocation.name.split(' ')[0]} {job.pickupLocation.name.split(' ')[1]}...</div>
-										<div class="tank-info">{job.pickupLocation.tankNumber}</div>
 									</div>
 								</div>
 
@@ -397,52 +385,29 @@
 								<!-- Delivery location -->
 								<div class="location delivery">
 									<div class="location-icon delivery-icon">
-										<MapPin size={14} />
+										<MapPin size={12} />
 									</div>
 									<div class="location-text">
 										<div class="location-name">{job.deliveryLocation.name.split(' ')[0]} {job.deliveryLocation.name.split(' ')[1]}...</div>
 									</div>
 								</div>
 							</div>
-
-							<!-- Special Instructions (if any) -->
-							{#if job.specialInstructions}
-								<div class="special-instructions">
-									<div class="instruction-label">
-										<AlertCircle size={12} />
-										<span>Special Instructions:</span>
-									</div>
-									<div class="instruction-text">{job.specialInstructions}</div>
-								</div>
-							{/if}
-
-							<!-- Contact Information -->
-							<div class="contact-info">
-								<div class="contact-item">
-									<span class="contact-label">Contact:</span>
-									<span class="contact-name">{job.customerContact.name}</span>
-									<span class="contact-phone">{job.customerContact.phone}</span>
-								</div>
-							</div>
 						</div>
 
-						<!-- Right section: Status and View Details -->
+						<!-- Right section: Status and Action -->
 						<div class="action-section">
 							<div class="status-info">
+								<div class="priority-label {job.priority}">
+									{getPriorityLabel(job.priority)}
+								</div>
 								<div class="duration-badge">
 									<Clock size={12} />
 									<span>{formatDuration(job.estimatedDuration)}</span>
 								</div>
-								<div class="priority-label {job.priority}">
-									{getPriorityLabel(job.priority)} Priority
-								</div>
-								<div class="status-label {getTimeUntilJob(job.scheduledTime) === 'Overdue' ? 'overdue' : ''}">
-									{getTimeUntilJob(job.scheduledTime) === 'Overdue' ? 'Overdue' : 'Scheduled'}
-								</div>
 							</div>
 							<div class="view-details-btn">
-								<span>View Details</span>
-								<ChevronRight size={16} />
+								<span>View</span>
+								<ChevronRight size={14} />
 							</div>
 						</div>
 					</div>
@@ -834,19 +799,13 @@
 	}
 
 	/* Job Header Info */
-	.job-header-info {
+	.job-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
 		gap: 12px;
 		padding-bottom: 8px;
 		border-bottom: 1px solid #f1f5f9;
-	}
-
-	.account-info {
-		display: flex;
-		align-items: center;
-		gap: 8px;
 	}
 
 	.account-name {
@@ -878,368 +837,6 @@
 	.load-type-badge.refined {
 		background: #f0fdf4;
 		color: #166534;
-	}
-
-	.job-specs {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-		align-items: flex-end;
-	}
-
-	.tank-level,
-	.temp-range {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		font-size: 11px;
-	}
-
-	.spec-label {
-		color: #64748b;
-		font-weight: 500;
-	}
-
-	.spec-value {
-		color: #1e293b;
-		font-weight: 600;
-		font-family: 'JetBrains Mono', monospace;
-	}
-
-	/* Special Instructions */
-	.special-instructions {
-		background: #fffbeb;
-		border: 1px solid #fbbf24;
-		border-radius: 6px;
-		padding: 8px;
-		margin-top: 4px;
-	}
-
-	.instruction-label {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		font-size: 11px;
-		font-weight: 600;
-		color: #d97706;
-		margin-bottom: 4px;
-	}
-
-	.instruction-text {
-		font-size: 12px;
-		color: #92400e;
-		line-height: 1.3;
-	}
-
-	/* Contact Information */
-	.contact-info {
-		background: #f8fafc;
-		border: 1px solid #e2e8f0;
-		border-radius: 6px;
-		padding: 6px 8px;
-		margin-top: 4px;
-	}
-
-	.contact-item {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		font-size: 11px;
-	}
-
-	.contact-label {
-		color: #64748b;
-		font-weight: 500;
-	}
-
-	.contact-name {
-		color: #1e293b;
-		font-weight: 600;
-	}
-
-	.contact-phone {
-		color: #3b82f6;
-		font-family: 'JetBrains Mono', monospace;
-		font-weight: 500;
-	}
-
-	/* Priority Label */
-	.priority-label {
-		font-size: 10px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.3px;
-		padding: 2px 6px;
-		border-radius: 3px;
-		align-self: flex-end;
-	}
-
-	.priority-label.urgent {
-		background: #fef2f2;
-		color: #dc2626;
-	}
-
-	.priority-label.high {
-		background: #fffbeb;
-		color: #d97706;
-	}
-
-	.priority-label.normal {
-		background: #f0f9ff;
-		color: #0369a1;
-	}
-
-	.priority-label.low {
-		background: #f8fafc;
-		color: #64748b;
-	}
-
-	/* Action Section */
-	.action-section {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 8px;
-		min-width: 100px;
-	}
-
-	.status-info {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 4px;
-	}
-
-	.duration-badge {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		font-size: 11px;
-		color: #64748b;
-		font-weight: 500;
-		background: #f1f5f9;
-		padding: 4px 8px;
-		border-radius: 4px;
-		white-space: nowrap;
-	}
-
-	.status-label {
-		font-size: 11px;
-		font-weight: 600;
-		color: #64748b;
-		text-transform: uppercase;
-		letter-spacing: 0.3px;
-	}
-
-	.status-label.overdue {
-		color: #dc2626;
-	}
-
-	.view-details-btn {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		color: #3b82f6;
-		font-size: 13px;
-		font-weight: 600;
-		padding: 6px 10px;
-		border-radius: 6px;
-		background: #f0f9ff;
-		border: 1px solid #bfdbfe;
-		transition: all 0.2s ease;
-		white-space: nowrap;
-	}
-
-	.job-card:hover .view-details-btn {
-		background: #dbeafe;
-		border-color: #93c5fd;
-		transform: translateX(2px);
-	}
-
-	/* Quick Actions */
-	.quick-actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px;
-		padding: 20px 12px;
-		background: rgba(255, 255, 255, 0.8);
-		backdrop-filter: blur(10px);
-		border-top: 1px solid rgba(0, 0, 0, 0.1);
-		position: sticky;
-		bottom: 0;
-		z-index: 10;
-	}
-
-	.action-btn {
-		flex: 1;
-		min-width: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		padding: 14px 16px;
-		border-radius: 12px;
-		font-size: 14px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		border: 1px solid;
-		min-height: 44px;
-	}
-
-	.action-btn.emergency {
-		background: rgba(239, 68, 68, 0.1);
-		color: #dc2626;
-		border-color: rgba(239, 68, 68, 0.2);
-	}
-
-	.action-btn.dispatch {
-		background: rgba(59, 130, 246, 0.1);
-		color: #2563eb;
-		border-color: rgba(59, 130, 246, 0.2);
-	}
-
-	.action-btn.navigation {
-		background: rgba(16, 185, 129, 0.1);
-		color: #059669;
-		border-color: rgba(16, 185, 129, 0.2);
-	}
-
-	.action-btn:hover {
-		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	}
-
-	/* Mobile Responsive */
-	@media (max-width: 640px) {
-		.card-content {
-			grid-template-columns: auto 1fr;
-			grid-template-rows: auto auto;
-			gap: 12px;
-			padding: 12px;
-		}
-
-		.time-barrels-section {
-			grid-column: 1;
-			grid-row: 1;
-		}
-
-		.route-display {
-			grid-column: 1 / -1;
-			grid-row: 2;
-		}
-
-		.action-section {
-			grid-column: 2;
-			grid-row: 1;
-			align-items: flex-end;
-		}
-
-		.job-header-info {
-			flex-direction: column;
-			gap: 8px;
-			align-items: flex-start;
-		}
-
-		.account-info {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 4px;
-		}
-
-		.job-specs {
-			align-items: flex-start;
-		}
-
-		.route-line {
-			grid-template-columns: 1fr auto 1fr;
-			gap: 8px;
-		}
-
-		.location-name {
-			font-size: 12px;
-		}
-
-		.barrels-value {
-			font-size: 20px;
-		}
-
-		.scheduled-time {
-			font-size: 14px;
-		}
-
-		.time-barrels-section {
-			min-width: 75px;
-		}
-
-		.action-section {
-			min-width: 90px;
-		}
-
-		.view-details-btn {
-			font-size: 12px;
-			padding: 4px 8px;
-		}
-
-		.duration-badge {
-			font-size: 10px;
-			padding: 3px 6px;
-		}
-
-		.location-icon {
-			width: 24px;
-			height: 24px;
-		}
-
-		.tank-info,
-		.distance-info {
-			font-size: 9px;
-		}
-
-		.account-name {
-			font-size: 13px;
-		}
-
-		.load-type-badge {
-			font-size: 8px;
-		}
-
-		.spec-label,
-		.spec-value {
-			font-size: 10px;
-		}
-
-		.instruction-text {
-			font-size: 11px;
-		}
-
-		.contact-item {
-			font-size: 10px;
-		}
-
-		.priority-label {
-			font-size: 9px;
-		}
-	}
-
-	/* Tablet responsive */
-	@media (min-width: 641px) and (max-width: 768px) {
-		.card-content {
-			gap: 14px;
-			padding: 14px;
-		}
-
-		.barrels-value {
-			font-size: 22px;
-		}
-
-		.scheduled-time {
-			font-size: 15px;
-		}
-
-		.account-name {
-			font-size: 13px;
-		}
 	}
 
 	/* Route Line */
@@ -1338,5 +935,228 @@
 		padding: 2px 6px;
 		border-radius: 3px;
 		white-space: nowrap;
+	}
+
+	/* Priority Label */
+	.priority-label {
+		font-size: 10px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.3px;
+		padding: 2px 6px;
+		border-radius: 3px;
+		align-self: flex-end;
+	}
+
+	.priority-label.urgent {
+		background: #fef2f2;
+		color: #dc2626;
+	}
+
+	.priority-label.high {
+		background: #fffbeb;
+		color: #d97706;
+	}
+
+	.priority-label.normal {
+		background: #f0f9ff;
+		color: #0369a1;
+	}
+
+	.priority-label.low {
+		background: #f8fafc;
+		color: #64748b;
+	}
+
+	/* Action Section */
+	.action-section {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 8px;
+		min-width: 100px;
+	}
+
+	.status-info {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 4px;
+	}
+
+	.duration-badge {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 11px;
+		color: #64748b;
+		font-weight: 500;
+		background: #f1f5f9;
+		padding: 4px 8px;
+		border-radius: 4px;
+		white-space: nowrap;
+	}
+
+	.view-details-btn {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		color: #3b82f6;
+		font-size: 12px;
+		font-weight: 600;
+		padding: 6px 10px;
+		border-radius: 6px;
+		background: #f0f9ff;
+		border: 1px solid #bfdbfe;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.job-card:hover .view-details-btn {
+		background: #dbeafe;
+		border-color: #93c5fd;
+		transform: translateX(2px);
+	}
+
+	/* Quick Actions */
+	.quick-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+		padding: 20px 12px;
+		background: rgba(255, 255, 255, 0.8);
+		backdrop-filter: blur(10px);
+		border-top: 1px solid rgba(0, 0, 0, 0.1);
+		position: sticky;
+		bottom: 0;
+		z-index: 10;
+	}
+
+	.action-btn {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 14px 16px;
+		border-radius: 12px;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		border: 1px solid;
+		min-height: 44px;
+	}
+
+	.action-btn.emergency {
+		background: rgba(239, 68, 68, 0.1);
+		color: #dc2626;
+		border-color: rgba(239, 68, 68, 0.2);
+	}
+
+	.action-btn.dispatch {
+		background: rgba(59, 130, 246, 0.1);
+		color: #2563eb;
+		border-color: rgba(59, 130, 246, 0.2);
+	}
+
+	.action-btn.navigation {
+		background: rgba(16, 185, 129, 0.1);
+		color: #059669;
+		border-color: rgba(16, 185, 129, 0.2);
+	}
+
+	.action-btn:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	}
+
+	/* Mobile Responsive */
+	@media (max-width: 640px) {
+		.card-content {
+			grid-template-columns: auto 1fr;
+			grid-template-rows: auto auto;
+			gap: 12px;
+			padding: 12px;
+		}
+
+		.time-barrels-section {
+			grid-column: 1;
+			grid-row: 1;
+		}
+
+		.route-display {
+			grid-column: 1 / -1;
+			grid-row: 2;
+		}
+
+		.action-section {
+			grid-column: 2;
+			grid-row: 1;
+			align-items: flex-end;
+		}
+
+		.job-header {
+			flex-direction: column;
+			gap: 8px;
+			align-items: flex-start;
+		}
+
+		.route-line {
+			grid-template-columns: 1fr auto 1fr;
+			gap: 8px;
+		}
+
+		.location-name {
+			font-size: 12px;
+		}
+
+		.barrels-value {
+			font-size: 20px;
+		}
+
+		.scheduled-time {
+			font-size: 14px;
+		}
+
+		.time-barrels-section {
+			min-width: 75px;
+		}
+
+		.action-section {
+			min-width: 90px;
+		}
+
+		.view-details-btn {
+			font-size: 11px;
+			padding: 4px 8px;
+		}
+
+		.duration-badge {
+			font-size: 10px;
+			padding: 3px 6px;
+		}
+
+		.location-icon {
+			width: 20px;
+			height: 20px;
+		}
+
+		.distance-info {
+			font-size: 9px;
+		}
+
+		.account-name {
+			font-size: 13px;
+		}
+
+		.load-type-badge {
+			font-size: 8px;
+		}
+
+		.priority-label {
+			font-size: 9px;
+		}
 	}
 </style> 
