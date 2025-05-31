@@ -132,6 +132,119 @@
 
 			<!-- Modal Content -->
 			<div class="modal-content">
+				<!-- Job Specifications - FIRST THING DRIVERS SEE -->
+				<div class="specifications">
+					<h4 class="section-title">Job Specifications</h4>
+					<div class="spec-grid">
+						<!-- Volume & Level -->
+						<div class="spec-item">
+							<Gauge size={16} />
+							<span class="spec-label">Volume</span>
+							<span class="spec-value">{job.estimatedBarrels} BBL</span>
+						</div>
+						<div class="spec-item">
+							<BarChart3 size={16} />
+							<span class="spec-label">Tank Level</span>
+							<span class="spec-value tank-level">{job.tankLevelHeight}</span>
+						</div>
+
+						<!-- Load Details -->
+						<div class="spec-item">
+							<FileText size={16} />
+							<span class="spec-label">Load Type</span>
+							<span class="spec-value load-type">{job.loadType.charAt(0).toUpperCase() + job.loadType.slice(1)}</span>
+						</div>
+						<div class="spec-item">
+							<Database size={16} />
+							<span class="spec-label">Tank Number</span>
+							<span class="spec-value">{job.pickupLocation.tankNumber}</span>
+						</div>
+
+						<!-- Temperature & Conditions -->
+						<div class="spec-item">
+							<Thermometer size={16} />
+							<span class="spec-label">Temperature</span>
+							<span class="spec-value temp-range">{job.expectedTemperature.min}°-{job.expectedTemperature.max}°F</span>
+						</div>
+						<div class="spec-item">
+							<AlertCircle size={16} />
+							<span class="spec-label">Route Type</span>
+							<span class="spec-value route-type">{job.routeType.charAt(0).toUpperCase() + job.routeType.slice(1)}</span>
+						</div>
+
+						<!-- Timing & Distance -->
+						<div class="spec-item">
+							<Clock size={16} />
+							<span class="spec-label">Est. Duration</span>
+							<span class="spec-value">{formatDuration(job.estimatedDuration)}</span>
+						</div>
+						<div class="spec-item">
+							<MapPin size={16} />
+							<span class="spec-label">Distance</span>
+							<span class="spec-value">{job.distance} miles</span>
+						</div>
+
+						<!-- Safety & Compliance -->
+						<div class="spec-item hazmat">
+							<Shield size={16} />
+							<span class="spec-label">HAZMAT</span>
+							<span class="spec-value hazmat-status">{job.hazmatRequired ? 'Required' : 'Not Required'}</span>
+						</div>
+						<div class="spec-item priority">
+							<AlertCircle size={16} />
+							<span class="spec-label">Priority</span>
+							<span class="spec-value priority-level" style="color: {getPriorityColor(job.priority)}">{getPriorityLabel(job.priority)}</span>
+						</div>
+					</div>
+
+					<!-- Additional Technical Specifications -->
+					<div class="tech-specs">
+						<h5 class="subsection-title">Technical Details</h5>
+						<div class="tech-grid">
+							<div class="tech-item">
+								<span class="tech-label">API Gravity:</span>
+								<span class="tech-value">42.1°</span>
+							</div>
+							<div class="tech-item">
+								<span class="tech-label">Water Cut:</span>
+								<span class="tech-value">0.8%</span>
+							</div>
+							<div class="tech-item">
+								<span class="tech-label">Density:</span>
+								<span class="tech-value">0.864 g/cm³</span>
+							</div>
+							<div class="tech-item">
+								<span class="tech-label">Pad Name:</span>
+								<span class="tech-value">{job.pickupLocation.padName}</span>
+							</div>
+							<div class="tech-item">
+								<span class="tech-label">Rate:</span>
+								<span class="tech-value">$485.50</span>
+							</div>
+							<div class="tech-item">
+								<span class="tech-label">Fuel Surcharge:</span>
+								<span class="tech-value">$23.75</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Quick Status Summary -->
+					<div class="status-summary">
+						<div class="summary-item {isJobReady() ? 'ready' : 'waiting'}">
+							<CheckCircle size={14} />
+							<span>Ready Status: {isJobReady() ? 'Can Start Now' : 'Waiting for Schedule'}</span>
+						</div>
+						<div class="summary-item equipment">
+							<Truck size={14} />
+							<span>Equipment: Verified & Available</span>
+						</div>
+						<div class="summary-item documentation">
+							<FileText size={14} />
+							<span>Documentation: BOL, Manifest, Permits Ready</span>
+						</div>
+					</div>
+				</div>
+
 				<!-- Account Information -->
 				<div class="account-section">
 					<div class="account-header" style="background-color: {job.accountColor}15; border-color: {job.accountColor}30;">
@@ -205,33 +318,6 @@
 						</div>
 						<div class="location-meta">
 							<span class="distance-badge">{job.estimatedBarrels} BBL</span>
-						</div>
-					</div>
-				</div>
-
-				<!-- Job Specifications -->
-				<div class="specifications">
-					<h4 class="section-title">Job Specifications</h4>
-					<div class="spec-grid">
-						<div class="spec-item">
-							<Gauge size={16} />
-							<span class="spec-label">Volume</span>
-							<span class="spec-value">{job.estimatedBarrels} BBL</span>
-						</div>
-						<div class="spec-item">
-							<Database size={16} />
-							<span class="spec-label">Tank #</span>
-							<span class="spec-value">{job.pickupLocation.tankNumber}</span>
-						</div>
-						<div class="spec-item">
-							<FileText size={16} />
-							<span class="spec-label">Load Type</span>
-							<span class="spec-value">{job.loadType.charAt(0).toUpperCase() + job.loadType.slice(1)}</span>
-						</div>
-						<div class="spec-item">
-							<BarChart3 size={16} />
-							<span class="spec-label">Tank Level Height</span>
-							<span class="spec-value tank-level">{job.tankLevelHeight || "17' 4\""}</span>
 						</div>
 					</div>
 				</div>
@@ -570,6 +656,12 @@
 	}
 
 	/* Specifications */
+	.specifications {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
 	.spec-grid {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
@@ -582,42 +674,152 @@
 		gap: 8px;
 		padding: 12px;
 		background: rgba(0, 0, 0, 0.02);
-		border-radius: 8px;
+		border-radius: 10px;
 		border: 1px solid rgba(0, 0, 0, 0.05);
+		transition: all 0.2s ease;
 	}
 
-	.spec-item svg {
-		color: #6b7280;
-		flex-shrink: 0;
+	.spec-item:hover {
+		background: rgba(0, 0, 0, 0.04);
+		border-color: rgba(0, 0, 0, 0.1);
+	}
+
+	.spec-item.hazmat {
+		border-color: #fbbf24;
+		background: #fffbeb;
+	}
+
+	.spec-item.priority {
+		border-color: #cbd5e1;
+		background: #f8fafc;
 	}
 
 	.spec-label {
 		font-size: 12px;
 		color: #6b7280;
+		font-weight: 500;
+		text-transform: uppercase;
+		letter-spacing: 0.3px;
 		flex: 1;
-		min-width: 0;
 	}
 
 	.spec-value {
-		font-size: 12px;
+		font-size: 13px;
 		font-weight: 600;
 		color: #1e293b;
-		text-align: right;
-	}
-
-	.spec-value.hazmat.required {
-		color: #dc2626;
-		font-weight: 600;
-	}
-
-	.spec-value.hazmat.not-required {
-		color: #059669;
+		font-family: 'JetBrains Mono', monospace;
+		white-space: nowrap;
 	}
 
 	.spec-value.tank-level {
-		font-family: 'JetBrains Mono', monospace;
+		color: #059669;
+	}
+
+	.spec-value.load-type {
+		color: #3b82f6;
+		text-transform: capitalize;
+	}
+
+	.spec-value.temp-range {
+		color: #f59e0b;
+	}
+
+	.spec-value.route-type {
+		color: #6b7280;
+		text-transform: capitalize;
+	}
+
+	.spec-value.hazmat-status {
+		color: #d97706;
 		font-weight: 700;
+	}
+
+	.spec-value.priority-level {
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	/* Technical Specifications */
+	.tech-specs {
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		padding: 16px;
+	}
+
+	.subsection-title {
+		font-size: 14px;
+		font-weight: 600;
+		color: #475569;
+		margin: 0 0 12px 0;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+
+	.tech-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 8px;
+	}
+
+	.tech-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 8px 12px;
+		background: white;
+		border-radius: 8px;
+		border: 1px solid #e2e8f0;
+	}
+
+	.tech-label {
+		font-size: 12px;
+		color: #64748b;
+		font-weight: 500;
+	}
+
+	.tech-value {
+		font-size: 12px;
+		font-weight: 600;
 		color: #1e293b;
+		font-family: 'JetBrains Mono', monospace;
+	}
+
+	/* Status Summary */
+	.status-summary {
+		background: #f0f9ff;
+		border: 1px solid #bae6fd;
+		border-radius: 12px;
+		padding: 12px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.summary-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		font-size: 12px;
+		font-weight: 500;
+		color: #0369a1;
+	}
+
+	.summary-item.ready {
+		color: #059669;
+	}
+
+	.summary-item.waiting {
+		color: #d97706;
+	}
+
+	.summary-item.equipment {
+		color: #3b82f6;
+	}
+
+	.summary-item.documentation {
+		color: #6366f1;
 	}
 
 	/* Instructions */
@@ -820,6 +1022,31 @@
 
 		.start-btn {
 			flex: none;
+		}
+
+		.spec-item {
+			padding: 10px;
+		}
+
+		.spec-label {
+			font-size: 11px;
+		}
+
+		.spec-value {
+			font-size: 12px;
+		}
+
+		.tech-item {
+			padding: 6px 10px;
+		}
+
+		.tech-label,
+		.tech-value {
+			font-size: 11px;
+		}
+
+		.summary-item {
+			font-size: 11px;
 		}
 	}
 </style> 
