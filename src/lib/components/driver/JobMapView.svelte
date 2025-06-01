@@ -6,11 +6,11 @@
 	} from 'lucide-svelte';
 	
 	// Import refactored components
-	import MapRenderer from './MapRenderer.svelte';
-	import JobStepsProgress from './JobStepsProgress.svelte';
-	import JobMetrics from './JobMetrics.svelte';
-	import { mapStore } from './stores/mapState.js';
-	import { jobTrackingStore } from './stores/jobTracking.js';
+	import MapRenderer from './job-map/MapRenderer.svelte';
+	import JobStepsProgress from './job-map/JobStepsProgress.svelte';
+	import JobMetrics from './job-map/JobMetrics.svelte';
+	import { mapStore } from './job-map/stores/mapState';
+	import { jobTrackingStore } from './job-map/stores/jobTracking';
 
 	const dispatch = createEventDispatcher();
 

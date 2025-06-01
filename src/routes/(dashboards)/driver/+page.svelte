@@ -2,6 +2,8 @@
 	import PreTripInspection from '$lib/components/driver/PreTripInspection.svelte';
 	import DriverSchedule from '$lib/components/driver/DriverSchedule.svelte';
 	import JobDetailModal from '$lib/components/driver/JobDetailModal.svelte';
+	import JobMapView from '$lib/components/driver/JobMapView.svelte';
+	import InTransitView from '$lib/components/driver/InTransitView.svelte';
 	import QuickNavBar from '$lib/components/ui/QuickNavBar.svelte';
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import SmartCalChart from '$lib/components/charts/SmartCalChart.svelte';
@@ -13,6 +15,10 @@
 	let showJobModal = false;
 	let inspectionCompleted = false;
 	let activeSection = 'overview';
+	
+	// Job flow states
+	let currentView = 'dashboard'; // 'dashboard' | 'job-map' | 'in-transit'
+	let activeJob: any = null;
 
 	// Navigation handling
 	function handleNavigation(event: CustomEvent) {
@@ -38,11 +44,29 @@
 		console.log('🚀 Starting job:', job.id, '| Account:', job.accountName);
 		console.log('📍 Route:', job.pickupLocation.name, '→', job.deliveryLocation.name);
 		
-		// TODO: Navigate to job map view or pre-trip inspection
+		// Set active job and transition to map view
+		activeJob = job;
+		currentView = 'job-map';
 		showJobModal = false;
-		
-		// For demo: show alert that job start was triggered
-		alert(`Job ${job.id} started! Next: Navigate to pickup location or complete pre-trip inspection.`);
+	}
+
+	function handleExitMap() {
+		currentView = 'dashboard';
+		activeJob = null;
+	}
+
+	function handleStartTransit(event: CustomEvent) {
+		const { job } = event.detail;
+		console.log('🚚 Starting transit for job:', job.id);
+		// Transition from map view to in-transit view
+		currentView = 'in-transit';
+		activeJob = job;
+	}
+
+	function handleTransitComplete() {
+		currentView = 'dashboard';
+		activeJob = null;
+		// TODO: Update job status, show completion modal, etc.
 	}
 
 	function handleInspectionComplete(event: CustomEvent) {
@@ -76,250 +100,271 @@
 </svelte:head>
 
 <div class="driver-dashboard">
-	<!-- Quick Navigation Bar -->
-	<QuickNavBar 
-		activeSection={activeSection} 
-		on:navigate={handleNavigation}
-	/>
+	<!-- Show dashboard sections only when in dashboard view -->
+	{#if currentView === 'dashboard'}
+		<!-- Quick Navigation Bar -->
+		<QuickNavBar 
+			activeSection={activeSection} 
+			on:navigate={handleNavigation}
+		/>
 
-	<!-- Header -->
-	<div class="dashboard-header">
-		<div class="header-content">
-			<div class="header-icon">
-				<Truck size={32} />
-			</div>
-			<div class="header-text">
-				<h1 class="header-title">Driver Dashboard</h1>
-				<p class="header-subtitle">Schedule, pre-trip inspection, and job management</p>
+		<!-- Header -->
+		<div class="dashboard-header">
+			<div class="header-content">
+				<div class="header-icon">
+					<Truck size={32} />
+				</div>
+				<div class="header-text">
+					<h1 class="header-title">Driver Dashboard</h1>
+					<p class="header-subtitle">Schedule, pre-trip inspection, and job management</p>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<!-- Overview Section -->
-	<section id="overview" class="dashboard-section">
-		<div class="section-header">
-			<h1 class="section-title">Driver Dashboard</h1>
-			<p class="section-subtitle">Complete your daily workflow and manage hauls</p>
-		</div>
+		<!-- Overview Section -->
+		<section id="overview" class="dashboard-section">
+			<div class="section-header">
+				<h1 class="section-title">Driver Dashboard</h1>
+				<p class="section-subtitle">Complete your daily workflow and manage hauls</p>
+			</div>
 
-		<div class="section-content">
-			<!-- Overview Cards -->
-			<div class="overview-cards">
-				<div class="overview-card pretrip" on:click={() => goToSection('pretrip')}>
-					<div class="card-header">
-						<div class="card-icon">
-							<BarChart3 size={24} />
+			<div class="section-content">
+				<!-- Overview Cards -->
+				<div class="overview-cards">
+					<div class="overview-card pretrip" on:click={() => goToSection('pretrip')}>
+						<div class="card-header">
+							<div class="card-icon">
+								<BarChart3 size={24} />
+							</div>
+							<div class="card-status status-pending">PENDING</div>
 						</div>
-						<div class="card-status status-pending">PENDING</div>
+						<h3>Pre-Trip Inspection</h3>
+						<p>Complete your daily safety inspection</p>
 					</div>
-					<h3>Pre-Trip Inspection</h3>
-					<p>Complete your daily safety inspection</p>
-				</div>
 
-				<div class="overview-card" on:click={() => goToSection('schedule')}>
-					<div class="card-icon">📅</div>
-					<div class="card-content">
-						<h3>Schedule & Routes</h3>
-						<p>View today's hauls and routes</p>
-						<span class="card-status active">5 Jobs Today</span>
-					</div>
-				</div>
-
-				<div class="overview-card" on:click={() => goToSection('performance')}>
-					<div class="card-icon">📊</div>
-					<div class="card-content">
-						<h3>Performance</h3>
-						<p>Track your metrics and stats</p>
-						<span class="card-status good">94.2% Efficiency</span>
-					</div>
-				</div>
-
-				<div class="overview-card safety" on:click={() => goToSection('safety')}>
-					<div class="card-header">
-						<div class="card-icon">
-							<Shield size={24} />
+					<div class="overview-card" on:click={() => goToSection('schedule')}>
+						<div class="card-icon">📅</div>
+						<div class="card-content">
+							<h3>Schedule & Routes</h3>
+							<p>View today's hauls and routes</p>
+							<span class="card-status active">5 Jobs Today</span>
 						</div>
-						<div class="card-status status-good">96.8%</div>
 					</div>
-					<h3>Safety Score</h3>
-					<p>Your current safety rating</p>
+
+					<div class="overview-card" on:click={() => goToSection('performance')}>
+						<div class="card-icon">📊</div>
+						<div class="card-content">
+							<h3>Performance</h3>
+							<p>Track your metrics and stats</p>
+							<span class="card-status good">94.2% Efficiency</span>
+						</div>
+					</div>
+
+					<div class="overview-card safety" on:click={() => goToSection('safety')}>
+						<div class="card-header">
+							<div class="card-icon">
+								<Shield size={24} />
+							</div>
+							<div class="card-status status-good">96.8%</div>
+						</div>
+						<h3>Safety Score</h3>
+						<p>Your current safety rating</p>
+					</div>
+				</div>
+
+				<!-- Quick Metrics -->
+				<div class="quick-metrics">
+					<MetricCard 
+						title="Today's Progress" 
+						value="3/5" 
+						unit="hauls" 
+						icon={Truck}
+						status="normal"
+						trend="up"
+						trendValue="+1"
+						color="blue"
+					/>
+					<MetricCard 
+						title="Current Status" 
+						value="Available" 
+						unit="" 
+						icon={CheckCircle}
+						status="normal"
+						trend="stable"
+						trendValue="Ready"
+						color="emerald"
+					/>
+					<MetricCard 
+						title="Next Haul" 
+						value="2:30 PM" 
+						unit="" 
+						icon={Clock}
+						status="normal"
+						trend="stable"
+						trendValue="Scheduled"
+						color="orange"
+					/>
 				</div>
 			</div>
+		</section>
 
-			<!-- Quick Metrics -->
-			<div class="quick-metrics">
-				<MetricCard 
-					title="Today's Progress" 
-					value="3/5" 
-					unit="hauls" 
-					icon={Truck}
-					status="normal"
-					trend="up"
-					trendValue="+1"
-					color="blue"
-				/>
-				<MetricCard 
-					title="Current Status" 
-					value="Available" 
-					unit="" 
-					icon={CheckCircle}
-					status="normal"
-					trend="stable"
-					trendValue="Ready"
-					color="emerald"
-				/>
-				<MetricCard 
-					title="Next Haul" 
-					value="2:30 PM" 
-					unit="" 
-					icon={Clock}
-					status="normal"
-					trend="stable"
-					trendValue="Scheduled"
-					color="orange"
-				/>
-			</div>
-		</div>
-	</section>
-
-	<!-- Pre-Trip Section -->
-	<section id="pretrip" class="dashboard-section">
-		<div class="section-header">
-			<h2 class="section-title">Pre-Trip Inspection</h2>
-			<button class="back-btn" on:click={() => goToSection('overview')}>
-				← Back to Overview
-			</button>
-		</div>
-
-		<div class="section-content">
-			<PreTripInspection on:inspection-complete={handleInspectionComplete} />
-		</div>
-	</section>
-
-	<!-- Schedule Section -->
-	<section id="schedule" class="dashboard-section">
-		<div class="section-header">
-			<h2 class="section-title">Schedule & Routes</h2>
-			<button class="back-btn" on:click={() => goToSection('overview')}>
-				← Back to Overview
-			</button>
-		</div>
-
-		<div class="section-content">
-			<DriverSchedule on:job-selected={handleJobSelected} />
-		</div>
-	</section>
-
-	<!-- Performance Section -->
-	<section id="performance" class="dashboard-section">
-		<div class="section-header">
-			<h2 class="section-title">Performance Analytics</h2>
-			<button class="back-btn" on:click={() => goToSection('overview')}>
-				← Back to Overview
-			</button>
-		</div>
-
-		<div class="section-content">
-			<div class="performance-metrics">
-				<MetricCard 
-					title="Safety Compliance" 
-					value="96.8" 
-					unit="%" 
-					icon={Shield}
-					status="normal"
-					trend="up"
-					trendValue="+2.1%"
-					color="emerald"
-				/>
-				<MetricCard 
-					title="Efficiency Rating" 
-					value="94.2" 
-					unit="%" 
-					icon={Zap}
-					status="normal"
-					trend="up"
-					trendValue="+3.1%"
-					color="blue"
-				/>
-				<MetricCard 
-					title="Hauls This Week" 
-					value="23" 
-					unit="" 
-					icon={Package}
-					status="normal"
-					trend="up"
-					trendValue="+2"
-					color="orange"
-				/>
-				<MetricCard 
-					title="On-Time Delivery" 
-					value="96.8" 
-					unit="%" 
-					icon={Clock}
-					status="normal"
-					trend="stable"
-					trendValue="+0.5%"
-					color="emerald"
-				/>
+		<!-- Pre-Trip Section -->
+		<section id="pretrip" class="dashboard-section">
+			<div class="section-header">
+				<h2 class="section-title">Pre-Trip Inspection</h2>
+				<button class="back-btn" on:click={() => goToSection('overview')}>
+					← Back to Overview
+				</button>
 			</div>
 
-			<!-- Smart Cal Chart -->
-			<div class="chart-section">
-				<h3>Smart Calibration Overview</h3>
-				<SmartCalChart size="medium" showLabels={true} />
+			<div class="section-content">
+				<PreTripInspection on:inspection-complete={handleInspectionComplete} />
+			</div>
+		</section>
+
+		<!-- Schedule Section -->
+		<section id="schedule" class="dashboard-section">
+			<div class="section-header">
+				<h2 class="section-title">Schedule & Routes</h2>
+				<button class="back-btn" on:click={() => goToSection('overview')}>
+					← Back to Overview
+				</button>
 			</div>
 
-			<!-- ROI Justification -->
-			<div class="roi-section">
-				<ROIJustificationCard />
+			<div class="section-content">
+				<DriverSchedule on:job-selected={handleJobSelected} />
 			</div>
-		</div>
-	</section>
+		</section>
 
-	<!-- Safety Section -->
-	<section id="safety" class="dashboard-section">
-		<div class="section-header">
-			<h2 class="section-title">Safety Record</h2>
-			<button class="back-btn" on:click={() => goToSection('overview')}>
-				← Back to Overview
-			</button>
-		</div>
-
-		<div class="section-content">
-			<div class="safety-metrics">
-				<MetricCard 
-					title="Days Without Incident" 
-					value="247" 
-					unit="days" 
-					icon={Trophy}
-					status="normal"
-					trend="up"
-					trendValue="+1"
-					color="emerald"
-				/>
-				<MetricCard 
-					title="Safety Training" 
-					value="100" 
-					unit="%" 
-					icon={BookOpen}
-					status="normal"
-					trend="stable"
-					trendValue="Current"
-					color="blue"
-				/>
-				<MetricCard 
-					title="Vehicle Inspections" 
-					value="23/23" 
-					unit="" 
-					icon={Search}
-					status="normal"
-					trend="stable"
-					trendValue="Perfect"
-					color="emerald"
-				/>
+		<!-- Performance Section -->
+		<section id="performance" class="dashboard-section">
+			<div class="section-header">
+				<h2 class="section-title">Performance Analytics</h2>
+				<button class="back-btn" on:click={() => goToSection('overview')}>
+					← Back to Overview
+				</button>
 			</div>
-		</div>
-	</section>
+
+			<div class="section-content">
+				<div class="performance-metrics">
+					<MetricCard 
+						title="Safety Compliance" 
+						value="96.8" 
+						unit="%" 
+						icon={Shield}
+						status="normal"
+						trend="up"
+						trendValue="+2.1%"
+						color="emerald"
+					/>
+					<MetricCard 
+						title="Efficiency Rating" 
+						value="94.2" 
+						unit="%" 
+						icon={Zap}
+						status="normal"
+						trend="up"
+						trendValue="+3.1%"
+						color="blue"
+					/>
+					<MetricCard 
+						title="Hauls This Week" 
+						value="23" 
+						unit="" 
+						icon={Package}
+						status="normal"
+						trend="up"
+						trendValue="+2"
+						color="orange"
+					/>
+					<MetricCard 
+						title="On-Time Delivery" 
+						value="96.8" 
+						unit="%" 
+						icon={Clock}
+						status="normal"
+						trend="stable"
+						trendValue="+0.5%"
+						color="emerald"
+					/>
+				</div>
+
+				<!-- Smart Cal Chart -->
+				<div class="chart-section">
+					<h3>Smart Calibration Overview</h3>
+					<SmartCalChart size="medium" showLabels={true} />
+				</div>
+
+				<!-- ROI Justification -->
+				<div class="roi-section">
+					<ROIJustificationCard />
+				</div>
+			</div>
+		</section>
+
+		<!-- Safety Section -->
+		<section id="safety" class="dashboard-section">
+			<div class="section-header">
+				<h2 class="section-title">Safety Record</h2>
+				<button class="back-btn" on:click={() => goToSection('overview')}>
+					← Back to Overview
+				</button>
+			</div>
+
+			<div class="section-content">
+				<div class="safety-metrics">
+					<MetricCard 
+						title="Days Without Incident" 
+						value="247" 
+						unit="days" 
+						icon={Trophy}
+						status="normal"
+						trend="up"
+						trendValue="+1"
+						color="emerald"
+					/>
+					<MetricCard 
+						title="Safety Training" 
+						value="100" 
+						unit="%" 
+						icon={BookOpen}
+						status="normal"
+						trend="stable"
+						trendValue="Current"
+						color="blue"
+					/>
+					<MetricCard 
+						title="Vehicle Inspections" 
+						value="23/23" 
+						unit="" 
+						icon={Search}
+						status="normal"
+						trend="stable"
+						trendValue="Perfect"
+						color="emerald"
+					/>
+				</div>
+			</div>
+		</section>
+	{/if}
+
+	<!-- Job Map View -->
+	{#if currentView === 'job-map' && activeJob}
+		<JobMapView 
+			job={activeJob}
+			on:exit-map={handleExitMap}
+			on:start-transit={handleStartTransit}
+		/>
+	{/if}
+
+	<!-- In-Transit View -->
+	{#if currentView === 'in-transit' && activeJob}
+		<InTransitView 
+			job={activeJob}
+			on:transit-complete={handleTransitComplete}
+			on:back-to-map={() => currentView = 'job-map'}
+		/>
+	{/if}
 </div>
 
 <!-- Job Detail Modal -->
