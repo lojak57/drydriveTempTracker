@@ -1,5 +1,6 @@
 <script lang="ts">
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
+	import { Warehouse, Truck, BarChart3, Shield } from 'lucide-svelte';
 </script>
 
 <svelte:head>
@@ -10,10 +11,12 @@
 	<!-- Header -->
 	<div class="dashboard-header">
 		<div class="header-content">
-			<div class="header-icon">🏗️</div>
+			<div class="header-icon">
+				<Warehouse size={32} />
+			</div>
 			<div class="header-text">
-				<h1>Yard Manager Dashboard</h1>
-				<p>Fleet overview, driver management, and yard operations</p>
+				<h1 class="header-title">Yard Manager Dashboard</h1>
+				<p class="header-subtitle">Fleet overview, driver management, and yard operations</p>
 			</div>
 		</div>
 	</div>
@@ -22,43 +25,43 @@
 	<div class="overview-metrics">
 		<MetricCard 
 			title="Total Fleet" 
-			value="24" 
+			value="89" 
 			unit="trucks" 
-			icon="🚛" 
+			icon={Truck}
 			status="normal"
 			trend="stable"
-			trendValue="+2"
+			trendValue="0 this week"
 			color="blue"
 		/>
 		<MetricCard 
 			title="Active Today" 
-			value="18" 
-			unit="" 
-			icon="✅" 
+			value="67" 
+			unit="trucks" 
+			icon={Truck}
 			status="normal"
 			trend="up"
-			trendValue="+3"
+			trendValue="+8 vs yesterday"
 			color="emerald"
 		/>
 		<MetricCard 
-			title="In Maintenance" 
-			value="3" 
-			unit="" 
-			icon="🔧" 
+			title="Maintenance Mode" 
+			value="8" 
+			unit="trucks" 
+			icon={BarChart3}
 			status="warning"
-			trend="down"
-			trendValue="-1"
-			color="amber"
+			trend="stable"
+			trendValue="scheduled"
+			color="orange"
 		/>
 		<MetricCard 
 			title="Utilization Rate" 
-			value="87.5" 
+			value="75.3" 
 			unit="%" 
-			icon="📊" 
+			icon={BarChart3}
 			status="normal"
 			trend="up"
-			trendValue="+4.2%"
-			color="emerald"
+			trendValue="+3.2%"
+			color="blue"
 		/>
 	</div>
 
@@ -106,30 +109,20 @@
 			<div class="driver-overview">
 				<div class="driver-metrics">
 					<MetricCard 
-						title="Total Drivers" 
-						value="28" 
-						unit="" 
-						icon="👥" 
+						title="Active Drivers" 
+						value="156" 
+						unit="certified" 
+						icon={Truck}
 						status="normal"
 						trend="up"
-						trendValue="+2"
-						color="blue"
-					/>
-					<MetricCard 
-						title="Active Today" 
-						value="22" 
-						unit="" 
-						icon="🚛" 
-						status="normal"
-						trend="up"
-						trendValue="+4"
+						trendValue="+4 this month"
 						color="emerald"
 					/>
 					<MetricCard 
-						title="Avg Safety Score" 
-						value="96.8" 
+						title="Safety Compliance" 
+						value="97.8" 
 						unit="%" 
-						icon="🛡️" 
+						icon={Shield}
 						status="normal"
 						trend="up"
 						trendValue="+1.2%"

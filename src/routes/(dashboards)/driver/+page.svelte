@@ -6,6 +6,7 @@
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import SmartCalChart from '$lib/components/charts/SmartCalChart.svelte';
 	import ROIJustificationCard from '$lib/components/dashboard/ROIJustificationCard.svelte';
+	import { Truck, BarChart3, Shield, CheckCircle, Clock, Zap, Package, Trophy, BookOpen, Search } from 'lucide-svelte';
 
 	// Driver workflow state
 	let selectedJob: any = null;
@@ -69,6 +70,19 @@
 		on:navigate={handleNavigation}
 	/>
 
+	<!-- Header -->
+	<div class="dashboard-header">
+		<div class="header-content">
+			<div class="header-icon">
+				<Truck size={32} />
+			</div>
+			<div class="header-text">
+				<h1 class="header-title">Driver Dashboard</h1>
+				<p class="header-subtitle">Schedule, pre-trip inspection, and job management</p>
+			</div>
+		</div>
+	</div>
+
 	<!-- Overview Section -->
 	<section id="overview" class="dashboard-section">
 		<div class="section-header">
@@ -79,15 +93,15 @@
 		<div class="section-content">
 			<!-- Overview Cards -->
 			<div class="overview-cards">
-				<div class="overview-card" on:click={() => goToSection('pretrip')}>
-					<div class="card-icon">✅</div>
-					<div class="card-content">
-						<h3>Pre-Trip Inspection</h3>
-						<p>Complete your daily safety inspection</p>
-						<span class="card-status {inspectionCompleted ? 'completed' : 'pending'}">
-							{inspectionCompleted ? 'Completed' : 'Required'}
-						</span>
+				<div class="overview-card pretrip" on:click={() => goToSection('pretrip')}>
+					<div class="card-header">
+						<div class="card-icon">
+							<BarChart3 size={24} />
+						</div>
+						<div class="card-status status-pending">PENDING</div>
 					</div>
+					<h3>Pre-Trip Inspection</h3>
+					<p>Complete your daily safety inspection</p>
 				</div>
 
 				<div class="overview-card" on:click={() => goToSection('schedule')}>
@@ -108,13 +122,15 @@
 					</div>
 				</div>
 
-				<div class="overview-card" on:click={() => goToSection('safety')}>
-					<div class="card-icon">🛡️</div>
-					<div class="card-content">
-						<h3>Safety Record</h3>
-						<p>View safety stats and training</p>
-						<span class="card-status excellent">98.5% Score</span>
+				<div class="overview-card safety" on:click={() => goToSection('safety')}>
+					<div class="card-header">
+						<div class="card-icon">
+							<Shield size={24} />
+						</div>
+						<div class="card-status status-good">96.8%</div>
 					</div>
+					<h3>Safety Score</h3>
+					<p>Your current safety rating</p>
 				</div>
 			</div>
 
@@ -124,7 +140,7 @@
 					title="Today's Progress" 
 					value="3/5" 
 					unit="hauls" 
-					icon="🚛" 
+					icon={Truck}
 					status="normal"
 					trend="up"
 					trendValue="+1"
@@ -134,7 +150,7 @@
 					title="Current Status" 
 					value="Available" 
 					unit="" 
-					icon="✅" 
+					icon={CheckCircle}
 					status="normal"
 					trend="stable"
 					trendValue="Ready"
@@ -144,7 +160,7 @@
 					title="Next Haul" 
 					value="2:30 PM" 
 					unit="" 
-					icon="⏰" 
+					icon={Clock}
 					status="normal"
 					trend="stable"
 					trendValue="Scheduled"
@@ -194,20 +210,20 @@
 		<div class="section-content">
 			<div class="performance-metrics">
 				<MetricCard 
-					title="Safety Score" 
-					value="98.5" 
+					title="Safety Compliance" 
+					value="96.8" 
 					unit="%" 
-					icon="🛡️" 
+					icon={Shield}
 					status="normal"
 					trend="up"
-					trendValue="+1.2%"
+					trendValue="+2.1%"
 					color="emerald"
 				/>
 				<MetricCard 
 					title="Efficiency Rating" 
 					value="94.2" 
 					unit="%" 
-					icon="⚡" 
+					icon={Zap}
 					status="normal"
 					trend="up"
 					trendValue="+3.1%"
@@ -217,7 +233,7 @@
 					title="Hauls This Week" 
 					value="23" 
 					unit="" 
-					icon="📦" 
+					icon={Package}
 					status="normal"
 					trend="up"
 					trendValue="+2"
@@ -227,7 +243,7 @@
 					title="On-Time Delivery" 
 					value="96.8" 
 					unit="%" 
-					icon="⏰" 
+					icon={Clock}
 					status="normal"
 					trend="stable"
 					trendValue="+0.5%"
@@ -263,7 +279,7 @@
 					title="Days Without Incident" 
 					value="247" 
 					unit="days" 
-					icon="🏆" 
+					icon={Trophy}
 					status="normal"
 					trend="up"
 					trendValue="+1"
@@ -273,7 +289,7 @@
 					title="Safety Training" 
 					value="100" 
 					unit="%" 
-					icon="📚" 
+					icon={BookOpen}
 					status="normal"
 					trend="stable"
 					trendValue="Current"
@@ -283,7 +299,7 @@
 					title="Vehicle Inspections" 
 					value="23/23" 
 					unit="" 
-					icon="🔍" 
+					icon={Search}
 					status="normal"
 					trend="stable"
 					trendValue="Perfect"

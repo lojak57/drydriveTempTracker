@@ -1,6 +1,7 @@
 <script lang="ts">
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import DispatchHub from '$lib/components/dispatch/DispatchHub.svelte';
+	import { Radio, Truck, BarChart3, Target } from 'lucide-svelte';
 
 	let showAnalytics = false;
 </script>
@@ -13,54 +14,56 @@
 	<!-- Header -->
 	<div class="dashboard-header">
 		<div class="header-content">
-			<div class="header-icon">📋</div>
+			<div class="header-icon">
+				<Radio size={32} />
+			</div>
 			<div class="header-text">
-				<h1>Dispatch Dashboard</h1>
-				<p>Route planning, fleet status, and active hauls</p>
+				<h1 class="header-title">Dispatch Dashboard</h1>
+				<p class="header-subtitle">Route planning, fleet status, and active hauls</p>
 			</div>
 		</div>
 	</div>
 
 	<!-- Overview Metrics -->
-	<div class="overview-metrics">
+	<div class="metrics-grid">
 		<MetricCard 
 			title="Active Hauls" 
-			value="47" 
-			unit="" 
-			icon="🚛" 
+			value="23" 
+			unit="in transit" 
+			icon={Truck}
 			status="normal"
 			trend="up"
-			trendValue="+3"
+			trendValue="+5"
 			color="blue"
 		/>
 		<MetricCard 
 			title="Pending Dispatch" 
 			value="12" 
-			unit="" 
-			icon="⏳" 
+			unit="queued" 
+			icon={BarChart3}
 			status="warning"
-			trend="up"
+			trend="stable"
 			trendValue="+2"
 			color="orange"
 		/>
 		<MetricCard 
 			title="Fleet Utilization" 
-			value="89.2" 
+			value="87.3" 
 			unit="%" 
-			icon="📊" 
+			icon={Target}
 			status="normal"
 			trend="up"
-			trendValue="+1.3%"
+			trendValue="+4.1%"
 			color="emerald"
 		/>
 		<MetricCard 
-			title="Avg ETA Accuracy" 
-			value="94.7" 
+			title="ETA Accuracy" 
+			value="94.2" 
 			unit="%" 
-			icon="🎯" 
+			icon={BarChart3}
 			status="normal"
 			trend="up"
-			trendValue="+0.8%"
+			trendValue="+2.8%"
 			color="blue"
 		/>
 	</div>

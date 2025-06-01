@@ -1,16 +1,17 @@
 <script lang="ts">
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import RealtimeChart from '$lib/components/charts/RealtimeChart.svelte';
+	import { MapPin, Building2, BarChart3, Target, TrendingUp, Truck, DollarSign, Shield } from 'lucide-svelte';
 
 	// Regional management state
 	let activeView = 'overview';
 	let selectedYard = null;
 
 	const regionalViews = [
-		{ id: 'overview', label: 'Regional Overview', icon: '🌍' },
-		{ id: 'yards', label: 'Yard Management', icon: '🏭' },
-		{ id: 'analytics', label: 'Performance Analytics', icon: '📊' },
-		{ id: 'strategic', label: 'Strategic Planning', icon: '🎯' }
+		{ id: 'overview', label: 'Regional Overview', icon: MapPin },
+		{ id: 'yards', label: 'Yard Management', icon: Building2 },
+		{ id: 'analytics', label: 'Performance Analytics', icon: BarChart3 },
+		{ id: 'strategic', label: 'Strategic Planning', icon: Target }
 	];
 
 	const yards = [
@@ -29,23 +30,26 @@
 	<!-- Header -->
 	<div class="dashboard-header">
 		<div class="header-content">
-			<div class="header-icon">🧭</div>
+			<div class="header-icon">
+				<MapPin size={32} />
+			</div>
 			<div class="header-text">
-				<h1>Regional Manager Dashboard</h1>
-				<p>Multi-yard oversight and regional performance analytics</p>
+				<h1 class="header-title">Regional Manager Dashboard</h1>
+				<p class="header-subtitle">Multi-yard oversight, regional analytics, and strategic planning</p>
 			</div>
 		</div>
 	</div>
 
-	<!-- Navigation Tabs -->
-	<div class="tab-navigation">
+	<!-- Navigation Views -->
+	<div class="view-navigation">
 		{#each regionalViews as view}
 			<button 
-				class="tab-btn {activeView === view.id ? 'active' : ''}"
+				class="view-btn" 
+				class:active={activeView === view.id}
 				on:click={() => activeView = view.id}
 			>
-				<span class="tab-icon">{view.icon}</span>
-				<span class="tab-label">{view.label}</span>
+				<svelte:component this={view.icon} size={16} />
+				<span>{view.label}</span>
 			</button>
 		{/each}
 	</div>
@@ -60,7 +64,7 @@
 						title="Total Regional Fleet" 
 						value="104" 
 						unit="trucks" 
-						icon="🚛" 
+						icon={Truck}
 						status="normal"
 						trend="up"
 						trendValue="+8"
@@ -70,7 +74,7 @@
 						title="Regional Revenue" 
 						value="$1.8M" 
 						unit="monthly" 
-						icon="💰" 
+						icon={DollarSign}
 						status="normal"
 						trend="up"
 						trendValue="+12.4%"
@@ -80,7 +84,7 @@
 						title="Avg Yard Efficiency" 
 						value="92.4" 
 						unit="%" 
-						icon="⚡" 
+						icon={BarChart3}
 						status="normal"
 						trend="up"
 						trendValue="+2.1%"
@@ -90,7 +94,7 @@
 						title="Regional Safety Score" 
 						value="95.7" 
 						unit="%" 
-						icon="🛡️" 
+						icon={Shield}
 						status="normal"
 						trend="stable"
 						trendValue="+0.3%"
@@ -174,7 +178,7 @@
 						title="Cross-Yard Efficiency" 
 						value="92.4" 
 						unit="%" 
-						icon="⚡" 
+						icon={BarChart3}
 						status="normal"
 						trend="up"
 						trendValue="+3.2%"
@@ -184,7 +188,7 @@
 						title="Resource Optimization" 
 						value="87.8" 
 						unit="%" 
-						icon="🔧" 
+						icon={TrendingUp}
 						status="normal"
 						trend="up"
 						trendValue="+1.5%"
@@ -194,7 +198,7 @@
 						title="Regional Market Share" 
 						value="42.1" 
 						unit="%" 
-						icon="📈" 
+						icon={TrendingUp}
 						status="normal"
 						trend="up"
 						trendValue="+2.8%"
@@ -227,7 +231,7 @@
 						title="Growth Trajectory" 
 						value="34.7" 
 						unit="%" 
-						icon="📈" 
+						icon={TrendingUp}
 						status="normal"
 						trend="up"
 						trendValue="+8.2%"
@@ -237,7 +241,7 @@
 						title="Market Expansion" 
 						value="3" 
 						unit="new areas" 
-						icon="🌟" 
+						icon={Target}
 						status="normal"
 						trend="up"
 						trendValue="+1"
@@ -247,7 +251,7 @@
 						title="Investment ROI" 
 						value="167" 
 						unit="%" 
-						icon="💎" 
+						icon={DollarSign}
 						status="normal"
 						trend="up"
 						trendValue="+23%"
@@ -327,7 +331,7 @@
 		margin: 0;
 	}
 
-	.tab-navigation {
+	.view-navigation {
 		display: flex;
 		gap: 12px;
 		margin-bottom: 32px;
@@ -335,7 +339,7 @@
 		padding: 4px;
 	}
 
-	.tab-btn {
+	.view-btn {
 		display: flex;
 		align-items: center;
 		gap: 10px;
@@ -351,25 +355,25 @@
 		white-space: nowrap;
 	}
 
-	.tab-btn:hover {
+	.view-btn:hover {
 		background: rgba(255, 255, 255, 0.95);
 		transform: translateY(-2px);
 		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 		color: #1e293b;
 	}
 
-	.tab-btn.active {
+	.view-btn.active {
 		background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
 		color: white;
 		border-color: #8B5CF6;
 		box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
 	}
 
-	.tab-icon {
+	.view-icon {
 		font-size: 18px;
 	}
 
-	.tab-label {
+	.view-label {
 		font-size: 14px;
 	}
 
@@ -610,16 +614,16 @@
 			font-size: 14px;
 		}
 
-		.tab-btn {
+		.view-btn {
 			padding: 12px 16px;
 			gap: 8px;
 		}
 
-		.tab-icon {
+		.view-icon {
 			font-size: 16px;
 		}
 
-		.tab-label {
+		.view-label {
 			font-size: 13px;
 		}
 
@@ -653,20 +657,20 @@
 	}
 
 	@media (max-width: 640px) {
-		.tab-navigation {
+		.view-navigation {
 			gap: 8px;
 		}
 
-		.tab-btn {
+		.view-btn {
 			padding: 10px 12px;
 			gap: 6px;
 		}
 
-		.tab-label {
+		.view-label {
 			display: none;
 		}
 
-		.tab-icon {
+		.view-icon {
 			font-size: 18px;
 		}
 
