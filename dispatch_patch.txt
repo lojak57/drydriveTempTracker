@@ -1,0 +1,26 @@
+CHANGES NEEDED:
+
+1. Add import: import DispatchHub from '$lib/components/dispatch/DispatchHub.svelte';
+
+2. Update dispatchTabs array to include:
+		{ id: 'analytics', label: 'God View Analytics', icon: '🔥' }
+
+3. Add analytics tab content in dispatch section:
+{:else if dispatchTab === 'analytics'}
+	<div class="analytics-tab-content">
+		<div class="tab-header mb-6">
+			<h2 class="text-2xl font-bold text-oil-black">God View Analytics</h2>
+			<p class="text-oil-gray">Hierarchical fleet intelligence: Fleet → Yard → Truck → Haul Tickets</p>
+		</div>
+		<div class="analytics-container">
+			{#await import('$lib/components/dispatch/DispatchHub.svelte') then module}
+				<svelte:component this={module.default} />
+			{:catch error}
+				<div class="error-state">
+					<p>Error loading analytics: {error.message}</p>
+				</div>
+			{/await}
+		</div>
+	</div>
+
+4. Add navigation tabs to dispatch section similar to yard-manager 

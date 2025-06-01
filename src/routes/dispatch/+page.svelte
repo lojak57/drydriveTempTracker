@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import RealtimeChart from '$lib/components/charts/RealtimeChart.svelte';
+	import DispatchHub from '$lib/components/dispatch/DispatchHub.svelte';
 	import { activeHauls, completedHauls, drivers, trucks } from '$lib/stores/haulStore';
 
 	// Tab management
@@ -11,7 +12,7 @@
 		{ id: 'completed', label: 'Completed', icon: '✅', count: $completedHauls.length },
 		{ id: 'fleet-tracking', label: 'Fleet Tracking', icon: '📍', count: $trucks.length },
 		{ id: 'scheduling', label: 'Scheduling', icon: '📅', count: 12 },
-		{ id: 'analytics', label: 'Analytics', icon: '📊', count: null }
+		{ id: 'analytics', label: 'God View Analytics', icon: '🔥', count: null }
 	];
 
 	// Mock data for dispatch operations
@@ -349,93 +350,15 @@
 				</div>
 
 			{:else if activeTab === 'analytics'}
-				<div class="analytics-view">
-					<div class="view-header mb-6">
-						<h3 class="text-xl font-semibold text-oil-black">Dispatch Analytics</h3>
-						<p class="text-oil-gray">Performance insights and optimization opportunities</p>
+				<div class="god-view-analytics">
+					<div class="view-header mb-4">
+						<h3 class="text-xl font-semibold text-oil-black">God View Analytics</h3>
+						<p class="text-oil-gray">Hierarchical fleet intelligence: Fleet → Yard → Truck → Haul Tickets</p>
 					</div>
 					
-					<div class="analytics-grid grid grid-cols-1 lg:grid-cols-2 gap-6">
-						<div class="chart-container">
-							<RealtimeChart 
-								title="Route Optimization Efficiency"
-								color="#9CCC65"
-								height={300}
-								unit="%"
-								animated={true}
-							/>
-						</div>
-						<div class="chart-container">
-							<RealtimeChart 
-								title="Driver Utilization Rates"
-								color="#CDDC39"
-								height={300}
-								unit="%"
-								animated={true}
-							/>
-						</div>
-						<div class="chart-container">
-							<RealtimeChart 
-								title="Fuel Efficiency Trends"
-								color="#4CAF50"
-								height={300}
-								unit=" MPG"
-								animated={true}
-							/>
-						</div>
-						<div class="chart-container">
-							<RealtimeChart 
-								title="Turnaround Time Analysis"
-								color="#558B2F"
-								height={300}
-								unit=" hrs"
-								animated={true}
-							/>
-						</div>
-					</div>
-					
-					<!-- Additional Analytics Metrics -->
-					<div class="analytics-metrics grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-						<MetricCard 
-							title="Avg Turnaround" 
-							value={dispatchMetrics.avgTurnaroundTime} 
-							unit="hrs" 
-							icon="⏱️" 
-							status="normal"
-							trend="down"
-							trendValue="-0.3hrs"
-							color="emerald"
-						/>
-						<MetricCard 
-							title="Fuel Efficiency" 
-							value={dispatchMetrics.fuelEfficiency} 
-							unit="MPG" 
-							icon="⛽" 
-							status="normal"
-							trend="up"
-							trendValue="+0.4"
-							color="blue"
-						/>
-						<MetricCard 
-							title="Route Optimization" 
-							value={dispatchMetrics.routeOptimization} 
-							unit="%" 
-							icon="🗺️" 
-							status="normal"
-							trend="up"
-							trendValue="+2.1%"
-							color="orange"
-						/>
-						<MetricCard 
-							title="Driver Utilization" 
-							value={dispatchMetrics.driverUtilization} 
-							unit="%" 
-							icon="👨‍💼" 
-							status="normal"
-							trend="stable"
-							trendValue="+0.5%"
-							color="purple"
-						/>
+					<!-- Full DispatchHub Analytics -->
+					<div class="analytics-container">
+						<DispatchHub />
 					</div>
 				</div>
 			{/if}
@@ -554,6 +477,20 @@
 
 	.detail-row {
 		font-size: 13px;
+	}
+
+	.god-view-analytics {
+		min-height: 600px;
+	}
+
+	.analytics-container {
+		border-radius: 16px;
+		overflow: hidden;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(10px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		height: 80vh;
+		min-height: 600px;
 	}
 
 	@media (max-width: 768px) {
