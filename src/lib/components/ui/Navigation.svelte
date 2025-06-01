@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { Menu, X, Home, Truck, FileText, BarChart3, Settings, Users, MapPin, AlertTriangle, Wrench, DollarSign, Clock, Shield } from 'lucide-svelte';
+	import { Menu, X, Home, Truck, FileText, BarChart3, Settings, Users, MapPin, AlertTriangle, Wrench, DollarSign, Clock, Shield, Globe, TrendingUp, Thermometer } from 'lucide-svelte';
 	import DryDriveLogo from './DryDriveLogo.svelte';
 
 	let mobileMenuOpen = $state(false);
@@ -10,7 +10,8 @@
 		{
 			title: 'Role Dashboards',
 			items: [
-				{ href: '/', label: 'Dashboard', icon: Home, description: 'Role selection and main dashboard' }
+				{ href: '/', label: 'Dashboard', icon: Home, description: 'Role selection and main dashboard' },
+				{ href: '/master-dispatch', label: 'Master Dispatch View', icon: BarChart3, description: 'Executive fleet intelligence and analytics' }
 			]
 		},
 		{
@@ -22,7 +23,6 @@
 		{
 			title: 'Calibration',
 			items: [
-				{ href: '/calibration/cost-visualizer', label: 'Cost Visualizer', icon: DollarSign, description: 'Fleet calibration cost analysis' },
 				{ href: '/calibration/smart-recommender', label: 'Smart Recommender', icon: BarChart3, description: 'AI-powered calibration recommendations' }
 			]
 		},
@@ -33,6 +33,18 @@
 				{ href: '/admin', label: 'System Admin', icon: Settings, description: 'Administrative controls' }
 			]
 		}
+	];
+
+	const navigationItems = [
+		{ href: '/driver', label: 'Driver Center', icon: Truck, description: 'Real-time tracking and workflow' },
+		{ href: '/dispatch', label: 'Dispatch Hub', icon: MapPin, description: 'Operations and fleet management' },
+		{ href: '/executive', label: 'Executive Dashboard', icon: BarChart3, description: 'Strategic insights for PAA leadership' },
+		{ href: '/regional', label: 'Regional Manager', icon: Globe, description: 'Multi-region oversight and comparison' },
+		{ href: '/safety', label: 'Safety Central', icon: Shield, description: 'Risk mitigation and compliance' },
+		{ href: '/analytics', label: 'Yard Analytics', icon: TrendingUp, description: 'Performance and efficiency metrics' },
+		{ href: '/maintenance', label: 'Fleet Management', icon: Wrench, description: 'Vehicle status and maintenance tracking' },
+		{ href: '/thermal', label: 'Thermal Analysis', icon: Thermometer, description: 'DryDrive temperature insights' },
+		{ href: '/calibration', label: 'Calibration Hub', icon: Settings, description: 'Flow meter calibration management' }
 	];
 
 	function isActiveRoute(href: string): boolean {

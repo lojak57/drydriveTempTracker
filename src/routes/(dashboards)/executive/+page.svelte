@@ -32,7 +32,7 @@
 				<TrendingUp size={32} />
 			</div>
 			<div class="header-text">
-				<h1 class="header-title">Executive Dashboard</h1>
+				<h1 class="header-title">VeriHaul Executive Dashboard – Strategic Insights for PAA Leadership</h1>
 				<p class="header-subtitle">Strategic overview, KPIs, and financial performance</p>
 			</div>
 		</div>
@@ -60,42 +60,42 @@
 				<div class="hero-metrics">
 					<MetricCard 
 						title="Monthly Revenue" 
-						value="$4.2M" 
+						value="$101.3M" 
 						unit="" 
 						icon={DollarSign}
 						status="normal"
 						trend="up"
-						trendValue="+15.3%"
+						trendValue="+6.4%"
 						color="emerald"
 					/>
 					<MetricCard 
-						title="Operating Margin" 
-						value="23.8" 
+						title="EBITDA Margin" 
+						value="9.2" 
 						unit="%" 
 						icon={TrendingUp}
 						status="normal"
-						trend="up"
-						trendValue="+2.1%"
+						trend="down"
+						trendValue="-1.5%"
 						color="blue"
 					/>
 					<MetricCard 
 						title="Active Fleet" 
-						value="247" 
-						unit="trucks" 
+						value="745/865" 
+						unit="trucks (86%)" 
 						icon={Truck}
 						status="normal"
 						trend="up"
-						trendValue="+12 units"
+						trendValue="+50 trucks"
 						color="orange"
 					/>
 					<MetricCard 
 						title="Safety Score" 
-						value="96.8" 
+						value="98.8" 
 						unit="%" 
 						icon={Shield}
 						status="normal"
-						trend="up"
-						trendValue="+1.2%"
+						trend="down"
+						trendValue="-0.1%"
 						color="emerald"
 						clickable={true}
 						onClick={handleSafetyClick}
@@ -106,7 +106,7 @@
 				<div class="charts-section">
 					<div class="chart-container">
 						<RealtimeChart 
-							title="Company Performance Overview"
+							title="Company Performance Overview (Adjusted EBITDA)"
 							color="#10B981"
 							height={400}
 							unit="$M"
@@ -130,23 +130,33 @@
 				<div class="financial-metrics">
 					<MetricCard 
 						title="Quarterly Revenue" 
-						value="$12.7M" 
+						value="$303.9M" 
 						unit="" 
 						icon={DollarSign}
 						status="normal"
 						trend="up"
-						trendValue="+8.4%"
+						trendValue="+6.4%"
 						color="emerald"
 					/>
 					<MetricCard 
-						title="Profit Margin" 
-						value="18.2" 
-						unit="%" 
+						title="Cost per Barrel Reduction Potential" 
+						value="$7.50 → $7.00" 
+						unit="" 
 						icon={TrendingUp}
 						status="normal"
 						trend="up"
-						trendValue="+0.8%"
+						trendValue="+0.8% EBITDA"
 						color="blue"
+					/>
+					<MetricCard 
+						title="Leverage Ratio" 
+						value="3.3x" 
+						unit="" 
+						icon={Target}
+						status="normal"
+						trend="stable"
+						trendValue="Within target"
+						color="emerald"
 					/>
 				</div>
 
@@ -165,7 +175,7 @@
 							title="Cost Analysis & Margins"
 							color="#3B82F6"
 							height={400}
-							unit="%"
+							unit="$"
 							animated={true}
 						/>
 					</div>
@@ -177,13 +187,33 @@
 				<div class="operations-metrics">
 					<MetricCard 
 						title="Fleet Utilization" 
-						value="87.3" 
+						value="86" 
 						unit="%" 
 						icon={Truck}
 						status="normal"
-						trend="up"
-						trendValue="+3.2%"
+						trend="down"
+						trendValue="-1%"
 						color="orange"
+					/>
+					<MetricCard 
+						title="Volume Transported" 
+						value="14.3M" 
+						unit="BBL monthly" 
+						icon={BarChart3}
+						status="normal"
+						trend="up"
+						trendValue="+6.7%"
+						color="blue"
+					/>
+					<MetricCard 
+						title="DryDrive Impact: Temperature Compliance" 
+						value="98" 
+						unit="%" 
+						icon={Shield}
+						status="normal"
+						trend="up"
+						trendValue="+0.5%"
+						color="emerald"
 					/>
 				</div>
 			</div>
@@ -192,23 +222,23 @@
 			<div class="strategic-section">
 				<div class="strategic-metrics">
 					<MetricCard 
-						title="Market Share Growth" 
-						value="12.4" 
+						title="Post-Acquisition Integration Efficiency" 
+						value="85" 
 						unit="%" 
 						icon={Target}
 						status="normal"
-						trend="up"
-						trendValue="+2.1%"
-						color="blue"
+						trend="down"
+						trendValue="-2%"
+						color="orange"
 					/>
 					<MetricCard 
-						title="Efficiency Index" 
-						value="94.2" 
-						unit="%" 
+						title="ESG Progress: Emissions Reduction" 
+						value="1.3" 
+						unit="t CO2e/1,000 BBL" 
 						icon={TrendingUp}
 						status="normal"
 						trend="up"
-						trendValue="+1.8%"
+						trendValue="On track for 6%"
 						color="emerald"
 					/>
 				</div>

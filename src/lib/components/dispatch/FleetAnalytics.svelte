@@ -10,6 +10,12 @@
 	$: yards = $yardsForCurrentLevel;
 
 	function formatRevenue(amount: number) {
+		if (amount >= 1000000) {
+			return '$' + (amount / 1000000).toFixed(1) + 'M';
+		}
+		if (amount >= 1000) {
+			return '$' + (amount / 1000).toFixed(0) + 'K';
+		}
 		return new Intl.NumberFormat('en-US', {
 			style: 'currency',
 			currency: 'USD',
@@ -220,7 +226,7 @@
 	}
 
 	.kpi-card {
-		@apply bg-white dark:bg-gray-800 rounded-lg border p-4 flex items-center gap-4;
+		@apply bg-white dark:bg-gray-800 rounded-lg border p-4 flex items-center gap-4 min-w-0;
 	}
 
 	.kpi-card.primary {
@@ -248,19 +254,19 @@
 	}
 
 	.kpi-content {
-		@apply flex-1;
+		@apply flex-1 min-w-0 overflow-hidden;
 	}
 
 	.kpi-value {
-		@apply text-2xl font-bold text-gray-900 dark:text-white;
+		@apply text-2xl font-bold text-gray-900 dark:text-white truncate;
 	}
 
 	.kpi-label {
-		@apply text-sm font-medium text-gray-600 dark:text-gray-300;
+		@apply text-sm font-medium text-gray-600 dark:text-gray-300 truncate;
 	}
 
 	.kpi-sub {
-		@apply text-xs text-gray-500 dark:text-gray-400;
+		@apply text-xs text-gray-500 dark:text-gray-400 truncate;
 	}
 
 	.insights-banner {
