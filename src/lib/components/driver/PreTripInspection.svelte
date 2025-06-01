@@ -74,8 +74,8 @@
 	// Current inspection state
 	let currentDate = new Date();
 	let driverName = "Mike Johnson"; // This would come from auth store
-	let truckId = "TX-TRK-892"; // This would come from assignment
-	let trailerNumber = "TX-TRL-445";
+	let truckId = "892"; // Updated per Kevin's feedback
+	let trailerNumber = "445"; // Updated per Kevin's feedback
 	let currentStep = 'inspection'; // 'inspection' | 'review' | 'complete'
 	let defectNotes = '';
 	let generalNotes = ''; // Static notes that always appear
@@ -600,9 +600,23 @@
 	}
 
 	.category-items {
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: 1fr;
 		gap: 12px;
+		max-height: 80vh;
+		overflow-y: auto;
+	}
+
+	@media (min-width: 640px) {
+		.category-items {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 768px) {
+		.category-items {
+			grid-template-columns: repeat(3, 1fr);
+		}
 	}
 
 	/* Inspection Items */
@@ -616,7 +630,7 @@
 
 	.inspection-item.critical-item {
 		border-left: 4px solid #dc2626;
-		background: rgba(254, 242, 242, 0.8);
+		background: rgba(255, 255, 255, 0.95);
 	}
 
 	.item-header {
@@ -725,23 +739,23 @@
 	}
 
 	.fail-btn {
-		border-color: #fecaca;
+		border-color: #e5e7eb;
 		color: #991b1b;
 	}
 
 	.fail-btn.active {
-		background: #fecaca;
+		background: #e5e7eb;
 		border-color: #dc2626;
 		color: #991b1b;
 	}
 
 	.defect-btn {
-		border-color: #fed7aa;
+		border-color: #e5e7eb;
 		color: #9a3412;
 	}
 
 	.defect-btn.active {
-		background: #fed7aa;
+		background: #e5e7eb;
 		border-color: #ea580c;
 		color: #9a3412;
 	}

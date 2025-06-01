@@ -151,10 +151,10 @@ const DEMO_FLEET: DemoFleetData = {
 
 const DEMO_YARDS: DemoYardData[] = [
 	{
-		id: 'permian-basin',
-		name: 'Permian Basin',
-		location: 'Midland, TX',
-		region: 'West Texas',
+		id: 'qrvwx',
+		name: 'QRVWX',
+		location: 'LAT: 28.970028, LONG: -98.235694',
+		region: 'South Texas',
 		totalTrucks: 41,
 		activeTrucks: 38,
 		todayHauls: 23,
@@ -175,9 +175,9 @@ const DEMO_YARDS: DemoYardData[] = [
 		]
 	},
 	{
-		id: 'eagle-ford',
-		name: 'Eagle Ford',
-		location: 'San Antonio, TX',
+		id: 'carmody',
+		name: 'Carmody',
+		location: 'LAT: 28.84805, LONG: -97.98977',
 		region: 'South Texas',
 		totalTrucks: 38,
 		activeTrucks: 35,
@@ -194,7 +194,7 @@ const DEMO_YARDS: DemoYardData[] = [
 ];
 
 const DEMO_TRUCKS: DemoTruckData[] = [
-	// Permian Basin Trucks
+	// QRVWX Trucks
 	{
 		id: 'T-205',
 		model: 'Peterbilt 579',
@@ -202,7 +202,7 @@ const DEMO_TRUCKS: DemoTruckData[] = [
 		capacity: 130,
 		driverId: 'D-147',
 		driverName: 'Mike Johnson',
-		yardId: 'permian-basin',
+		yardId: 'qrvwx',
 		currentStatus: 'active',
 		todayHauls: 2,
 		weekHauls: 12,
@@ -237,7 +237,7 @@ const DEMO_TRUCKS: DemoTruckData[] = [
 		capacity: 130,
 		driverId: 'D-189',
 		driverName: 'Sarah Davis',
-		yardId: 'permian-basin',
+		yardId: 'qrvwx',
 		currentStatus: 'transit',
 		todayHauls: 3,
 		weekHauls: 18,
@@ -259,7 +259,7 @@ const DEMO_TRUCKS: DemoTruckData[] = [
 		capacity: 130,
 		driverId: 'D-203',
 		driverName: 'Tom Wilson',
-		yardId: 'permian-basin',
+		yardId: 'qrvwx',
 		currentStatus: 'loading',
 		todayHauls: 2,
 		weekHauls: 15,
@@ -281,7 +281,7 @@ const DEMO_TRUCKS: DemoTruckData[] = [
 		capacity: 130,
 		driverId: 'D-224',
 		driverName: 'Jake Martinez',
-		yardId: 'permian-basin',
+		yardId: 'qrvwx',
 		currentStatus: 'active',
 		todayHauls: 2,
 		weekHauls: 14,
@@ -303,7 +303,7 @@ const DEMO_TRUCKS: DemoTruckData[] = [
 		capacity: 130,
 		driverId: 'D-245',
 		driverName: 'Robert Lee',
-		yardId: 'permian-basin',
+		yardId: 'qrvwx',
 		currentStatus: 'available',
 		todayHauls: 1,
 		weekHauls: 11,
@@ -445,9 +445,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		truckId: 'T-205',
 		driverId: 'D-147',
 		driverName: 'Mike Johnson',
-		origin: 'Permian Basin Site A',
-		destination: 'Houston Refinery Terminal',
-		customer: 'ExxonMobil',
+		origin: 'QRVWX',
+		destination: 'Falls City Harvest Pipeline',
+		customer: 'Devon Energy',
 		onloadVolume: 27845.6,
 		offloadVolume: 26510.3,
 		volumeLoss: 1335.3,
@@ -483,9 +483,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		pressureReadings: [145, 147, 149, 146, 144, 142],
 		tempReadings: [102, 98, 89, 78, 71, 68, 69, 71, 74, 78],
 		gpsTrail: [
-			{ lat: 31.9973, lng: -102.0779, timestamp: new Date(Date.now() - 7200000) },
-			{ lat: 30.2672, lng: -97.7431, timestamp: new Date(Date.now() - 5400000) },
-			{ lat: 29.7604, lng: -95.3698, timestamp: new Date(Date.now() - 1800000) }
+			{ lat: 28.970028, lng: -98.235694, timestamp: new Date(Date.now() - 7200000) },
+			{ lat: 28.99683, lng: -98.03021, timestamp: new Date(Date.now() - 5400000) },
+			{ lat: 28.99683, lng: -98.03021, timestamp: new Date(Date.now() - 1800000) }
 		]
 	},
 	// Perfect haul - T-212's excellence
@@ -494,9 +494,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		truckId: 'T-212',
 		driverId: 'D-189',
 		driverName: 'Sarah Davis',
-		origin: 'Permian Basin Site B',
-		destination: 'Corpus Christi Terminal',
-		customer: 'Chevron',
+		origin: 'QRVWX',
+		destination: 'Sugarhorn Marathon Facility',
+		customer: 'Shell Energy',
 		onloadVolume: 28156.2,
 		offloadVolume: 27823.7,
 		volumeLoss: 332.5,
@@ -519,9 +519,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		pressureReadings: [152, 153, 154, 153, 152, 151],
 		tempReadings: [89, 88, 87, 86, 85, 86, 87, 89, 91, 94],
 		gpsTrail: [
-			{ lat: 31.9973, lng: -102.0779, timestamp: new Date(Date.now() - 21600000) },
-			{ lat: 28.3949, lng: -96.3903, timestamp: new Date(Date.now() - 18000000) },
-			{ lat: 27.8006, lng: -97.3964, timestamp: new Date(Date.now() - 14400000) }
+			{ lat: 28.970028, lng: -98.235694, timestamp: new Date(Date.now() - 21600000) },
+			{ lat: 28.84889, lng: -97.99120, timestamp: new Date(Date.now() - 18000000) },
+			{ lat: 28.84889, lng: -97.99120, timestamp: new Date(Date.now() - 14400000) }
 		]
 	},
 	// More demo hauls for context...
@@ -530,9 +530,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		truckId: 'T-198',
 		driverId: 'D-203',
 		driverName: 'Tom Wilson',
-		origin: 'Permian Basin Site C',
-		destination: 'Beaumont Refinery',
-		customer: 'Shell',
+		origin: 'QRVWX',
+		destination: 'Linhart',
+		customer: 'Shell Energy',
 		onloadVolume: 27934.1,
 		offloadVolume: 27389.6,
 		volumeLoss: 544.5,
@@ -555,20 +555,20 @@ const DEMO_HAULS: DemoHaulData[] = [
 		pressureReadings: [148, 149, 150, 149, 147, 146],
 		tempReadings: [92, 91, 90, 89, 88, 87, 89, 92, 95, 97],
 		gpsTrail: [
-			{ lat: 31.9973, lng: -102.0779, timestamp: new Date(Date.now() - 14400000) },
-			{ lat: 30.0668, lng: -94.1265, timestamp: new Date(Date.now() - 10800000) },
-			{ lat: 30.0860, lng: -94.1018, timestamp: new Date(Date.now() - 7200000) }
+			{ lat: 28.970028, lng: -98.235694, timestamp: new Date(Date.now() - 14400000) },
+			{ lat: 28.93972, lng: -97.86080, timestamp: new Date(Date.now() - 10800000) },
+			{ lat: 28.93972, lng: -97.86080, timestamp: new Date(Date.now() - 7200000) }
 		]
 	},
-	// Eagle Ford hauls - excellent performance
+	// Carmody hauls - excellent performance
 	{
 		id: 'HL-001645',
 		truckId: 'T-301',
 		driverId: 'D-267',
 		driverName: 'Carlos Rodriguez',
-		origin: 'Eagle Ford Site A',
-		destination: 'Victoria Terminal',
-		customer: 'Marathon',
+		origin: 'Carmody',
+		destination: 'Sugarhorn Marathon Facility',
+		customer: 'Devon Energy',
 		onloadVolume: 28234.7,
 		offloadVolume: 27889.2,
 		volumeLoss: 345.5,
@@ -591,9 +591,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		pressureReadings: [151, 152, 153, 152, 151, 150],
 		tempReadings: [89, 88, 87, 85, 84, 85, 87, 90, 92, 93],
 		gpsTrail: [
-			{ lat: 28.9384, lng: -97.9222, timestamp: new Date(Date.now() - 18000000) },
-			{ lat: 28.8053, lng: -97.0036, timestamp: new Date(Date.now() - 14400000) },
-			{ lat: 28.8053, lng: -97.0036, timestamp: new Date(Date.now() - 10800000) }
+			{ lat: 28.84805, lng: -97.98977, timestamp: new Date(Date.now() - 18000000) },
+			{ lat: 28.84889, lng: -97.99120, timestamp: new Date(Date.now() - 14400000) },
+			{ lat: 28.84889, lng: -97.99120, timestamp: new Date(Date.now() - 10800000) }
 		]
 	},
 	{
@@ -601,9 +601,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		truckId: 'T-318',
 		driverId: 'D-291',
 		driverName: 'Jennifer Kim',
-		origin: 'Eagle Ford Site B',
-		destination: 'Port Arthur Refinery',
-		customer: 'Valero',
+		origin: 'Carmody',
+		destination: 'Falls City Harvest Pipeline',
+		customer: 'Devon Energy',
 		onloadVolume: 27987.3,
 		offloadVolume: 27612.8,
 		volumeLoss: 374.5,
@@ -626,9 +626,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		pressureReadings: [149, 150, 151, 150, 149, 148],
 		tempReadings: [90, 89, 88, 87, 86, 87, 89, 92, 94, 96],
 		gpsTrail: [
-			{ lat: 28.9384, lng: -97.9222, timestamp: new Date(Date.now() - 25200000) },
-			{ lat: 29.8833, lng: -93.9333, timestamp: new Date(Date.now() - 21600000) },
-			{ lat: 29.8675, lng: -93.9301, timestamp: new Date(Date.now() - 18000000) }
+			{ lat: 28.84805, lng: -97.98977, timestamp: new Date(Date.now() - 25200000) },
+			{ lat: 28.99683, lng: -98.03021, timestamp: new Date(Date.now() - 21600000) },
+			{ lat: 28.99683, lng: -98.03021, timestamp: new Date(Date.now() - 18000000) }
 		]
 	},
 	{
@@ -636,9 +636,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		truckId: 'T-342',
 		driverId: 'D-331',
 		driverName: 'Maria Gonzalez',
-		origin: 'Eagle Ford Site C',
-		destination: 'Galveston Terminal',
-		customer: 'Phillips 66',
+		origin: 'Carmody',
+		destination: 'Falls City Harvest Pipeline',
+		customer: 'Devon Energy',
 		onloadVolume: 28098.4,
 		offloadVolume: 27734.1,
 		volumeLoss: 364.3,
@@ -661,9 +661,9 @@ const DEMO_HAULS: DemoHaulData[] = [
 		pressureReadings: [153, 154, 155, 154, 153, 152],
 		tempReadings: [88, 87, 86, 84, 83, 84, 86, 89, 91, 93],
 		gpsTrail: [
-			{ lat: 28.9384, lng: -97.9222, timestamp: new Date(Date.now() - 32400000) },
-			{ lat: 29.3013, lng: -94.7977, timestamp: new Date(Date.now() - 28800000) },
-			{ lat: 29.3013, lng: -94.7977, timestamp: new Date(Date.now() - 25200000) }
+			{ lat: 28.84805, lng: -97.98977, timestamp: new Date(Date.now() - 32400000) },
+			{ lat: 28.99683, lng: -98.03021, timestamp: new Date(Date.now() - 28800000) },
+			{ lat: 28.99683, lng: -98.03021, timestamp: new Date(Date.now() - 25200000) }
 		]
 	},
 	// More Permian Basin hauls
@@ -963,7 +963,7 @@ const DEMO_HAULS: DemoHaulData[] = [
 		truckId: 'T-342',
 		driverId: 'D-331',
 		driverName: 'Maria Gonzalez',
-		origin: 'Eagle Ford Site G',
+		origin: 'Falls City Harvest Pipeline',
 		destination: 'Sweeny Refinery',
 		customer: 'Phillips 66',
 		onloadVolume: 28234.1,

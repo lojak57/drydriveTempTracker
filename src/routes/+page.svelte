@@ -224,12 +224,12 @@
 <StartFromPreTrip {afterPreTripSubmit} targetSection="dashboard-top" />
 
 <!-- Header -->
-<div class="text-center mb-4 sm:mb-8 mobile-sticky px-4">
-	<div class="flex justify-center mb-3 sm:mb-4">
-		<DryDriveLogo size={$isRoleView ? 160 : 240} />
+<div class="text-center mb-4 sm:mb-6 mobile-sticky px-4">
+	<div class="flex justify-center mb-2 sm:mb-3">
+		<DryDriveLogo size={$isRoleView ? 140 : 180} />
 	</div>
-	<h1 class="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold tracking-tight text-oil-black mb-2 px-2">Oil Transport Operations Center</h1>
-	<p class="text-xs sm:text-sm md:text-base text-oil-gray px-2">Real-time SCADA monitoring and fleet management platform</p>
+	<h1 class="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-oil-black mb-2 px-2">Oil Transport Operations Center</h1>
+	<p class="text-xs sm:text-sm text-oil-gray px-2">Real-time operations monitoring and fleet management platform</p>
 </div>
 
 <!-- Role Selector -->
