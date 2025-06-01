@@ -708,29 +708,31 @@
 		background: #f1f5f9;
 	}
 
-	/* Card Content */
+	/* Card Content - Fixed Professional Layout */
 	.card-content {
-		display: grid;
-		grid-template-columns: auto 1fr auto;
+		display: flex;
 		align-items: center;
 		gap: 16px;
-		padding: 16px;
-		min-height: 80px;
+		padding: 20px;
+		min-height: 100px;
 	}
 
-	/* Time and Barrels Section */
+	/* Time and Barrels Section - Fixed Alignment */
 	.time-barrels-section {
 		display: flex;
 		flex-direction: column;
-		align-items: flex-start;
-		gap: 8px;
-		min-width: 85px;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		min-width: 90px;
+		text-align: center;
 	}
 
 	.time-display {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		align-items: center;
+		gap: 4px;
 	}
 
 	.scheduled-time {
@@ -738,28 +740,27 @@
 		font-weight: 700;
 		color: #0f172a;
 		font-family: 'JetBrains Mono', monospace;
-		line-height: 1.2;
+		line-height: 1;
 	}
 
 	.time-status {
-		font-size: 12px;
+		font-size: 11px;
 		font-weight: 600;
-		padding: 3px 8px;
+		padding: 2px 6px;
 		border-radius: 4px;
 		text-transform: uppercase;
 		letter-spacing: 0.3px;
 		white-space: nowrap;
-		align-self: flex-start;
 	}
 
 	.time-status.normal {
-		background: #f0f9ff;
-		color: #0369a1;
+		background: #f8fafc;
+		color: #64748b;
 	}
 
 	.time-status.soon {
-		background: #fffbeb;
-		color: #d97706;
+		background: #fef2f2;
+		color: #dc2626;
 	}
 
 	.time-status.overdue {
@@ -775,7 +776,7 @@
 	}
 
 	.barrels-value {
-		font-size: 26px;
+		font-size: 24px;
 		font-weight: 700;
 		color: #0f172a;
 		font-family: 'JetBrains Mono', monospace;
@@ -783,46 +784,48 @@
 	}
 
 	.barrels-label {
-		font-size: 11px;
+		font-size: 10px;
 		color: #64748b;
 		font-weight: 600;
 		letter-spacing: 0.5px;
 		text-transform: uppercase;
 	}
 
-	/* Route Display */
+	/* Route Display - Fixed Flex Layout */
 	.route-display {
 		flex: 1;
 		min-width: 0;
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
+		padding: 0 8px;
 	}
 
-	/* Job Header Info */
+	/* Job Header Info - Better Spacing */
 	.job-header {
 		display: flex;
 		justify-content: space-between;
-		align-items: flex-start;
+		align-items: center;
 		gap: 12px;
-		padding-bottom: 8px;
-		border-bottom: 1px solid #f1f5f9;
+		margin-bottom: 8px;
 	}
 
 	.account-name {
 		font-size: 16px;
 		font-weight: 700;
 		color: #0f172a;
+		flex: 1;
 	}
 
 	.load-type-badge {
 		font-size: 9px;
 		font-weight: 700;
-		padding: 3px 6px;
+		padding: 4px 8px;
 		border-radius: 4px;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 		white-space: nowrap;
+		flex-shrink: 0;
 	}
 
 	.load-type-badge.crude {
@@ -843,10 +846,9 @@
 		border: 1px solid #e2e8f0;
 	}
 
-	/* Route Line */
+	/* Route Line - Cleaner Layout */
 	.route-line {
-		display: grid;
-		grid-template-columns: 1fr auto 1fr;
+		display: flex;
 		align-items: center;
 		gap: 12px;
 		width: 100%;
@@ -856,21 +858,14 @@
 		display: flex;
 		align-items: center;
 		gap: 8px;
+		flex: 1;
 		min-width: 0;
 	}
 
-	.location.pickup {
-		justify-self: start;
-	}
-
-	.location.delivery {
-		justify-self: end;
-	}
-
 	.location-icon {
-		width: 28px;
-		height: 28px;
-		border-radius: 6px;
+		width: 24px;
+		height: 24px;
+		border-radius: 4px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -879,17 +874,17 @@
 	}
 
 	.pickup-icon {
-		background: #475569;
+		background: #6b7280;
 	}
 
 	.delivery-icon {
-		background: #64748b;
+		background: #6b7280;
 	}
 
 	.location-text {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 1px;
 		min-width: 0;
 		overflow: hidden;
 	}
@@ -897,22 +892,10 @@
 	.location-name {
 		font-weight: 600;
 		color: #0f172a;
-		font-size: 14px;
+		font-size: 13px;
 		line-height: 1.2;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.tank-info {
-		font-size: 11px;
-		color: #64748b;
-		font-family: 'JetBrains Mono', monospace;
-		font-weight: 500;
-		background: #f1f5f9;
-		padding: 2px 6px;
-		border-radius: 3px;
-		align-self: flex-start;
 		white-space: nowrap;
 	}
 
@@ -920,25 +903,58 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 4px;
-		justify-self: center;
+		gap: 2px;
+		flex-shrink: 0;
+		margin: 0 4px;
 	}
 
 	.route-arrow {
-		font-size: 18px;
+		font-size: 16px;
 		color: #64748b;
 		font-weight: bold;
 	}
 
 	.distance-info {
-		font-size: 10px;
+		font-size: 9px;
 		color: #64748b;
 		font-weight: 600;
 		font-family: 'JetBrains Mono', monospace;
 		background: #f1f5f9;
-		padding: 2px 6px;
+		padding: 1px 4px;
 		border-radius: 3px;
 		white-space: nowrap;
+	}
+
+	/* Action Section - Proper Alignment */
+	.action-section {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		justify-content: center;
+		gap: 8px;
+		min-width: 80px;
+		padding-left: 8px;
+	}
+
+	.status-info {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 4px;
+	}
+
+	.duration-badge {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 11px;
+		color: #64748b;
+		font-weight: 500;
+		background: #f8fafc;
+		padding: 4px 8px;
+		border-radius: 4px;
+		white-space: nowrap;
+		border: 1px solid #e2e8f0;
 	}
 
 	/* Priority Label */
@@ -972,35 +988,7 @@
 		color: #64748b;
 	}
 
-	/* Action Section */
-	.action-section {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 8px;
-		min-width: 100px;
-	}
-
-	.status-info {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 4px;
-	}
-
-	.duration-badge {
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		font-size: 11px;
-		color: #64748b;
-		font-weight: 500;
-		background: #f1f5f9;
-		padding: 4px 8px;
-		border-radius: 4px;
-		white-space: nowrap;
-	}
-
+	/* View Details Button */
 	.view-details-btn {
 		display: flex;
 		align-items: center;
