@@ -3,6 +3,9 @@
 	import DemoYardCard from './DemoYardCard.svelte';
 	import { BarChart3, Truck, DollarSign, TrendingUp, TrendingDown, AlertTriangle, Users, Building2 } from 'lucide-svelte';
 
+	// Drill-down handler prop
+	export let handleDrillDown: (targetLevel: string, id?: string) => void;
+
 	$: ({ demoFleet } = $dispatchAnalytics);
 	$: yards = $yardsForCurrentLevel;
 
@@ -188,7 +191,7 @@
 			
 			<div class="yards-grid">
 				{#each yards as yard (yard.id)}
-					<DemoYardCard {yard} />
+					<DemoYardCard {yard} {handleDrillDown} />
 				{/each}
 			</div>
 		</div>

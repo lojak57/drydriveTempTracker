@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { DemoYardData } from '$lib/stores/dispatchAnalytics';
-	import { dispatchAnalytics } from '$lib/stores/dispatchAnalytics';
 	import { AlertTriangle, TrendingUp, TrendingDown, MapPin, Truck, Activity } from 'lucide-svelte';
 
 	export let yard: DemoYardData;
+	export let handleDrillDown: (targetLevel: string, id?: string) => void;
 
 	function handleClick() {
-		dispatchAnalytics.drillDown('yard', yard.id);
+		handleDrillDown('yard', yard.id);
 	}
 
 	function getStatusColor(status: string) {

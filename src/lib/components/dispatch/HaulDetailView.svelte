@@ -1,9 +1,26 @@
 <script lang="ts">
-	import { currentHaulData, viewMode } from '$lib/stores/dispatchAnalytics';
-	import { MapPin, Clock, Thermometer, Droplets, Gauge, DollarSign, AlertTriangle, User, Truck } from 'lucide-svelte';
+	import { currentHaulData, viewMode, dispatchAnalytics } from '$lib/stores/dispatchAnalytics';
+	import DemoHaulCard from './DemoHaulCard.svelte';
+	import { MapPin, Clock, Thermometer, Droplets, Gauge, DollarSign, AlertTriangle, User, Truck, Activity, FileText, TrendingUp, Target } from 'lucide-svelte';
 	import { format } from 'date-fns';
 
+	// Drill-down handler prop (not needed for haul detail but kept for consistency)
+	export let handleDrillDown: (targetLevel: string, id?: string) => void;
+
 	$: haulData = $currentHaulData;
+	$: allHauls = $dispatchAnalytics.demoHauls;
+	$: allTrucks = $dispatchAnalytics.demoTrucks;
+	$: allYards = $dispatchAnalytics.demoYards;
+
+	// Show all hauls when no specific haul is selected
+	$: showingAllHauls = !haulData;
+
+	// Group hauls by status for better organization
+	$: haulsByStatus = {
+		completed: allHauls.filter(h => h.status === 'completed'),
+		'in-progress': allHauls.filter(h => h.status === 'in-progress'),
+		scheduled: allHauls.filter(h => h.status === 'scheduled')
+	};
 
 	function formatVolume(volume: number) {
 		return new Intl.NumberFormat('en-US', {
@@ -28,9 +45,150 @@
 	function formatCoordinate(coord: number) {
 		return coord.toFixed(6);
 	}
+
+	function getHaulStatusClass(status: string) {
+		switch (status) {
+			case 'completed': return 'success';
+			case 'in-progress': return 'warning';
+			case 'scheduled': return 'info';
+			default: return 'neutral';
+		}
+	}
 </script>
 
-{#if haulData}
+{#if showingAllHauls}
+	<!-- Show aggregated hauls data -->
+	<div class="hauls-overview">
+		<div class="analytics-header">
+			<h1 class="page-title">All Haul Tickets Overview</h1>
+			<p class="page-subtitle">
+				<FileText class="w-4 h-4 inline" />
+				Fleet-wide haul performance and detailed ticket data
+			</p>
+		</div>
+
+		<!-- Aggregated KPI Dashboard -->
+		<div class="kpi-grid">
+			<div class="kpi-card primary">
+				<div class="kpi-icon">
+					<FileText class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{allHauls.length}</div>
+					<div class="kpi-label">Total Hauls</div>
+					<div class="kpi-sub">{haulsByStatus.completed.length} completed, {haulsByStatus['in-progress'].length} active</div>
+				</div>
+			</div>
+
+			<div class="kpi-card success">
+				<div class="kpi-icon">
+					<DollarSign class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{formatCurrency(allHauls.reduce((sum, h) => sum + h.revenue, 0))}</div>
+					<div class="kpi-label">Total Revenue</div>
+					<div class="kpi-sub">All hauls combined</div>
+				</div>
+			</div>
+
+			<div class="kpi-card {(allHauls.reduce((sum, h) => sum + h.efficiency, 0) / allHauls.length) >= 92 ? 'success' : 'warning'}">
+				<div class="kpi-icon">
+					<TrendingUp class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{((allHauls.reduce((sum, h) => sum + h.efficiency, 0) / allHauls.length)).toFixed(1)}%</div>
+					<div class="kpi-label">Avg Efficiency</div>
+					<div class="kpi-sub">Target: 92.5%</div>
+				</div>
+			</div>
+
+			<div class="kpi-card {(allHauls.reduce((sum, h) => sum + h.volumeLossPercent, 0) / allHauls.length) <= 2.0 ? 'success' : 'warning'}">
+				<div class="kpi-icon">
+					<Target class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{((allHauls.reduce((sum, h) => sum + h.volumeLossPercent, 0) / allHauls.length)).toFixed(1)}%</div>
+					<div class="kpi-label">Avg Volume Loss</div>
+					<div class="kpi-sub">Target: ≤2.0%</div>
+				</div>
+			</div>
+
+			<div class="kpi-card info">
+				<div class="kpi-icon">
+					<Droplets class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{formatVolume(allHauls.reduce((sum, h) => sum + h.onloadVolume, 0))}</div>
+					<div class="kpi-label">Total Volume</div>
+					<div class="kpi-sub">Barrels transported</div>
+				</div>
+			</div>
+
+			<div class="kpi-card neutral">
+				<div class="kpi-icon">
+					<Clock class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{((allHauls.reduce((sum, h) => sum + h.duration, 0) / allHauls.length)).toFixed(0)}</div>
+					<div class="kpi-label">Avg Duration</div>
+					<div class="kpi-sub">Minutes per haul</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Problem Hauls Alert -->
+		{#if allHauls.some(h => h.efficiency < 85 || h.volumeLossPercent > 3.0 || h.alerts.length > 0)}
+			<div class="insights-banner">
+				<div class="insight-icon">
+					<AlertTriangle class="w-5 h-5" />
+				</div>
+				<div class="insight-content">
+					<div class="insight-title">Haul Performance Alerts</div>
+					<div class="insight-text">
+						{allHauls.filter(h => h.efficiency < 85).length} hauls below efficiency threshold, 
+						{allHauls.filter(h => h.volumeLossPercent > 3.0).length} with high volume loss, 
+						{allHauls.reduce((sum, h) => sum + h.alerts.length, 0)} total active alerts
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		<!-- Hauls by Status -->
+		<div class="hauls-section">
+			<h2 class="section-title">
+				Haul Tickets by Status
+				<span class="section-subtitle">Click any haul to view detailed ticket data</span>
+			</h2>
+			
+			{#each Object.entries(haulsByStatus) as [status, hauls] (status)}
+				{#if hauls.length > 0}
+					<div class="status-section">
+						<h3 class="status-header">
+							<Activity class="w-4 h-4" />
+							{status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')} Hauls
+							<span class="haul-count">({hauls.length} tickets)</span>
+						</h3>
+						
+						<div class="hauls-grid">
+							{#each hauls.slice(0, 6) as haul (haul.id)}
+								<DemoHaulCard {haul} />
+							{/each}
+						</div>
+						
+						{#if hauls.length > 6}
+							<div class="show-more">
+								<button class="show-more-btn">
+									Show {hauls.length - 6} more {status} hauls
+								</button>
+							</div>
+						{/if}
+					</div>
+				{/if}
+			{/each}
+		</div>
+	</div>
+{:else if haulData}
+	<!-- Show specific haul data (existing code) -->
 	<div class="haul-detail">
 		<!-- Header -->
 		<div class="detail-header">
@@ -249,7 +407,7 @@
 									<span class="data-label">Average Temp:</span>
 									<span class="data-value">{haulData.avgTemp.toFixed(2)}°F</span>
 								</div>
-								<div class="data-pair {haulData.minTemp < 70 ? 'critical' : ''}">
+								<div class="data-pair">
 									<span class="data-label">Minimum Temp:</span>
 									<span class="data-value">{haulData.minTemp.toFixed(2)}°F</span>
 								</div>
@@ -257,18 +415,18 @@
 									<span class="data-label">Maximum Temp:</span>
 									<span class="data-value">{haulData.maxTemp.toFixed(2)}°F</span>
 								</div>
-								<div class="data-pair {Math.abs(haulData.maxTemp - haulData.minTemp) > 30 ? 'critical' : ''}">
-									<span class="data-label">Temperature Variance:</span>
-									<span class="data-value">{Math.abs(haulData.maxTemp - haulData.minTemp).toFixed(2)}°F</span>
+								<div class="data-pair">
+									<span class="data-label">Temp Variance:</span>
+									<span class="data-value">{(haulData.maxTemp - haulData.minTemp).toFixed(2)}°F</span>
 								</div>
 							</div>
 						</div>
 
 						<div class="data-group">
-							<h4 class="group-title">Temperature Readings Timeline</h4>
+							<h4 class="group-title">Temperature Readings</h4>
 							<div class="readings-grid">
 								{#each haulData.tempReadings as reading, index}
-									<div class="reading-item {reading < 70 ? 'critical-reading' : ''}">
+									<div class="reading-item">
 										<span class="reading-index">T{index + 1}:</span>
 										<span class="reading-value">{reading.toFixed(1)}°F</span>
 									</div>
@@ -429,12 +587,124 @@
 		@apply p-6 space-y-6 overflow-y-auto h-full;
 	}
 
-	.detail-header {
-		@apply mb-6;
+	.hauls-overview {
+		@apply flex flex-col gap-6 p-6 h-full overflow-y-auto;
+	}
+
+	.analytics-header {
+		@apply text-center space-y-2;
 	}
 
 	.page-title {
-		@apply text-2xl font-bold text-gray-900 dark:text-white mb-3;
+		@apply text-3xl font-bold text-gray-900 dark:text-white;
+	}
+
+	.page-subtitle {
+		@apply text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2;
+	}
+
+	.kpi-grid {
+		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4;
+	}
+
+	.kpi-card {
+		@apply bg-white dark:bg-gray-800 p-6 rounded-xl border shadow-sm hover:shadow-md transition-shadow;
+	}
+
+	.kpi-card.primary {
+		@apply border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20;
+	}
+
+	.kpi-card.success {
+		@apply border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20;
+	}
+
+	.kpi-card.warning {
+		@apply border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20;
+	}
+
+	.kpi-card.info {
+		@apply border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20;
+	}
+
+	.kpi-card.neutral {
+		@apply border-gray-200 dark:border-gray-700;
+	}
+
+	.kpi-icon {
+		@apply flex items-center justify-center w-12 h-12 rounded-lg bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 mb-4;
+	}
+
+	.kpi-content {
+		@apply space-y-1;
+	}
+
+	.kpi-value {
+		@apply text-2xl font-bold text-gray-900 dark:text-white;
+	}
+
+	.kpi-label {
+		@apply text-sm font-medium text-gray-600 dark:text-gray-300;
+	}
+
+	.kpi-sub {
+		@apply text-xs text-gray-500 dark:text-gray-400;
+	}
+
+	.insights-banner {
+		@apply flex items-start gap-4 p-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl;
+	}
+
+	.insight-icon {
+		@apply flex items-center justify-center w-10 h-10 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 rounded-lg flex-shrink-0;
+	}
+
+	.insight-content {
+		@apply space-y-1;
+	}
+
+	.insight-title {
+		@apply font-semibold text-yellow-800 dark:text-yellow-300;
+	}
+
+	.insight-text {
+		@apply text-sm text-yellow-700 dark:text-yellow-400;
+	}
+
+	.section-title {
+		@apply flex items-center justify-between text-lg font-semibold text-gray-900 dark:text-white mb-4;
+	}
+
+	.section-subtitle {
+		@apply text-sm text-gray-500 dark:text-gray-400;
+	}
+
+	.status-section {
+		@apply space-y-4 mb-8;
+	}
+
+	.status-header {
+		@apply flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white pb-2 border-b border-gray-200 dark:border-gray-700;
+	}
+
+	.haul-count {
+		@apply text-sm text-gray-500 dark:text-gray-400 font-normal;
+	}
+
+	.hauls-grid {
+		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+	}
+
+	.show-more {
+		@apply text-center pt-4;
+	}
+
+	.show-more-btn {
+		@apply px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors;
+	}
+
+	.detail-header {
+		@apply mb-6;
 	}
 
 	.haul-meta {
@@ -477,14 +747,6 @@
 
 	.summary-section {
 		@apply space-y-4;
-	}
-
-	.section-title {
-		@apply text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-3;
-	}
-
-	.section-subtitle {
-		@apply text-sm font-normal text-gray-500 dark:text-gray-400;
 	}
 
 	.summary-grid {

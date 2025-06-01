@@ -1,10 +1,19 @@
 <script lang="ts">
-	import { currentYardData, trucksForCurrentYard, viewMode } from '$lib/stores/dispatchAnalytics';
+	import { currentYardData, trucksForCurrentYard, viewMode, dispatchAnalytics } from '$lib/stores/dispatchAnalytics';
 	import DemoTruckCard from './DemoTruckCard.svelte';
+	import DemoYardCard from './DemoYardCard.svelte';
 	import { Truck, TrendingUp, TrendingDown, AlertTriangle, Activity, MapPin } from 'lucide-svelte';
+
+	// Drill-down handler prop
+	export let handleDrillDown: (targetLevel: string, id?: string) => void;
 
 	$: yardData = $currentYardData;
 	$: trucks = $trucksForCurrentYard;
+	$: allYards = $dispatchAnalytics.demoYards;
+	$: allTrucks = $dispatchAnalytics.demoTrucks;
+
+	// Show all yards when no specific yard is selected
+	$: showingAllYards = !yardData;
 
 	function formatRevenue(amount: number) {
 		return new Intl.NumberFormat('en-US', {
@@ -16,7 +25,80 @@
 	}
 </script>
 
-{#if yardData}
+{#if showingAllYards}
+	<!-- Show aggregated yard data -->
+	<div class="yards-overview">
+		<div class="analytics-header">
+			<h1 class="page-title">All Yards Overview</h1>
+			<p class="page-subtitle">
+				<MapPin class="w-4 h-4 inline" />
+				Fleet-wide yard performance and metrics
+			</p>
+		</div>
+
+		<!-- Aggregated KPI Dashboard -->
+		<div class="kpi-grid">
+			<div class="kpi-card primary">
+				<div class="kpi-icon">
+					<Truck class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{allTrucks.length}</div>
+					<div class="kpi-label">Total Trucks</div>
+					<div class="kpi-sub">Across {allYards.length} yards</div>
+				</div>
+			</div>
+
+			<div class="kpi-card success">
+				<div class="kpi-icon">
+					<Activity class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{allYards.reduce((sum, y) => sum + y.todayHauls, 0)}</div>
+					<div class="kpi-label">Today's Hauls</div>
+					<div class="kpi-sub">{allYards.reduce((sum, y) => sum + y.weekHauls, 0)} this week</div>
+				</div>
+			</div>
+
+			<div class="kpi-card {(allYards.reduce((sum, y) => sum + y.efficiency, 0) / allYards.length) >= 92 ? 'success' : 'warning'}">
+				<div class="kpi-icon">
+					<TrendingUp class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{((allYards.reduce((sum, y) => sum + y.efficiency, 0) / allYards.length)).toFixed(1)}%</div>
+					<div class="kpi-label">Avg Efficiency</div>
+					<div class="kpi-sub">Target: 92.5%</div>
+				</div>
+			</div>
+
+			<div class="kpi-card info">
+				<div class="kpi-icon">
+					<Activity class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{formatRevenue(allYards.reduce((sum, y) => sum + y.revenue, 0))}</div>
+					<div class="kpi-label">Total Revenue</div>
+					<div class="kpi-sub">All yards combined</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Yard Cards -->
+		<div class="yards-section">
+			<h2 class="section-title">
+				Individual Yard Performance
+				<span class="section-subtitle">Click any yard to drill down</span>
+			</h2>
+			
+			<div class="yards-grid">
+				{#each allYards as yard (yard.id)}
+					<DemoYardCard {yard} {handleDrillDown} />
+				{/each}
+			</div>
+		</div>
+	</div>
+{:else if yardData}
+	<!-- Show specific yard data (existing code) -->
 	<div class="yard-analytics">
 		<div class="analytics-header">
 			<h1 class="page-title">{yardData.name}</h1>
@@ -135,7 +217,7 @@
 				
 				<div class="trucks-grid">
 					{#each trucks as truck (truck.id)}
-						<DemoTruckCard {truck} />
+						<DemoTruckCard {truck} {handleDrillDown} />
 					{/each}
 				</div>
 			</div>
@@ -148,56 +230,60 @@
 {/if}
 
 <style>
-	.yard-analytics {
-		@apply p-6 space-y-6 overflow-y-auto h-full;
+	.yard-analytics, .yards-overview {
+		@apply flex flex-col gap-6 p-6 h-full overflow-y-auto;
 	}
 
 	.analytics-header {
-		@apply mb-6;
+		@apply text-center space-y-2;
 	}
 
 	.page-title {
-		@apply text-2xl font-bold text-gray-900 dark:text-white mb-2;
+		@apply text-3xl font-bold text-gray-900 dark:text-white;
 	}
 
 	.page-subtitle {
-		@apply text-lg text-gray-600 dark:text-gray-300 flex items-center gap-2;
+		@apply text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2;
 	}
 
 	.kpi-grid {
-		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6;
+		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4;
 	}
 
 	.kpi-card {
-		@apply bg-white dark:bg-gray-800 rounded-lg border p-4 flex items-center gap-4;
+		@apply bg-white dark:bg-gray-800 p-6 rounded-xl border shadow-sm hover:shadow-md transition-shadow;
 	}
 
 	.kpi-card.primary {
-		@apply border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/10;
+		@apply border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20;
 	}
 
 	.kpi-card.success {
-		@apply border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/10;
+		@apply border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20;
 	}
 
 	.kpi-card.warning {
-		@apply border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/10;
+		@apply border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20;
 	}
 
 	.kpi-card.info {
+		@apply border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20;
+	}
+
+	.kpi-card.neutral {
 		@apply border-gray-200 dark:border-gray-700;
 	}
 
 	.kpi-icon {
-		@apply flex-shrink-0 p-2 rounded-lg bg-white dark:bg-gray-700;
+		@apply flex items-center justify-center w-12 h-12 rounded-lg bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 mb-4;
 	}
 
 	.kpi-content {
-		@apply flex-1;
+		@apply space-y-1;
 	}
 
 	.kpi-value {
-		@apply text-xl font-bold text-gray-900 dark:text-white;
+		@apply text-2xl font-bold text-gray-900 dark:text-white;
 	}
 
 	.kpi-label {
@@ -209,35 +295,39 @@
 	}
 
 	.insights-banner {
-		@apply flex items-center gap-4 p-4 bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 rounded-lg;
+		@apply flex items-start gap-4 p-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl;
 	}
 
 	.insight-icon {
-		@apply flex-shrink-0 p-2 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg text-yellow-600 dark:text-yellow-400;
+		@apply flex items-center justify-center w-10 h-10 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 rounded-lg flex-shrink-0;
 	}
 
 	.insight-content {
-		@apply flex-1;
+		@apply space-y-1;
 	}
 
 	.insight-title {
-		@apply font-semibold text-gray-900 dark:text-white mb-1;
+		@apply font-semibold text-yellow-800 dark:text-yellow-300;
 	}
 
 	.insight-text {
-		@apply text-sm text-gray-600 dark:text-gray-300;
-	}
-
-	.analytics-section {
-		@apply space-y-4;
+		@apply text-sm text-yellow-700 dark:text-yellow-400;
 	}
 
 	.section-title {
-		@apply text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-3;
+		@apply flex items-center justify-between text-lg font-semibold text-gray-900 dark:text-white mb-4;
 	}
 
 	.section-subtitle {
-		@apply text-sm font-normal text-gray-500 dark:text-gray-400;
+		@apply text-sm text-gray-500 dark:text-gray-400;
+	}
+
+	.yards-grid {
+		@apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+	}
+
+	.trucks-grid {
+		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
 	}
 
 	.charts-grid {
@@ -245,15 +335,15 @@
 	}
 
 	.chart-placeholder {
-		@apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden;
+		@apply bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700;
 	}
 
 	.chart-header {
-		@apply flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50;
+		@apply flex items-center justify-between mb-4;
 	}
 
 	.chart-header h3 {
-		@apply font-semibold text-gray-900 dark:text-white;
+		@apply text-lg font-semibold text-gray-900 dark:text-white;
 	}
 
 	.chart-period {
@@ -261,22 +351,26 @@
 	}
 
 	.chart-body {
-		@apply p-6;
+		@apply h-48 flex items-center justify-center;
 	}
 
 	.chart-mock {
-		@apply text-center py-8 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600;
+		@apply text-center text-gray-600 dark:text-gray-400 p-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg;
 	}
 
-	.trucks-section {
+	.yard-section {
 		@apply space-y-4;
 	}
 
-	.trucks-grid {
-		@apply grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4;
+	.yard-header {
+		@apply flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white;
+	}
+
+	.truck-count {
+		@apply text-sm text-gray-500 dark:text-gray-400 font-normal;
 	}
 
 	.no-data {
-		@apply p-6 text-center text-gray-500 dark:text-gray-400;
+		@apply flex items-center justify-center h-full text-gray-500 dark:text-gray-400;
 	}
 </style> 

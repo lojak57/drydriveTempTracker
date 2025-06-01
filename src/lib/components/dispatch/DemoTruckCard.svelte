@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { DemoTruckData } from '$lib/stores/dispatchAnalytics';
-	import { dispatchAnalytics } from '$lib/stores/dispatchAnalytics';
 	import { AlertTriangle, TrendingUp, TrendingDown, Truck, User, Clock, Wrench } from 'lucide-svelte';
 	import { formatDistanceToNow } from 'date-fns';
 
 	export let truck: DemoTruckData;
+	export let handleDrillDown: (targetLevel: string, id?: string) => void;
 
 	function handleClick() {
-		dispatchAnalytics.drillDown('truck', truck.id);
+		handleDrillDown('truck', truck.id);
 	}
 
 	function getStatusColor(status: string) {

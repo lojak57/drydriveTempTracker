@@ -1,83 +1,221 @@
 <script lang="ts">
-	import { currentTruckData, haulsForCurrentTruck, viewMode } from '$lib/stores/dispatchAnalytics';
+	import { currentTruckData, haulsForCurrentTruck, viewMode, dispatchAnalytics } from '$lib/stores/dispatchAnalytics';
 	import DemoHaulCard from './DemoHaulCard.svelte';
-	import { Truck, User, TrendingUp, TrendingDown, AlertTriangle, Gauge, Droplets, Clock } from 'lucide-svelte';
+	import DemoTruckCard from './DemoTruckCard.svelte';
+	import { 
+		Truck, 
+		Activity, 
+		TrendingUp, 
+		TrendingDown, 
+		AlertTriangle, 
+		Clock, 
+		Fuel,
+		Target,
+		MapPin,
+		Wrench
+	} from 'lucide-svelte';
 	import { formatDistanceToNow } from 'date-fns';
+
+	// Drill-down handler prop
+	export let handleDrillDown: (targetLevel: string, id?: string) => void;
 
 	$: truckData = $currentTruckData;
 	$: hauls = $haulsForCurrentTruck;
+	$: allTrucks = $dispatchAnalytics.demoTrucks;
+	$: allHauls = $dispatchAnalytics.demoHauls;
+	$: allYards = $dispatchAnalytics.demoYards;
 
-	function getStatusColor(status: string) {
-		switch (status) {
-			case 'active': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/20';
-			case 'loading': return 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/20';
-			case 'transit': return 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/20';
-			case 'maintenance': return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/20';
-			case 'available': return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/20';
-			default: return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/20';
-		}
+	// Show all trucks when no specific truck is selected
+	$: showingAllTrucks = !truckData;
+
+	// Group trucks by yard for better organization
+	$: trucksByYard = allYards.map(yard => ({
+		yard,
+		trucks: allTrucks.filter(truck => truck.yardId === yard.id)
+	}));
+
+	function formatLastSeen(date: Date | null) {
+		if (!date) return 'Unknown';
+		return formatDistanceToNow(date, { addSuffix: true });
 	}
 
-	function getEfficiencyColor(efficiency: number) {
-		if (efficiency >= 95) return 'text-green-600 dark:text-green-400';
-		if (efficiency >= 85) return 'text-blue-600 dark:text-blue-400';
-		if (efficiency >= 75) return 'text-yellow-600 dark:text-yellow-400';
-		return 'text-red-600 dark:text-red-400';
+	function getTruckStatus(truck: any) {
+		switch (truck.currentStatus) {
+			case 'active': return { label: 'Active', class: 'success' };
+			case 'loading': return { label: 'Loading', class: 'warning' };
+			case 'transit': return { label: 'In Transit', class: 'info' };
+			case 'maintenance': return { label: 'Maintenance', class: 'error' };
+			case 'available': return { label: 'Available', class: 'neutral' };
+			default: return { label: 'Unknown', class: 'neutral' };
+		}
 	}
 </script>
 
-{#if truckData}
-	<div class="truck-analytics">
+{#if showingAllTrucks}
+	<!-- Show aggregated truck data -->
+	<div class="trucks-overview">
 		<div class="analytics-header">
-			<div class="truck-header-info">
-				<h1 class="page-title">{truckData.id}</h1>
-				<div class="truck-details">
-					<span class="truck-model">
-						<Truck class="w-4 h-4" />
-						{truckData.model} ({truckData.year})
-					</span>
-					<span class="driver-name">
-						<User class="w-4 h-4" />
-						{truckData.driverName}
-					</span>
-					<span class="status-badge {getStatusColor(truckData.currentStatus)}">
-						{truckData.currentStatus}
-					</span>
+			<h1 class="page-title">All Trucks Overview</h1>
+			<p class="page-subtitle">
+				<Truck class="w-4 h-4 inline" />
+				Fleet-wide truck performance and metrics
+			</p>
+		</div>
+
+		<!-- Aggregated KPI Dashboard -->
+		<div class="kpi-grid">
+			<div class="kpi-card primary">
+				<div class="kpi-icon">
+					<Truck class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{allTrucks.length}</div>
+					<div class="kpi-label">Total Trucks</div>
+					<div class="kpi-sub">{allTrucks.filter(t => t.currentStatus === 'active' || t.currentStatus === 'loading' || t.currentStatus === 'transit').length} active</div>
+				</div>
+			</div>
+
+			<div class="kpi-card success">
+				<div class="kpi-icon">
+					<Activity class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{allHauls.length}</div>
+					<div class="kpi-label">Total Hauls</div>
+					<div class="kpi-sub">{allTrucks.reduce((sum, t) => sum + t.todayHauls, 0)} today</div>
+				</div>
+			</div>
+
+			<div class="kpi-card {(allTrucks.reduce((sum, t) => sum + t.efficiency, 0) / allTrucks.length) >= 92 ? 'success' : 'warning'}">
+				<div class="kpi-icon">
+					<TrendingUp class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{((allTrucks.reduce((sum, t) => sum + t.efficiency, 0) / allTrucks.length)).toFixed(1)}%</div>
+					<div class="kpi-label">Avg Efficiency</div>
+					<div class="kpi-sub">Target: 92.5%</div>
+				</div>
+			</div>
+
+			<div class="kpi-card {(allTrucks.reduce((sum, t) => sum + t.avgVolumeLoss, 0) / allTrucks.length) <= 2.0 ? 'success' : 'warning'}">
+				<div class="kpi-icon">
+					<Target class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{((allTrucks.reduce((sum, t) => sum + t.avgVolumeLoss, 0) / allTrucks.length)).toFixed(1)}%</div>
+					<div class="kpi-label">Avg Volume Loss</div>
+					<div class="kpi-sub">Target: ≤2.0%</div>
+				</div>
+			</div>
+
+			<div class="kpi-card info">
+				<div class="kpi-icon">
+					<Wrench class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{allTrucks.filter(t => t.currentStatus === 'maintenance').length}</div>
+					<div class="kpi-label">In Maintenance</div>
+					<div class="kpi-sub">{((allTrucks.filter(t => t.currentStatus === 'maintenance').length / allTrucks.length) * 100).toFixed(0)}% of fleet</div>
+				</div>
+			</div>
+
+			<div class="kpi-card neutral">
+				<div class="kpi-icon">
+					<Fuel class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{((allTrucks.reduce((sum, t) => sum + t.fuelEfficiency, 0) / allTrucks.length)).toFixed(1)}</div>
+					<div class="kpi-label">Avg Fuel MPG</div>
+					<div class="kpi-sub">Fleet average</div>
 				</div>
 			</div>
 		</div>
 
+		<!-- Problem Trucks Alert -->
+		{#if allTrucks.some(t => t.efficiency < 85 || t.avgVolumeLoss > 3.0 || t.alerts.length > 0)}
+			<div class="insights-banner">
+				<div class="insight-icon">
+					<AlertTriangle class="w-5 h-5" />
+				</div>
+				<div class="insight-content">
+					<div class="insight-title">Fleet Alerts</div>
+					<div class="insight-text">
+						{allTrucks.filter(t => t.efficiency < 85).length} trucks below efficiency threshold, 
+						{allTrucks.filter(t => t.avgVolumeLoss > 3.0).length} with high volume loss, 
+						{allTrucks.reduce((sum, t) => sum + t.alerts.length, 0)} total active alerts
+					</div>
+				</div>
+			</div>
+		{/if}
+
+		<!-- Trucks by Yard -->
+		<div class="trucks-section">
+			<h2 class="section-title">
+				Trucks by Yard
+				<span class="section-subtitle">Click any truck to drill down</span>
+			</h2>
+			
+			{#each trucksByYard as { yard, trucks } (yard.id)}
+				{#if trucks.length > 0}
+					<div class="yard-section">
+						<h3 class="yard-header">
+							<MapPin class="w-4 h-4" />
+							{yard.name}
+							<span class="truck-count">({trucks.length} trucks)</span>
+						</h3>
+						
+						<div class="trucks-grid">
+							{#each trucks as truck (truck.id)}
+								<DemoTruckCard {truck} {handleDrillDown} />
+							{/each}
+						</div>
+					</div>
+				{/if}
+			{/each}
+		</div>
+	</div>
+{:else if truckData}
+	<!-- Show specific truck data (existing code) -->
+	<div class="truck-analytics">
+		<div class="analytics-header">
+			<h1 class="page-title">Truck {truckData.id}</h1>
+			<p class="page-subtitle">
+				<Truck class="w-4 h-4 inline" />
+				{truckData.model} ({truckData.year}) • Driver: {truckData.driverName}
+			</p>
+		</div>
+
 		<!-- Truck KPI Dashboard -->
 		<div class="kpi-grid">
-			<div class="kpi-card {truckData.efficiency >= 85 ? 'success' : 'danger'}">
+			<div class="kpi-card {getTruckStatus(truckData).class}">
 				<div class="kpi-icon">
-					{#if truckData.efficiency >= 85}
+					<Activity class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{getTruckStatus(truckData).label}</div>
+					<div class="kpi-label">Current Status</div>
+					<div class="kpi-sub">Last seen {formatLastSeen(truckData.lastHaulTime)}</div>
+				</div>
+			</div>
+
+			<div class="kpi-card {truckData.efficiency >= 92 ? 'success' : 'warning'}">
+				<div class="kpi-icon">
+					{#if truckData.efficiency >= 92}
 						<TrendingUp class="w-6 h-6" />
 					{:else}
 						<TrendingDown class="w-6 h-6" />
 					{/if}
 				</div>
 				<div class="kpi-content">
-					<div class="kpi-value {getEfficiencyColor(truckData.efficiency)}">{truckData.efficiency.toFixed(1)}%</div>
+					<div class="kpi-value">{truckData.efficiency.toFixed(1)}%</div>
 					<div class="kpi-label">Efficiency</div>
-					<div class="kpi-sub">Target: 85%+</div>
+					<div class="kpi-sub">Target: 92.5%</div>
 				</div>
 			</div>
 
-			<div class="kpi-card {truckData.avgVolumeLoss <= 3.0 ? 'success' : 'danger'}">
+			<div class="kpi-card success">
 				<div class="kpi-icon">
-					<Droplets class="w-6 h-6" />
-				</div>
-				<div class="kpi-content">
-					<div class="kpi-value {truckData.avgVolumeLoss > 3.0 ? 'text-red-600 dark:text-red-400' : ''}">{truckData.avgVolumeLoss.toFixed(1)}%</div>
-					<div class="kpi-label">Avg Volume Loss</div>
-					<div class="kpi-sub">Target: ≤3.0%</div>
-				</div>
-			</div>
-
-			<div class="kpi-card primary">
-				<div class="kpi-icon">
-					<Clock class="w-6 h-6" />
+					<Activity class="w-6 h-6" />
 				</div>
 				<div class="kpi-content">
 					<div class="kpi-value">{truckData.todayHauls}</div>
@@ -86,52 +224,37 @@
 				</div>
 			</div>
 
+			<div class="kpi-card {truckData.avgVolumeLoss <= 2.0 ? 'success' : 'warning'}">
+				<div class="kpi-icon">
+					<Target class="w-6 h-6" />
+				</div>
+				<div class="kpi-content">
+					<div class="kpi-value">{truckData.avgVolumeLoss.toFixed(1)}%</div>
+					<div class="kpi-label">Avg Volume Loss</div>
+					<div class="kpi-sub">Target: ≤2.0%</div>
+				</div>
+			</div>
+
 			<div class="kpi-card info">
 				<div class="kpi-icon">
-					<Gauge class="w-6 h-6" />
+					<Fuel class="w-6 h-6" />
 				</div>
 				<div class="kpi-content">
-					<div class="kpi-value">{truckData.fuelEfficiency.toFixed(1)}</div>
-					<div class="kpi-label">Fuel MPG</div>
-					<div class="kpi-sub">{truckData.mileage.toLocaleString()} miles</div>
+					<div class="kpi-value">{truckData.fuelEfficiency}</div>
+					<div class="kpi-label">Fuel Efficiency</div>
+					<div class="kpi-sub">MPG</div>
 				</div>
 			</div>
 
-			<div class="kpi-card success">
+			<div class="kpi-card neutral">
 				<div class="kpi-icon">
-					<User class="w-6 h-6" />
+					<Clock class="w-6 h-6" />
 				</div>
 				<div class="kpi-content">
-					<div class="kpi-value">{truckData.safetyScore.toFixed(1)}%</div>
-					<div class="kpi-label">Safety Score</div>
-					<div class="kpi-sub">Excellent</div>
+					<div class="kpi-value">{(truckData.mileage).toLocaleString()}</div>
+					<div class="kpi-label">Total Mileage</div>
+					<div class="kpi-sub">Miles driven</div>
 				</div>
-			</div>
-		</div>
-
-		<!-- Truck Status Info -->
-		<div class="status-info">
-			<div class="status-item">
-				<span class="status-label">Last Haul:</span>
-				<span class="status-value">
-					{truckData.lastHaulTime ? formatDistanceToNow(truckData.lastHaulTime, { addSuffix: true }) : 'No recent hauls'}
-				</span>
-			</div>
-			
-			{#if truckData.nextScheduled}
-				<div class="status-item">
-					<span class="status-label">Next Scheduled:</span>
-					<span class="status-value">
-						{formatDistanceToNow(truckData.nextScheduled, { addSuffix: true })}
-					</span>
-				</div>
-			{/if}
-
-			<div class="status-item">
-				<span class="status-label">Next Maintenance:</span>
-				<span class="status-value">
-					{formatDistanceToNow(truckData.nextMaintenance, { addSuffix: true })}
-				</span>
 			</div>
 		</div>
 
@@ -144,7 +267,7 @@
 				<div class="insight-content">
 					<div class="insight-title">Truck Alerts</div>
 					{#each truckData.alerts as alert}
-						<div class="insight-text severity-{alert.severity}">{alert.summary}</div>
+						<div class="insight-text">{alert.summary}</div>
 					{/each}
 				</div>
 			</div>
@@ -158,24 +281,24 @@
 				<div class="charts-grid">
 					<div class="chart-placeholder">
 						<div class="chart-header">
-							<h3>Recent Performance Trend</h3>
+							<h3>Efficiency Trend</h3>
 							<span class="chart-period">Last 7 Days</span>
 						</div>
 						<div class="chart-body">
 							<div class="chart-mock">
-								📉 Efficiency declining: 98% → 76% (22% drop)
+								📈 Daily efficiency: Mon 94% → Tue 91% → Wed 89% → Today {truckData.efficiency}%
 							</div>
 						</div>
 					</div>
 
 					<div class="chart-placeholder">
 						<div class="chart-header">
-							<h3>Volume Loss Pattern</h3>
+							<h3>Volume Loss Analysis</h3>
 							<span class="chart-period">Recent Hauls</span>
 						</div>
 						<div class="chart-body">
 							<div class="chart-mock">
-								🔴 Latest: 4.8% loss | Trend: Increasing | Alert triggered
+								🔍 Loss pattern: {hauls.map(h => h.volumeLossPercent.toFixed(1) + '%').join(' → ')}
 							</div>
 						</div>
 					</div>
@@ -183,25 +306,19 @@
 			</div>
 		{/if}
 
-		<!-- Haul Cards -->
+		<!-- Haul History -->
 		{#if $viewMode === 'cards' || $viewMode === 'analytics'}
 			<div class="hauls-section">
 				<h2 class="section-title">
 					Recent Hauls
-					<span class="section-subtitle">Click any haul to view raw data</span>
+					<span class="section-subtitle">Click any haul to drill down</span>
 				</h2>
 				
-				{#if hauls.length > 0}
-					<div class="hauls-grid">
-						{#each hauls as haul (haul.id)}
-							<DemoHaulCard {haul} />
-						{/each}
-					</div>
-				{:else}
-					<div class="no-hauls">
-						<p>No hauls found for this truck</p>
-					</div>
-				{/if}
+				<div class="hauls-grid">
+					{#each hauls.slice(0, 6) as haul (haul.id)}
+						<DemoHaulCard {haul} />
+					{/each}
+				</div>
 			</div>
 		{/if}
 	</div>
@@ -212,69 +329,64 @@
 {/if}
 
 <style>
-	.truck-analytics {
-		@apply p-6 space-y-6 overflow-y-auto h-full;
+	.truck-analytics, .trucks-overview {
+		@apply flex flex-col gap-6 p-6 h-full overflow-y-auto;
 	}
 
 	.analytics-header {
-		@apply mb-6;
-	}
-
-	.truck-header-info {
-		@apply space-y-3;
+		@apply text-center space-y-2;
 	}
 
 	.page-title {
-		@apply text-2xl font-bold text-gray-900 dark:text-white;
+		@apply text-3xl font-bold text-gray-900 dark:text-white;
 	}
 
-	.truck-details {
-		@apply flex flex-wrap items-center gap-4;
-	}
-
-	.truck-model,
-	.driver-name {
-		@apply flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300;
-	}
-
-	.status-badge {
-		@apply flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium capitalize;
+	.page-subtitle {
+		@apply text-sm text-gray-500 dark:text-gray-400 flex items-center justify-center gap-2;
 	}
 
 	.kpi-grid {
-		@apply grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6;
+		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4;
 	}
 
 	.kpi-card {
-		@apply bg-white dark:bg-gray-800 rounded-lg border p-4 flex items-center gap-4;
+		@apply bg-white dark:bg-gray-800 p-6 rounded-xl border shadow-sm hover:shadow-md transition-shadow;
 	}
 
 	.kpi-card.primary {
-		@apply border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/10;
+		@apply border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20;
 	}
 
 	.kpi-card.success {
-		@apply border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/10;
+		@apply border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20;
 	}
 
-	.kpi-card.danger {
-		@apply border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/10;
+	.kpi-card.warning {
+		@apply border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20;
 	}
 
 	.kpi-card.info {
+		@apply border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20;
+	}
+
+	.kpi-card.error {
+		@apply border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20;
+	}
+
+	.kpi-card.neutral {
 		@apply border-gray-200 dark:border-gray-700;
 	}
 
 	.kpi-icon {
-		@apply flex-shrink-0 p-2 rounded-lg bg-white dark:bg-gray-700;
+		@apply flex items-center justify-center w-12 h-12 rounded-lg bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 mb-4;
 	}
 
 	.kpi-content {
-		@apply flex-1;
+		@apply space-y-1;
 	}
 
 	.kpi-value {
-		@apply text-xl font-bold text-gray-900 dark:text-white;
+		@apply text-2xl font-bold text-gray-900 dark:text-white;
 	}
 
 	.kpi-label {
@@ -285,60 +397,48 @@
 		@apply text-xs text-gray-500 dark:text-gray-400;
 	}
 
-	.status-info {
-		@apply flex flex-wrap gap-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg;
-	}
-
-	.status-item {
-		@apply flex items-center gap-2;
-	}
-
-	.status-label {
-		@apply text-sm font-medium text-gray-600 dark:text-gray-300;
-	}
-
-	.status-value {
-		@apply text-sm text-gray-900 dark:text-white font-mono;
-	}
-
 	.insights-banner {
-		@apply flex items-start gap-4 p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg;
+		@apply flex items-start gap-4 p-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl;
 	}
 
 	.insight-icon {
-		@apply flex-shrink-0 p-2 bg-red-100 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400;
+		@apply flex items-center justify-center w-10 h-10 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 rounded-lg flex-shrink-0;
 	}
 
 	.insight-content {
-		@apply flex-1;
+		@apply space-y-1;
 	}
 
 	.insight-title {
-		@apply font-semibold text-gray-900 dark:text-white mb-2;
+		@apply font-semibold text-yellow-800 dark:text-yellow-300;
 	}
 
 	.insight-text {
-		@apply text-sm text-gray-600 dark:text-gray-300 mb-1;
-	}
-
-	.insight-text.severity-high {
-		@apply text-red-600 dark:text-red-400 font-medium;
-	}
-
-	.insight-text.severity-medium {
-		@apply text-yellow-600 dark:text-yellow-400;
-	}
-
-	.analytics-section {
-		@apply space-y-4;
+		@apply text-sm text-yellow-700 dark:text-yellow-400;
 	}
 
 	.section-title {
-		@apply text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-3;
+		@apply flex items-center justify-between text-lg font-semibold text-gray-900 dark:text-white mb-4;
 	}
 
 	.section-subtitle {
-		@apply text-sm font-normal text-gray-500 dark:text-gray-400;
+		@apply text-sm text-gray-500 dark:text-gray-400;
+	}
+
+	.yard-section {
+		@apply space-y-4 mb-8;
+	}
+
+	.yard-header {
+		@apply flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white pb-2 border-b border-gray-200 dark:border-gray-700;
+	}
+
+	.truck-count {
+		@apply text-sm text-gray-500 dark:text-gray-400 font-normal;
+	}
+
+	.trucks-grid {
+		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
 	}
 
 	.charts-grid {
@@ -346,15 +446,15 @@
 	}
 
 	.chart-placeholder {
-		@apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden;
+		@apply bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700;
 	}
 
 	.chart-header {
-		@apply flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50;
+		@apply flex items-center justify-between mb-4;
 	}
 
 	.chart-header h3 {
-		@apply font-semibold text-gray-900 dark:text-white;
+		@apply text-lg font-semibold text-gray-900 dark:text-white;
 	}
 
 	.chart-period {
@@ -362,23 +462,18 @@
 	}
 
 	.chart-body {
-		@apply p-6;
+		@apply h-48 flex items-center justify-center;
 	}
 
 	.chart-mock {
-		@apply text-center py-8 text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600;
-	}
-
-	.hauls-section {
-		@apply space-y-4;
+		@apply text-center text-gray-600 dark:text-gray-400 p-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg;
 	}
 
 	.hauls-grid {
-		@apply grid grid-cols-1 lg:grid-cols-2 gap-4;
+		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
 	}
 
-	.no-hauls,
 	.no-data {
-		@apply p-6 text-center text-gray-500 dark:text-gray-400;
+		@apply flex items-center justify-center h-full text-gray-500 dark:text-gray-400;
 	}
 </style> 
