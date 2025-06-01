@@ -658,6 +658,7 @@
 	.job-card {
 		background: white;
 		border: 1px solid #e2e8f0;
+		border-left: none;
 		border-radius: 12px;
 		overflow: hidden;
 		cursor: pointer;
@@ -670,14 +671,6 @@
 		transform: translateY(-1px);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		border-color: #cbd5e1;
-	}
-
-	.job-card.overdue {
-		border-left: 4px solid #dc2626;
-	}
-
-	.job-card.soon {
-		border-left: 4px solid #f59e0b;
 	}
 
 	/* Priority Bar */
@@ -708,49 +701,56 @@
 		background: #f1f5f9;
 	}
 
-	/* Card Content - Fixed Professional Layout */
+	/* Card Content - Hard Vertical Spine Alignment */
 	.card-content {
-		display: flex;
+		display: grid;
+		/* 84 px is just wide enough for "11:30 AM", "OVERDUE", and BBLS */
+		grid-template-columns: 84px 1fr 96px; /* left | middle | right */
+		column-gap: 24px;
+		padding: 20px 16px;
 		align-items: center;
-		gap: 16px;
-		padding: 20px;
 		min-height: 100px;
 	}
 
-	/* Time and Barrels Section - Fixed Alignment */
+	/* Time and Barrels Section - Hard Left Alignment */
 	.time-barrels-section {
+		width: 84px;    /* now exact width of track */
+		padding: 0;     /* no internal left/right padding */
+		text-align: left;   /* numbers start right at grid line */
 		display: flex;
 		flex-direction: column;
-		align-items: center;
 		justify-content: center;
-		gap: 12px;
-		min-width: 90px;
-		text-align: center;
+		gap: 8px;
 	}
 
 	.time-display {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 4px;
+		align-items: flex-start;   /* instead of center */
+		gap: 2px;
+		width: 100%;
 	}
 
 	.scheduled-time {
-		font-size: 18px;
+		text-align: left;
+		font-size: 16px;
 		font-weight: 700;
 		color: #0f172a;
 		font-family: 'JetBrains Mono', monospace;
-		line-height: 1;
+		line-height: 1.2;
+		margin: 0;
 	}
 
 	.time-status {
-		font-size: 11px;
+		font-size: 10px;
 		font-weight: 600;
 		padding: 2px 6px;
 		border-radius: 4px;
 		text-transform: uppercase;
 		letter-spacing: 0.3px;
 		white-space: nowrap;
+		margin: 0;
+		align-self: flex-start;
 	}
 
 	.time-status.normal {
@@ -771,61 +771,67 @@
 	.barrels-display {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 2px;
+		align-items: flex-start;   /* instead of center */
+		gap: 1px;
+		width: 100%;
 	}
 
 	.barrels-value {
-		font-size: 24px;
+		text-align: left;
+		font-size: 22px;
 		font-weight: 700;
 		color: #0f172a;
 		font-family: 'JetBrains Mono', monospace;
 		line-height: 1;
+		margin: 0;
 	}
 
 	.barrels-label {
-		font-size: 10px;
+		font-size: 9px;
 		color: #64748b;
 		font-weight: 600;
 		letter-spacing: 0.5px;
 		text-transform: uppercase;
+		margin: 0;
 	}
 
-	/* Route Display - Fixed Flex Layout */
+	/* Route Display - Respects the ruler */
 	.route-display {
-		flex: 1;
-		min-width: 0;
+		min-width: 0;   /* so ellipsis works */
 		display: flex;
 		flex-direction: column;
 		gap: 12px;
-		padding: 0 8px;
 	}
 
-	/* Job Header Info - Better Spacing */
+	/* Job Header Info - Clean Layout */
 	.job-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		gap: 12px;
-		margin-bottom: 8px;
+		margin: 0;
 	}
 
 	.account-name {
-		font-size: 16px;
+		min-width: 0;   /* so ellipsis works */
+		font-size: 15px;
 		font-weight: 700;
 		color: #0f172a;
 		flex: 1;
+		line-height: 1.2;
+		margin: 0;
 	}
 
 	.load-type-badge {
 		font-size: 9px;
 		font-weight: 700;
-		padding: 4px 8px;
+		padding: 3px 6px;
 		border-radius: 4px;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 		white-space: nowrap;
 		flex-shrink: 0;
+		margin: 0;
 	}
 
 	.load-type-badge.crude {
@@ -846,7 +852,7 @@
 		border: 1px solid #e2e8f0;
 	}
 
-	/* Route Line - Cleaner Layout */
+	/* Route Line - Perfect Spacing */
 	.route-line {
 		display: flex;
 		align-items: center;
@@ -882,21 +888,21 @@
 	}
 
 	.location-text {
+		min-width: 0;   /* so ellipsis works */
 		display: flex;
 		flex-direction: column;
 		gap: 1px;
-		min-width: 0;
 		overflow: hidden;
 	}
 
 	.location-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 		font-weight: 600;
 		color: #0f172a;
 		font-size: 13px;
 		line-height: 1.2;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 
 	.route-connector {
@@ -925,15 +931,15 @@
 		white-space: nowrap;
 	}
 
-	/* Action Section - Proper Alignment */
+	/* Action Section - Fixed Right Alignment */
 	.action-section {
+		width: 96px;
+		padding: 0;
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
 		justify-content: center;
 		gap: 8px;
-		min-width: 80px;
-		padding-left: 8px;
 	}
 
 	.status-info {
@@ -941,6 +947,7 @@
 		flex-direction: column;
 		align-items: flex-end;
 		gap: 4px;
+		width: 100%;
 	}
 
 	.duration-badge {
