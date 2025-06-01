@@ -118,7 +118,8 @@
 					<div class="job-title-section">
 						<h2 class="job-title">Job Details</h2>
 						<div class="job-meta">
-							<span class="job-id">#{job.id}</span>
+							<span class="job-id">Ticket #{job.id}</span>
+							<div class="customer-banner">{job.accountName}</div>
 							<div class="priority-badge" style="background-color: {getPriorityColor(job.priority)}">
 								{getPriorityLabel(job.priority)}
 							</div>
@@ -139,7 +140,7 @@
 						<!-- Volume & Level -->
 						<div class="spec-item">
 							<Gauge size={16} />
-							<span class="spec-label">Volume</span>
+							<span class="spec-label">EST Volume</span>
 							<span class="spec-value">{job.estimatedBarrels} BBL</span>
 						</div>
 						<div class="spec-item">
@@ -151,7 +152,7 @@
 						<!-- Load Details -->
 						<div class="spec-item">
 							<FileText size={16} />
-							<span class="spec-label">Load Type</span>
+							<span class="spec-label">Product Type</span>
 							<span class="spec-value load-type">{job.loadType.charAt(0).toUpperCase() + job.loadType.slice(1)}</span>
 						</div>
 						<div class="spec-item">
@@ -160,22 +161,10 @@
 							<span class="spec-value">{job.pickupLocation.tankNumber}</span>
 						</div>
 
-						<!-- Temperature & Conditions -->
-						<div class="spec-item">
-							<Thermometer size={16} />
-							<span class="spec-label">Temperature</span>
-							<span class="spec-value temp-range">{job.expectedTemperature.min}°-{job.expectedTemperature.max}°F</span>
-						</div>
-						<div class="spec-item">
-							<AlertCircle size={16} />
-							<span class="spec-label">Route Type</span>
-							<span class="spec-value route-type">{job.routeType.charAt(0).toUpperCase() + job.routeType.slice(1)}</span>
-						</div>
-
 						<!-- Timing & Distance -->
 						<div class="spec-item">
 							<Clock size={16} />
-							<span class="spec-label">Est. Duration</span>
+							<span class="spec-label">EST Transit Time</span>
 							<span class="spec-value">{formatDuration(job.estimatedDuration)}</span>
 						</div>
 						<div class="spec-item">
@@ -184,12 +173,7 @@
 							<span class="spec-value">{job.distance} miles</span>
 						</div>
 
-						<!-- Safety & Compliance -->
-						<div class="spec-item hazmat">
-							<Shield size={16} />
-							<span class="spec-label">HAZMAT</span>
-							<span class="spec-value hazmat-status">{job.hazmatRequired ? 'Required' : 'Not Required'}</span>
-						</div>
+						<!-- Priority -->
 						<div class="spec-item priority">
 							<AlertCircle size={16} />
 							<span class="spec-label">Priority</span>
@@ -203,15 +187,15 @@
 						<div class="tech-grid">
 							<div class="tech-item">
 								<span class="tech-label">API Gravity:</span>
-								<span class="tech-value">42.1°</span>
+								<span class="tech-value">0.0°</span>
 							</div>
 							<div class="tech-item">
 								<span class="tech-label">Water Cut:</span>
-								<span class="tech-value">0.8%</span>
+								<span class="tech-value">0.0%</span>
 							</div>
 							<div class="tech-item">
 								<span class="tech-label">Density:</span>
-								<span class="tech-value">0.864 g/cm³</span>
+								<span class="tech-value">0.000 g/cm³</span>
 							</div>
 							<div class="tech-item">
 								<span class="tech-label">Pad Name:</span>
@@ -219,21 +203,17 @@
 							</div>
 							<div class="tech-item">
 								<span class="tech-label">Rate:</span>
-								<span class="tech-value">$485.50</span>
+								<span class="tech-value">$0.00</span>
 							</div>
 							<div class="tech-item">
 								<span class="tech-label">Fuel Surcharge:</span>
-								<span class="tech-value">$23.75</span>
+								<span class="tech-value">$0.00</span>
 							</div>
 						</div>
 					</div>
 
 					<!-- Quick Status Summary -->
 					<div class="status-summary">
-						<div class="summary-item {isJobReady() ? 'ready' : 'waiting'}">
-							<CheckCircle size={14} />
-							<span>Ready Status: {isJobReady() ? 'Can Start Now' : 'Waiting for Schedule'}</span>
-						</div>
 						<div class="summary-item equipment">
 							<Truck size={14} />
 							<span>Equipment: Verified & Available</span>
@@ -459,6 +439,16 @@
 		font-size: 14px;
 		color: #6b7280;
 		font-weight: 600;
+	}
+
+	.customer-banner {
+		font-size: 12px;
+		color: #6b7280;
+		font-weight: 500;
+		padding: 4px 8px;
+		border-radius: 8px;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
 	}
 
 	.priority-badge {

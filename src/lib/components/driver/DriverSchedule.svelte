@@ -47,16 +47,16 @@
 			accountName: 'Shell Energy',
 			accountColor: '#FFD100',
 			pickupLocation: {
-				name: 'Permian Basin Facility',
-				address: '2847 County Road 140, Midland, TX 79706',
+				name: 'QRVWX',
+				address: 'LAT: 28.970028, LONG: -98.235694',
 				padName: 'Eagle Point Pad',
 				tankNumber: 'Tank 7-A',
-				coordinates: { lat: 31.9974, lng: -102.0779 }
+				coordinates: { lat: 28.970028, lng: -98.235694 }
 			},
 			deliveryLocation: {
-				name: 'Midland Refinery Terminal',
-				address: '1200 Industrial Blvd, Midland, TX 79701',
-				coordinates: { lat: 32.0268, lng: -102.1038 }
+				name: 'Falls City Harvest Pipeline',
+				address: 'LAT: 28.99683, LONG: -98.03021',
+				coordinates: { lat: 28.99683, lng: -98.03021 }
 			},
 			estimatedBarrels: 185,
 			tankLevelHeight: "17' 4\"",
@@ -77,19 +77,19 @@
 		},
 		{
 			id: 'JOB-002',
-			accountName: 'ExxonMobil',
+			accountName: 'Devon Energy',
 			accountColor: '#0033A0',
 			pickupLocation: {
-				name: 'Eagle Ford Shale Site',
-				address: '15th County Road 200, Karnes City, TX 78118',
+				name: 'Carmody',
+				address: 'LAT: 28.84805, LONG: -97.98977',
 				padName: 'Thunder Creek Pad',
 				tankNumber: 'Tank 12-B',
-				coordinates: { lat: 28.8851, lng: -97.9003 }
+				coordinates: { lat: 28.84805, lng: -97.98977 }
 			},
 			deliveryLocation: {
-				name: 'Corpus Christi Terminal',
-				address: '5500 Harbor Bridge, Corpus Christi, TX 78407',
-				coordinates: { lat: 27.7936, lng: -97.3916 }
+				name: 'Sugarhorn Marathon Facility',
+				address: 'LAT: 28.84889, LONG: -97.99120',
+				coordinates: { lat: 28.84889, lng: -97.99120 }
 			},
 			estimatedBarrels: 210,
 			tankLevelHeight: "22' 8\"",
@@ -110,19 +110,19 @@
 		},
 		{
 			id: 'JOB-003',
-			accountName: 'Chevron',
+			accountName: 'Shell Energy',
 			accountColor: '#0066CC',
 			pickupLocation: {
-				name: 'Bakken Formation Site',
-				address: '890 Ranch Road 1431, Gonzales, TX 78629',
+				name: 'Linhart',
+				address: 'LAT: 28.93972, LONG: -97.86080',
 				padName: 'Mustang Ridge Pad',
 				tankNumber: 'Tank 5-C',
-				coordinates: { lat: 29.5016, lng: -97.4522 }
+				coordinates: { lat: 28.93972, lng: -97.86080 }
 			},
 			deliveryLocation: {
-				name: 'Houston Ship Channel',
-				address: '7300 Clinton Dr, Houston, TX 77020',
-				coordinates: { lat: 29.7342, lng: -95.2791 }
+				name: 'Falls City Harvest Pipeline',
+				address: 'LAT: 28.99683, LONG: -98.03021',
+				coordinates: { lat: 28.99683, lng: -98.03021 }
 			},
 			estimatedBarrels: 165,
 			tankLevelHeight: "14' 11\"",
@@ -285,7 +285,7 @@
 				</div>
 				<div class="card-details">
 					<span class="card-value">{totalBarrels.toLocaleString()}</span>
-					<span class="card-label">Total Barrels</span>
+					<span class="card-label">EST. Total Barrels</span>
 				</div>
 			</div>
 			<div class="summary-card">
@@ -294,7 +294,7 @@
 				</div>
 				<div class="card-details">
 					<span class="card-value">{totalDistance.toFixed(0)}</span>
-					<span class="card-label">Miles</span>
+					<span class="card-label">EST. Miles</span>
 				</div>
 			</div>
 			<div class="summary-card">
@@ -499,14 +499,14 @@
 
 	.driver-name {
 		font-weight: 600;
-		color: #059669;
+		color: #1e293b;
 		font-size: 14px;
 	}
 
 	.truck-id {
 		font-family: 'JetBrains Mono', monospace;
 		font-weight: 600;
-		color: #3b82f6;
+		color: #1e293b;
 		font-size: 14px;
 	}
 
