@@ -1,10 +1,12 @@
 <script lang="ts">
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import RealtimeChart from '$lib/components/charts/RealtimeChart.svelte';
+	import SafetyAnalyticsModal from '$lib/components/executive/SafetyAnalyticsModal.svelte';
 	import { BarChart3, DollarSign, Building2, Target, TrendingUp, Truck, Shield } from 'lucide-svelte';
 
 	// Executive metrics
 	let activeTab = 'overview';
+	let showSafetyModal = false;
 
 	const tabs = [
 		{ id: 'overview', label: 'Executive Overview', icon: BarChart3 },
@@ -12,6 +14,10 @@
 		{ id: 'operations', label: 'Operations Summary', icon: Building2 },
 		{ id: 'strategic', label: 'Strategic Metrics', icon: Target }
 	];
+
+	function handleSafetyClick() {
+		showSafetyModal = true;
+	}
 </script>
 
 <svelte:head>
@@ -91,6 +97,8 @@
 						trend="up"
 						trendValue="+1.2%"
 						color="emerald"
+						clickable={true}
+						on:click={handleSafetyClick}
 					/>
 				</div>
 
@@ -208,6 +216,12 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Safety Analytics Modal -->
+<SafetyAnalyticsModal 
+	isOpen={showSafetyModal} 
+	on:close={() => showSafetyModal = false}
+/>
 
 <style>
 	.executive-dashboard {

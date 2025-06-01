@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-svelte';
 	import type { ComponentType } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	export let title: string;
 	export let value: string | number;
@@ -10,6 +11,15 @@
 	export let trend: 'up' | 'down' | 'stable' = 'stable';
 	export let trendValue: string = '';
 	export let color: string = 'blue';
+	export let clickable: boolean = false;
+
+	const dispatch = createEventDispatcher();
+
+	function handleClick() {
+		if (clickable) {
+			dispatch('click', { title, value, unit });
+		}
+	}
 
 	// Enhanced color mappings for industrial look
 	const colorMap = {
@@ -65,7 +75,14 @@
 	$: trendColor = trend === 'up' ? '#10b981' : trend === 'down' ? '#ef4444' : '#6b7280';
 </script>
 
-<div class="metric-card" style="--primary-color: {colors.primary}; --accent-bg: {colors.accent}; --gradient-bg: {colors.bg}; --border-color: {colors.border}">
+<div 
+	class="metric-card" 
+	class:clickable
+	style="--primary-color: {colors.primary}; --accent-bg: {colors.accent}; --gradient-bg: {colors.bg}; --border-color: {colors.border}"
+	on:click={handleClick}
+	role={clickable ? 'button' : undefined}
+	tabindex={clickable ? 0 : undefined}
+>
 	<!-- Header -->
 	<div class="card-header">
 		<div class="header-left">
@@ -102,6 +119,13 @@
 		{/if}
 	</div>
 
+	<!-- Click indicator for drill-down -->
+	{#if clickable}
+		<div class="click-indicator">
+			<span>Click for details →</span>
+		</div>
+	{/if}
+
 	<!-- Background accent -->
 	<div class="background-accent"></div>
 	
@@ -129,6 +153,36 @@
 	.metric-card:hover {
 		transform: translateY(-2px);
 		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+	}
+
+	.metric-card.clickable {
+		cursor: pointer;
+	}
+
+	.metric-card.clickable:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 16px 50px rgba(0, 0, 0, 0.2);
+		border-color: var(--primary-color);
+	}
+
+	.metric-card.clickable:focus {
+		outline: 2px solid var(--primary-color);
+		outline-offset: 2px;
+	}
+
+	.click-indicator {
+		position: absolute;
+		bottom: 8px;
+		right: 12px;
+		font-size: 10px;
+		color: #64748b;
+		opacity: 0;
+		transition: opacity 0.2s ease;
+		font-weight: 500;
+	}
+
+	.metric-card.clickable:hover .click-indicator {
+		opacity: 1;
 	}
 	
 	.card-header {
