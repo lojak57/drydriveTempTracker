@@ -33,6 +33,18 @@
 		showJobModal = true;
 	}
 
+	function handleJobStart(event: CustomEvent) {
+		const { job } = event.detail;
+		console.log('🚀 Starting job:', job.id, '| Account:', job.accountName);
+		console.log('📍 Route:', job.pickupLocation.name, '→', job.deliveryLocation.name);
+		
+		// TODO: Navigate to job map view or pre-trip inspection
+		showJobModal = false;
+		
+		// For demo: show alert that job start was triggered
+		alert(`Job ${job.id} started! Next: Navigate to pickup location or complete pre-trip inspection.`);
+	}
+
 	function handleInspectionComplete(event: CustomEvent) {
 		const inspectionData = event.detail.inspectionData;
 		inspectionCompleted = true;
@@ -316,6 +328,7 @@
 		job={selectedJob}
 		isOpen={showJobModal}
 		on:close={() => showJobModal = false}
+		on:start-navigation={handleJobStart}
 	/>
 {/if}
 
