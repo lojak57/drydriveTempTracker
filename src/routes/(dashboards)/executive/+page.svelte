@@ -16,6 +16,7 @@
 	];
 
 	function handleSafetyClick() {
+		console.log('Safety click handler called');
 		showSafetyModal = true;
 	}
 </script>
@@ -98,7 +99,7 @@
 						trendValue="+1.2%"
 						color="emerald"
 						clickable={true}
-						on:click={handleSafetyClick}
+						onClick={handleSafetyClick}
 					/>
 				</div>
 

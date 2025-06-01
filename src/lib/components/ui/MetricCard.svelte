@@ -12,12 +12,18 @@
 	export let trendValue: string = '';
 	export let color: string = 'blue';
 	export let clickable: boolean = false;
+	export let onClick: (() => void) | null = null;
 
 	const dispatch = createEventDispatcher();
 
 	function handleClick() {
+		console.log('MetricCard clicked:', title, 'clickable:', clickable);
 		if (clickable) {
-			dispatch('click', { title, value, unit });
+			if (onClick) {
+				onClick();
+			} else {
+				dispatch('click', { title, value, unit });
+			}
 		}
 	}
 
