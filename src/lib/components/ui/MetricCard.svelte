@@ -17,7 +17,6 @@
 	const dispatch = createEventDispatcher();
 
 	function handleClick() {
-		console.log('MetricCard clicked:', title, 'clickable:', clickable);
 		if (clickable) {
 			if (onClick) {
 				onClick();

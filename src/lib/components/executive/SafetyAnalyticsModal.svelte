@@ -2,6 +2,7 @@
 	import { Shield, AlertTriangle, CheckCircle, TrendingUp, Users, Truck, Clock, Award } from 'lucide-svelte';
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import RealtimeChart from '$lib/components/charts/RealtimeChart.svelte';
+	import IncidentDetailModal from './IncidentDetailModal.svelte';
 	import { createEventDispatcher } from 'svelte';
 	
 	export let isOpen = false;
@@ -45,6 +46,10 @@
 		{ region: 'Kansas West', score: 94.9, incidents: 2, trend: 'down' }
 	];
 
+	// Incident detail modal state
+	let showIncidentModal = false;
+	let selectedIncidentType = 'minor';
+
 	function closeModal() {
 		isOpen = false;
 		dispatch('close');
@@ -54,6 +59,11 @@
 		if (e.target === e.currentTarget) {
 			closeModal();
 		}
+	}
+
+	function openIncidentDetails(type: string) {
+		selectedIncidentType = type;
+		showIncidentModal = true;
 	}
 </script>
 
@@ -175,17 +185,17 @@
 					<h2>Incident Analysis (Last 90 Days)</h2>
 					<div class="incidents-overview">
 						<div class="incident-summary">
-							<div class="incident-card minor">
+							<div class="incident-card minor" on:click={() => openIncidentDetails('minor')}>
 								<div class="incident-count">2</div>
 								<div class="incident-type">Minor Incidents</div>
 								<div class="incident-desc">Equipment scratches, minor delays</div>
 							</div>
-							<div class="incident-card major">
+							<div class="incident-card major" on:click={() => openIncidentDetails('major')}>
 								<div class="incident-count">1</div>
 								<div class="incident-type">Major Incident</div>
 								<div class="incident-desc">Vehicle breakdown requiring tow</div>
 							</div>
-							<div class="incident-card critical">
+							<div class="incident-card critical" on:click={() => openIncidentDetails('critical')}>
 								<div class="incident-count">0</div>
 								<div class="incident-type">Critical Incidents</div>
 								<div class="incident-desc">No safety-related injuries</div>
@@ -280,6 +290,13 @@
 		</div>
 	</div>
 {/if}
+
+<!-- Incident Detail Modal -->
+<IncidentDetailModal 
+	isOpen={showIncidentModal} 
+	incidentType={selectedIncidentType}
+	on:close={() => showIncidentModal = false}
+/>
 
 <style>
 	.modal-backdrop {
@@ -516,6 +533,34 @@
 		padding: 20px;
 		border-radius: 12px;
 		border-left: 4px solid;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		position: relative;
+	}
+
+	.incident-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+	}
+
+	.incident-card:active {
+		transform: translateY(0);
+	}
+
+	.incident-card::after {
+		content: "Click for details →";
+		position: absolute;
+		bottom: 8px;
+		right: 12px;
+		font-size: 10px;
+		color: #64748b;
+		opacity: 0;
+		transition: opacity 0.2s ease;
+		font-weight: 500;
+	}
+
+	.incident-card:hover::after {
+		opacity: 1;
 	}
 
 	.incident-card.minor {

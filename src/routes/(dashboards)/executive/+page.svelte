@@ -16,7 +16,6 @@
 	];
 
 	function handleSafetyClick() {
-		console.log('Safety click handler called');
 		showSafetyModal = true;
 	}
 </script>
