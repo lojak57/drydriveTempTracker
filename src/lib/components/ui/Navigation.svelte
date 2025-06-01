@@ -8,12 +8,9 @@
 	// Clean navigation structure - only working routes
 	const navigationSections = [
 		{
-			title: 'Operations',
+			title: 'Role Dashboards',
 			items: [
-				{ href: '/', label: 'Dashboard', icon: Home, description: 'Main operations center' },
-				{ href: '/hauls', label: 'Live Hauls', icon: Truck, description: 'Active haul monitoring' },
-				{ href: '/dispatch', label: 'Dispatch Center', icon: MapPin, description: 'Fleet coordination' },
-				{ href: '/fleet', label: 'Fleet Management', icon: Truck, description: 'Vehicle & driver management' }
+				{ href: '/', label: 'Dashboard', icon: Home, description: 'Role selection and main dashboard' }
 			]
 		},
 		{
@@ -32,7 +29,6 @@
 		{
 			title: 'Management',
 			items: [
-				{ href: '/drivers', label: 'Driver Portal', icon: Users, description: 'Driver workflows & scheduling' },
 				{ href: '/documents', label: 'Document Center', icon: FileText, description: 'Compliance & file management' },
 				{ href: '/admin', label: 'System Admin', icon: Settings, description: 'Administrative controls' }
 			]
