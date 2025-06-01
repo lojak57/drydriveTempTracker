@@ -1,15 +1,16 @@
 <script lang="ts">
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import RealtimeChart from '$lib/components/charts/RealtimeChart.svelte';
+	import { BarChart3, DollarSign, Building2, Target, TrendingUp, Truck, Shield } from 'lucide-svelte';
 
 	// Executive metrics
 	let activeTab = 'overview';
 
-	const executiveTabs = [
-		{ id: 'overview', label: 'Executive Overview', icon: '📊' },
-		{ id: 'financial', label: 'Financial Performance', icon: '💰' },
-		{ id: 'operations', label: 'Operations Summary', icon: '🏭' },
-		{ id: 'strategic', label: 'Strategic Metrics', icon: '🎯' }
+	const tabs = [
+		{ id: 'overview', label: 'Executive Overview', icon: BarChart3 },
+		{ id: 'financial', label: 'Financial Performance', icon: DollarSign },
+		{ id: 'operations', label: 'Operations Summary', icon: Building2 },
+		{ id: 'strategic', label: 'Strategic Metrics', icon: Target }
 	];
 </script>
 
@@ -21,23 +22,26 @@
 	<!-- Header -->
 	<div class="dashboard-header">
 		<div class="header-content">
-			<div class="header-icon">📈</div>
+			<div class="header-icon">
+				<TrendingUp size={32} />
+			</div>
 			<div class="header-text">
-				<h1>Executive Dashboard</h1>
-				<p>Strategic overview, KPIs, and financial performance</p>
+				<h1 class="header-title">Executive Dashboard</h1>
+				<p class="header-subtitle">Strategic overview, KPIs, and financial performance</p>
 			</div>
 		</div>
 	</div>
 
 	<!-- Navigation Tabs -->
-	<div class="tab-navigation">
-		{#each executiveTabs as tab}
+	<div class="nav-tabs">
+		{#each tabs as tab}
 			<button 
-				class="tab-btn {activeTab === tab.id ? 'active' : ''}"
+				class="nav-tab" 
+				class:active={activeTab === tab.id}
 				on:click={() => activeTab = tab.id}
 			>
-				<span class="tab-icon">{tab.icon}</span>
-				<span class="tab-label">{tab.label}</span>
+				<svelte:component this={tab.icon} size={16} />
+				<span>{tab.label}</span>
 			</button>
 		{/each}
 	</div>
@@ -52,7 +56,7 @@
 						title="Monthly Revenue" 
 						value="$4.2M" 
 						unit="" 
-						icon="💰" 
+						icon={DollarSign}
 						status="normal"
 						trend="up"
 						trendValue="+15.3%"
@@ -62,7 +66,7 @@
 						title="Operating Margin" 
 						value="23.8" 
 						unit="%" 
-						icon="📈" 
+						icon={TrendingUp}
 						status="normal"
 						trend="up"
 						trendValue="+2.1%"
@@ -72,17 +76,17 @@
 						title="Active Fleet" 
 						value="247" 
 						unit="trucks" 
-						icon="🚛" 
+						icon={Truck}
 						status="normal"
 						trend="up"
-						trendValue="+12"
+						trendValue="+12 units"
 						color="orange"
 					/>
 					<MetricCard 
 						title="Safety Score" 
 						value="96.8" 
 						unit="%" 
-						icon="🛡️" 
+						icon={Shield}
 						status="normal"
 						trend="up"
 						trendValue="+1.2%"
@@ -117,34 +121,24 @@
 			<div class="financial-section">
 				<div class="financial-metrics">
 					<MetricCard 
-						title="Monthly Revenue" 
-						value="$4.2M" 
+						title="Quarterly Revenue" 
+						value="$12.7M" 
 						unit="" 
-						icon="💰" 
+						icon={DollarSign}
 						status="normal"
 						trend="up"
-						trendValue="+15.3%"
+						trendValue="+8.4%"
 						color="emerald"
 					/>
 					<MetricCard 
-						title="Operating Margin" 
-						value="23.8" 
+						title="Profit Margin" 
+						value="18.2" 
 						unit="%" 
-						icon="📈" 
+						icon={TrendingUp}
 						status="normal"
 						trend="up"
-						trendValue="+2.1%"
+						trendValue="+0.8%"
 						color="blue"
-					/>
-					<MetricCard 
-						title="EBITDA" 
-						value="$1.8M" 
-						unit="" 
-						icon="💎" 
-						status="normal"
-						trend="up"
-						trendValue="+18.7%"
-						color="orange"
 					/>
 				</div>
 
@@ -174,44 +168,14 @@
 			<div class="operations-section">
 				<div class="operations-metrics">
 					<MetricCard 
-						title="Total Fleet" 
-						value="247" 
-						unit="trucks" 
-						icon="🚛" 
-						status="normal"
-						trend="up"
-						trendValue="+12"
-						color="blue"
-					/>
-					<MetricCard 
-						title="Active Drivers" 
-						value="189" 
-						unit="" 
-						icon="👨‍💼" 
-						status="normal"
-						trend="stable"
-						trendValue="+3"
-						color="emerald"
-					/>
-					<MetricCard 
-						title="Daily Hauls" 
-						value="156" 
-						unit="" 
-						icon="📦" 
-						status="normal"
-						trend="up"
-						trendValue="+8"
-						color="orange"
-					/>
-					<MetricCard 
-						title="System Uptime" 
-						value="99.2" 
+						title="Fleet Utilization" 
+						value="87.3" 
 						unit="%" 
-						icon="⚡" 
+						icon={Truck}
 						status="normal"
-						trend="stable"
-						trendValue="+0.1%"
-						color="emerald"
+						trend="up"
+						trendValue="+3.2%"
+						color="orange"
 					/>
 				</div>
 			</div>
@@ -220,34 +184,24 @@
 			<div class="strategic-section">
 				<div class="strategic-metrics">
 					<MetricCard 
-						title="Market Share" 
-						value="34.2" 
+						title="Market Share Growth" 
+						value="12.4" 
 						unit="%" 
-						icon="🎯" 
+						icon={Target}
 						status="normal"
 						trend="up"
-						trendValue="+2.8%"
+						trendValue="+2.1%"
 						color="blue"
 					/>
 					<MetricCard 
-						title="Customer Retention" 
-						value="94.7" 
+						title="Efficiency Index" 
+						value="94.2" 
 						unit="%" 
-						icon="🤝" 
+						icon={TrendingUp}
 						status="normal"
 						trend="up"
-						trendValue="+1.2%"
+						trendValue="+1.8%"
 						color="emerald"
-					/>
-					<MetricCard 
-						title="Growth Rate" 
-						value="28.5" 
-						unit="%" 
-						icon="📈" 
-						status="normal"
-						trend="up"
-						trendValue="+5.3%"
-						color="orange"
 					/>
 				</div>
 			</div>
@@ -305,7 +259,7 @@
 		margin: 0;
 	}
 
-	.tab-navigation {
+	.nav-tabs {
 		display: flex;
 		gap: 12px;
 		margin-bottom: 32px;
@@ -313,7 +267,7 @@
 		padding: 4px;
 	}
 
-	.tab-btn {
+	.nav-tab {
 		display: flex;
 		align-items: center;
 		gap: 10px;
@@ -329,14 +283,14 @@
 		white-space: nowrap;
 	}
 
-	.tab-btn:hover {
+	.nav-tab:hover {
 		background: rgba(255, 255, 255, 0.95);
 		transform: translateY(-2px);
 		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 		color: #1e293b;
 	}
 
-	.tab-btn.active {
+	.nav-tab.active {
 		background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
 		color: white;
 		border-color: #10B981;
@@ -423,7 +377,7 @@
 			font-size: 14px;
 		}
 
-		.tab-btn {
+		.nav-tab {
 			padding: 12px 16px;
 			gap: 8px;
 		}
@@ -461,11 +415,11 @@
 	}
 
 	@media (max-width: 640px) {
-		.tab-navigation {
+		.nav-tabs {
 			gap: 8px;
 		}
 
-		.tab-btn {
+		.nav-tab {
 			padding: 10px 12px;
 			gap: 6px;
 		}

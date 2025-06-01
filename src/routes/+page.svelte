@@ -6,36 +6,36 @@
 		{
 			id: 'executive',
 			title: 'Executive',
-			icon: '📈',
+			icon: 'TrendingUp',
 			description: 'Strategic overview, KPIs, and financial performance',
 			href: '/executive'
 		},
 		{
 			id: 'driver',
 			title: 'Driver',
-			icon: '🚛',
+			icon: 'Truck',
 			description: 'Schedule, pre-trip inspection, and job management',
 			href: '/driver'
 		},
 		{
 			id: 'dispatch',
 			title: 'Dispatch',
-			icon: '📋',
+			icon: 'Radio',
 			description: 'Route planning, fleet status, and active hauls',
 			href: '/dispatch'
 		},
 		{
 			id: 'yard',
 			title: 'Yard Manager',
-			icon: '🏗️',
+			icon: 'Warehouse',
 			description: 'Fleet overview, driver management, and yard operations',
 			href: '/yard'
 		},
 		{
 			id: 'regional',
 			title: 'Regional Manager',
-			icon: '🧭',
-			description: 'Multi-yard oversight and regional performance analytics',
+			icon: 'MapPin',
+			description: 'Multi-yard oversight, regional analytics, and strategic planning',
 			href: '/regional'
 		}
 	];
@@ -47,16 +47,16 @@
 </svelte:head>
 
 <div class="dashboard-landing">
-	<!-- Header -->
+<!-- Header -->
 	<div class="landing-header">
 		<div class="header-content">
 			<DryDriveLogo />
 			<div class="header-text">
 				<h1 class="main-title">Oil Field Temp Tracker</h1>
 				<p class="main-subtitle">Select your role to access your dashboard</p>
-			</div>
-		</div>
 	</div>
+</div>
+</div>
 
 	<!-- Role Selection -->
 	<div class="role-selection">
@@ -68,15 +68,15 @@
 					description={role.description}
 					href={role.href}
 				/>
-			{/each}
-		</div>
-	</div>
+					{/each}
+				</div>
+			</div>
 
 	<!-- Footer Info -->
 	<div class="landing-footer">
 		<p>Secure access to real-time haul monitoring and fleet management</p>
-	</div>
-</div>
+						</div>
+					</div>
 
 <style>
 	.dashboard-landing {
@@ -136,7 +136,7 @@
 		max-width: 800px;
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 20px;
+			gap: 20px;
 	}
 
 	@media (min-width: 768px) {

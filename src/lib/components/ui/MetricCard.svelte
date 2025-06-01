@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-svelte';
+	import type { ComponentType } from 'svelte';
+
 	export let title: string;
 	export let value: string | number;
 	export let unit: string = '';
-	export let icon: string = '';
+	export let icon: ComponentType | null = null;
 	export let status: 'normal' | 'warning' | 'critical' = 'normal';
 	export let trend: 'up' | 'down' | 'stable' = 'stable';
 	export let trendValue: string = '';
@@ -57,8 +60,8 @@
 		critical: 'bg-red-100/80 text-red-700 border-red-200/60'
 	}[status];
 
-	// Trend indicator
-	$: trendIcon = trend === 'up' ? '↗️' : trend === 'down' ? '↘️' : '➡️';
+	// Trend indicator with Lucide icons
+	$: trendIconComponent = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : ArrowRight;
 	$: trendColor = trend === 'up' ? '#10b981' : trend === 'down' ? '#ef4444' : '#6b7280';
 </script>
 
@@ -68,7 +71,7 @@
 		<div class="header-left">
 			{#if icon}
 				<div class="icon-container">
-					{icon}
+					<svelte:component this={icon} size={18} />
 				</div>
 			{/if}
 			<div class="title-section">
@@ -85,7 +88,7 @@
 		<!-- Trend indicator -->
 		{#if trendValue}
 			<div class="trend-indicator" style="color: {trendColor}">
-				<span class="trend-icon">{trendIcon}</span>
+				<svelte:component this={trendIconComponent} size={14} />
 				<span class="trend-value">{trendValue}</span>
 			</div>
 		{/if}

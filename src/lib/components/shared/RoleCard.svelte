@@ -1,8 +1,23 @@
 <script lang="ts">
+	import { 
+		TrendingUp, Truck, Radio, Warehouse, MapPin 
+	} from 'lucide-svelte';
+
 	export let role: string;
 	export let href: string;
-	export let icon: string;
+	export let icon: 'TrendingUp' | 'Truck' | 'Radio' | 'Warehouse' | 'MapPin';
 	export let description: string;
+
+	// Icon mapping for professional Lucide icons
+	const iconMap = {
+		TrendingUp,
+		Truck,
+		Radio,
+		Warehouse,
+		MapPin
+	} as const;
+
+	$: IconComponent = iconMap[icon] || TrendingUp;
 </script>
 
 <a 
@@ -11,7 +26,7 @@
 	data-sveltekit-preload-data="hover"
 >
 	<div class="role-icon">
-		{icon}
+		<svelte:component this={IconComponent} size={28} />
 	</div>
 	<div class="role-content">
 		<h2 class="role-title">{role}</h2>
@@ -44,15 +59,15 @@
 	}
 
 	.role-icon {
-		font-size: 32px;
 		width: 60px;
 		height: 60px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: #f8fafc;
+		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 		border-radius: 12px;
 		flex-shrink: 0;
+		color: #374151;
 	}
 
 	.role-content {
@@ -94,7 +109,6 @@
 		}
 
 		.role-icon {
-			font-size: 28px;
 			width: 50px;
 			height: 50px;
 		}
