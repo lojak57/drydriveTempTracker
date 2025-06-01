@@ -570,8 +570,8 @@
 	}
 
 	.completed-items {
-		background: rgba(59, 130, 246, 0.1);
-		color: #1e40af;
+		background: rgba(148, 163, 184, 0.1);
+		color: #475569;
 		padding: 4px 8px;
 		border-radius: 6px;
 		font-weight: 600;

@@ -44,7 +44,7 @@
 	}
 
 	function startJob() {
-		dispatch('start-job', { job });
+		dispatch('start-navigation', { job });
 		closeModal();
 	}
 

@@ -171,6 +171,12 @@
 		showMapView = true;
 	}
 
+	function handleDirectNavigation(event: CustomEvent) {
+		selectedJob = event.detail.job;
+		showJobModal = false;
+		showTransitView = true; // Go directly to navigation screen
+	}
+
 	function handleInspectionComplete(event: CustomEvent) {
 		const inspectionData = event.detail.inspectionData;
 		inspectionCompleted = true;
@@ -180,6 +186,14 @@
 		// Trigger post-submit scroll
 		afterPreTripSubmit = true;
 		activeNavSection = 'schedule';
+		
+		// Ensure scroll to top of schedule section
+		setTimeout(() => {
+			const scheduleElement = document.getElementById('schedule');
+			if (scheduleElement) {
+				scheduleElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}
+		}, 100);
 	}
 
 	function handleExitMap() {
@@ -1890,7 +1904,7 @@
 											<span class="font-medium">{yard.avgSafety}%</span>
 										</div>
 										<div class="stat-row flex justify-between">
-											<span class="text-blue-600">Avg Efficiency:</span>
+											<span class="text-oil-black">Avg Efficiency:</span>
 											<span class="font-medium">{yard.avgEfficiency}%</span>
 										</div>
 										<div class="stat-row flex justify-between">
@@ -2253,7 +2267,7 @@
 		job={selectedJob}
 		isOpen={showJobModal}
 		on:close={() => showJobModal = false}
-		on:start-job={handleJobStart}
+		on:start-navigation={handleDirectNavigation}
 	/>
 {/if}
 

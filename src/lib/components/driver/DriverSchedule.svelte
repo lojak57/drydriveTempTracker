@@ -175,7 +175,7 @@
 
 	function getJobStatusColor(status: ScheduledJob['status']) {
 		switch (status) {
-			case 'scheduled': return 'bg-blue-100 text-blue-700 border-blue-200';
+			case 'scheduled': return 'bg-gray-100 text-gray-700 border-gray-200';
 			case 'in-progress': return 'bg-orange-100 text-orange-700 border-orange-200';
 			case 'completed': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
 			case 'delayed': return 'bg-red-100 text-red-700 border-red-200';
@@ -186,10 +186,10 @@
 	function getPriorityColor(priority: ScheduledJob['priority']) {
 		switch (priority) {
 			case 'urgent': return 'bg-red-500';
-			case 'high': return 'bg-orange-500';
-			case 'normal': return 'bg-blue-500';
-			case 'low': return 'bg-gray-500';
-			default: return 'bg-gray-500';
+			case 'high': return 'bg-red-400';
+			case 'normal': return 'bg-gray-400';
+			case 'low': return 'bg-gray-300';
+			default: return 'bg-gray-300';
 		}
 	}
 
@@ -590,19 +590,19 @@
 	}
 
 	.card-icon.barrels {
-		background: linear-gradient(135deg, #f59e0b, #f97316);
+		background: #6b7280;
 	}
 
 	.card-icon.distance {
-		background: linear-gradient(135deg, #3b82f6, #2563eb);
+		background: #6b7280;
 	}
 
 	.card-icon.time {
-		background: linear-gradient(135deg, #059669, #10b981);
+		background: #6b7280;
 	}
 
 	.card-icon.truck {
-		background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+		background: #6b7280;
 	}
 
 	.card-details {
@@ -696,16 +696,16 @@
 		background: #dc2626;
 	}
 
-	.priority-indicator.bg-orange-500 {
+	.priority-indicator.bg-red-400 {
 		background: #f59e0b;
 	}
 
-	.priority-indicator.bg-blue-500 {
-		background: #3b82f6;
+	.priority-indicator.bg-gray-400 {
+		background: #6b7280;
 	}
 
-	.priority-indicator.bg-gray-500 {
-		background: #6b7280;
+	.priority-indicator.bg-gray-300 {
+		background: #f1f5f9;
 	}
 
 	/* Card Content */
@@ -734,17 +734,17 @@
 	}
 
 	.scheduled-time {
-		font-size: 16px;
+		font-size: 18px;
 		font-weight: 700;
-		color: #1e293b;
+		color: #0f172a;
 		font-family: 'JetBrains Mono', monospace;
 		line-height: 1.2;
 	}
 
 	.time-status {
-		font-size: 11px;
+		font-size: 12px;
 		font-weight: 600;
-		padding: 2px 6px;
+		padding: 3px 8px;
 		border-radius: 4px;
 		text-transform: uppercase;
 		letter-spacing: 0.3px;
@@ -775,18 +775,19 @@
 	}
 
 	.barrels-value {
-		font-size: 24px;
+		font-size: 26px;
 		font-weight: 700;
-		color: #1e293b;
+		color: #0f172a;
 		font-family: 'JetBrains Mono', monospace;
 		line-height: 1;
 	}
 
 	.barrels-label {
-		font-size: 10px;
+		font-size: 11px;
 		color: #64748b;
 		font-weight: 600;
 		letter-spacing: 0.5px;
+		text-transform: uppercase;
 	}
 
 	/* Route Display */
@@ -809,9 +810,9 @@
 	}
 
 	.account-name {
-		font-size: 14px;
+		font-size: 16px;
 		font-weight: 700;
-		color: #1e293b;
+		color: #0f172a;
 	}
 
 	.load-type-badge {
@@ -825,18 +826,21 @@
 	}
 
 	.load-type-badge.crude {
-		background: #fef3c7;
-		color: #d97706;
+		background: #f1f5f9;
+		color: #475569;
+		border: 1px solid #e2e8f0;
 	}
 
 	.load-type-badge.condensate {
-		background: #e0e7ff;
-		color: #3730a3;
+		background: #f8fafc;
+		color: #64748b;
+		border: 1px solid #e2e8f0;
 	}
 
 	.load-type-badge.refined {
-		background: #f0fdf4;
-		color: #166534;
+		background: #f1f5f9;
+		color: #475569;
+		border: 1px solid #e2e8f0;
 	}
 
 	/* Route Line */
@@ -875,11 +879,11 @@
 	}
 
 	.pickup-icon {
-		background: #10b981;
+		background: #475569;
 	}
 
 	.delivery-icon {
-		background: #3b82f6;
+		background: #64748b;
 	}
 
 	.location-text {
@@ -892,8 +896,8 @@
 
 	.location-name {
 		font-weight: 600;
-		color: #1e293b;
-		font-size: 13px;
+		color: #0f172a;
+		font-size: 14px;
 		line-height: 1.2;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -954,13 +958,13 @@
 	}
 
 	.priority-label.high {
-		background: #fffbeb;
-		color: #d97706;
+		background: #fef2f2;
+		color: #dc2626;
 	}
 
 	.priority-label.normal {
-		background: #f0f9ff;
-		color: #0369a1;
+		background: #f8fafc;
+		color: #64748b;
 	}
 
 	.priority-label.low {
