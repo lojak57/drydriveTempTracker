@@ -20,34 +20,34 @@
 	let inspectionItems: InspectionItem[] = [
 		// Vehicle Exterior
 		{ id: 'tires', category: 'Exterior', description: 'Tires (tread depth, air pressure, damage)', status: 'pass', critical: true },
-		{ id: 'wheels', category: 'Exterior', description: 'Wheels and rims (cracks, loose lugs)', status: 'pass', critical: true },
+		{ id: 'wheels', category: 'Exterior', description: 'Wheels and rims (cracks, loose lugs)', status: 'pending', critical: true },
 		{ id: 'lights', category: 'Exterior', description: 'All lights and reflectors working', status: 'pass', critical: true },
 		{ id: 'mirrors', category: 'Exterior', description: 'Mirrors clean and properly adjusted', status: 'pass' },
-		{ id: 'windshield', category: 'Exterior', description: 'Windshield and windows (cracks, chips)', status: 'pass' },
+		{ id: 'windshield', category: 'Exterior', description: 'Windshield and windows (cracks, chips)', status: 'pending' },
 		{ id: 'hood', category: 'Exterior', description: 'Hood latched securely', status: 'pass' },
 		
 		// Engine Compartment
 		{ id: 'oil-level', category: 'Engine', description: 'Engine oil level and condition', status: 'pass', critical: true },
-		{ id: 'coolant', category: 'Engine', description: 'Coolant level and condition', status: 'pass', critical: true },
+		{ id: 'coolant', category: 'Engine', description: 'Coolant level and condition', status: 'pending', critical: true },
 		{ id: 'belts', category: 'Engine', description: 'Drive belts (wear, tension)', status: 'pass' },
 		{ id: 'hoses', category: 'Engine', description: 'Hoses and connections', status: 'pass' },
-		{ id: 'battery', category: 'Engine', description: 'Battery secured and terminals clean', status: 'pass' },
+		{ id: 'battery', category: 'Engine', description: 'Battery secured and terminals clean', status: 'pending' },
 		
 		// Cab Interior
 		{ id: 'seat-belts', category: 'Interior', description: 'Seat belts functional', status: 'pass', critical: true },
-		{ id: 'horn', category: 'Interior', description: 'Horn working', status: 'pass' },
+		{ id: 'horn', category: 'Interior', description: 'Horn working', status: 'pending' },
 		{ id: 'gauges', category: 'Interior', description: 'All gauges and warning lights', status: 'pass', critical: true },
 		{ id: 'wipers', category: 'Interior', description: 'Windshield wipers and washers', status: 'pass' },
 		{ id: 'heater-defrost', category: 'Interior', description: 'Heater and defroster working', status: 'pass' },
 		
 		// Braking System
 		{ id: 'brake-pedal', category: 'Brakes', description: 'Brake pedal feel and travel', status: 'pass', critical: true },
-		{ id: 'parking-brake', category: 'Brakes', description: 'Parking brake operation', status: 'pass', critical: true },
+		{ id: 'parking-brake', category: 'Brakes', description: 'Parking brake operation', status: 'pending', critical: true },
 		{ id: 'air-pressure', category: 'Brakes', description: 'Air pressure build-up and leaks', status: 'pass', critical: true },
 		
 		// Trailer/Tank Specific
 		{ id: 'coupling', category: 'Coupling', description: 'Fifth wheel and kingpin secure', status: 'pass', critical: true },
-		{ id: 'air-lines', category: 'Coupling', description: 'Air lines connected and secure', status: 'pass', critical: true },
+		{ id: 'air-lines', category: 'Coupling', description: 'Air lines connected and secure', status: 'pending', critical: true },
 		{ id: 'electrical', category: 'Coupling', description: 'Electrical connections working', status: 'pass' },
 		{ id: 'tank-valves', category: 'Tank', description: 'Tank valves closed and secure', status: 'pass', critical: true },
 		{ id: 'emergency-kit', category: 'Safety', description: 'Emergency kit and spill response', status: 'pass', critical: true },
@@ -83,18 +83,25 @@
 	let selectedItemForPhoto: InspectionItem | null = null;
 
 	function updateItemStatus(itemId: string, status: InspectionItem['status']) {
+		console.log('Updating item status:', itemId, status); // Debug log
 		inspectionItems = inspectionItems.map(item => 
 			item.id === itemId ? { ...item, status } : item
 		);
+		// Force reactivity update
+		inspectionItems = [...inspectionItems];
 	}
 
 	function addNotes(itemId: string, notes: string) {
+		console.log('Adding notes:', itemId, notes); // Debug log
 		inspectionItems = inspectionItems.map(item => 
 			item.id === itemId ? { ...item, notes } : item
 		);
+		// Force reactivity update
+		inspectionItems = [...inspectionItems];
 	}
 
 	function takePhoto(item: InspectionItem) {
+		console.log('Taking photo for:', item.id); // Debug log
 		selectedItemForPhoto = item;
 		showPhotoModal = true;
 	}
@@ -274,21 +281,33 @@
 								
 								<div class="status-controls grid grid-cols-3 gap-2">
 									<button 
-										class="status-btn border border-slate-400 text-slate-700 bg-transparent hover:bg-slate-100 px-2 py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 transition-colors {item.status === 'pass' ? 'border-green-500 text-green-700 bg-green-50' : ''}"
+										class="status-btn px-2 py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer
+										{item.status === 'pass' 
+											? 'border-2 border-green-500 text-white bg-green-500 shadow-md transform scale-105' 
+											: 'border-2 border-gray-300 text-gray-600 bg-white hover:border-green-400 hover:bg-green-50 hover:text-green-600'}"
+										type="button"
 										on:click={() => updateItemStatus(item.id, 'pass')}
 									>
 										<CheckCircle size={14} />
 										<span>Pass</span>
 									</button>
 									<button 
-										class="status-btn border border-slate-400 text-slate-700 bg-transparent hover:bg-slate-100 px-2 py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 transition-colors {item.status === 'fail' ? 'border-red-500 text-red-700 bg-red-50' : ''}"
+										class="status-btn px-2 py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer
+										{item.status === 'fail' 
+											? 'border-2 border-red-500 text-white bg-red-500 shadow-md transform scale-105' 
+											: 'border-2 border-gray-300 text-gray-600 bg-white hover:border-red-400 hover:bg-red-50 hover:text-red-600'}"
+										type="button"
 										on:click={() => updateItemStatus(item.id, 'fail')}
 									>
 										<XCircle size={14} />
 										<span>Fail</span>
 									</button>
 									<button 
-										class="status-btn border border-slate-400 text-slate-700 bg-transparent hover:bg-slate-100 px-2 py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 transition-colors {item.status === 'defect' ? 'border-orange-500 text-orange-700 bg-orange-50' : ''}"
+										class="status-btn px-2 py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 transition-all duration-200 cursor-pointer
+										{item.status === 'defect' 
+											? 'border-2 border-orange-500 text-white bg-orange-500 shadow-md transform scale-105' 
+											: 'border-2 border-gray-300 text-gray-600 bg-white hover:border-orange-400 hover:bg-orange-50 hover:text-orange-600'}"
+										type="button"
 										on:click={() => updateItemStatus(item.id, 'defect')}
 									>
 										<AlertTriangle size={14} />
@@ -442,6 +461,49 @@
 		
 		.inspection-card {
 			padding: 16px;
+		}
+	}
+
+	/* Enhanced button styling for better interactivity */
+	:global(.status-btn) {
+		position: relative;
+		z-index: 1;
+		min-height: 36px;
+		user-select: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	:global(.status-btn:active) {
+		transform: scale(0.98) !important;
+	}
+
+	:global(.inspection-item) {
+		position: relative;
+		z-index: 0;
+	}
+
+	/* Ensure photo buttons are also clickable */
+	:global(.photo-btn) {
+		position: relative;
+		z-index: 1;
+		cursor: pointer;
+		user-select: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	/* Add visual feedback for pending items */
+	:global(.inspection-item:has(.status-btn[class*="border-gray-300"])) {
+		background: linear-gradient(135deg, #fff9c4 0%, #ffffff 100%);
+		border-left: 4px solid #f59e0b;
+		animation: pulse-pending 2s ease-in-out infinite;
+	}
+
+	@keyframes pulse-pending {
+		0%, 100% {
+			box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+		}
+		50% {
+			box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.1);
 		}
 	}
 </style> 

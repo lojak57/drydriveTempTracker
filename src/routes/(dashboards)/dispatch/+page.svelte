@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Radio, Truck, Users, Clock, MapPin, AlertTriangle, Settings, Phone } from 'lucide-svelte';
-	import { onMount, onDestroy } from 'svelte';
-	import maplibregl from 'maplibre-gl';
+	import { onMount } from 'svelte';
 	import CollapsibleSection from '$lib/components/ui/CollapsibleSection.svelte';
+	import FleetTrackingMap from '$lib/components/dispatch/FleetTrackingMap.svelte';
 
 	// TypeScript interfaces
 	interface Driver {
@@ -185,9 +185,7 @@
 	let selectedDriver = '';
 
 	// Map state
-	let mapContainer: HTMLDivElement;
-	let map: maplibregl.Map | null = null;
-	let hoveredTruck: MapTruck | null = null;
+	let showFullscreenMap = false;
 
 	// Reactive statements
 	$: pendingCount = pendingAssignments.length;
@@ -206,126 +204,9 @@
 
 	// Initialize map on mount
 	onMount(() => {
-		if (mapContainer) {
-			initializeMap();
-		}
+		// Update pending assignments count
+		pendingCount = pendingAssignments.length;
 	});
-
-	onDestroy(() => {
-		if (map) {
-			map.remove();
-		}
-	});
-
-	function initializeMap() {
-		// Initialize map with light styling suitable for oil field operations
-		map = new maplibregl.Map({
-			container: mapContainer,
-			style: {
-				"version": 8,
-				"sources": {
-					"carto-light": {
-						"type": "raster",
-						"tiles": [
-							"https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-							"https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-							"https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
-						],
-						"tileSize": 256,
-						"attribution": "© CartoDB © OpenStreetMap contributors"
-					}
-				},
-				"layers": [
-					{
-						"id": "carto-light-layer",
-						"type": "raster",
-						"source": "carto-light",
-						"minzoom": 0,
-						"maxzoom": 22
-					}
-				]
-			},
-			center: [-97.7431, 30.2672], // Center on Texas
-			zoom: 6,
-			attributionControl: false
-		});
-
-		// Add navigation controls
-		map.addControl(new maplibregl.NavigationControl(), 'top-right');
-
-		// Add truck markers when map loads
-		map.on('load', () => {
-			addTruckMarkers();
-		});
-	}
-
-	function addTruckMarkers() {
-		if (!map) return;
-
-		mapTrucks.forEach((truck) => {
-			// Create a custom marker element
-			const markerElement = document.createElement('div');
-			markerElement.className = 'truck-marker-element';
-			markerElement.style.cssText = `
-				width: 24px;
-				height: 24px;
-				border-radius: 50%;
-				background-color: ${getStatusColor(truck.status)};
-				border: 2px solid white;
-				cursor: pointer;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				color: white;
-				font-size: 12px;
-				font-weight: bold;
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-				transition: all 0.2s ease;
-			`;
-			markerElement.innerHTML = '🚛';
-
-			// Create marker with popup
-			const marker = new maplibregl.Marker({
-				element: markerElement
-			})
-			.setLngLat([truck.lng, truck.lat])
-			.setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
-				<div style="text-align: center; padding: 12px; min-width: 180px;">
-					<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-						<strong style="color: #1e293b;">${truck.id}</strong>
-						<span style="color: #64748b; font-size: 12px;">${truck.driver}</span>
-					</div>
-					<div style="margin-bottom: 6px; color: #475569; font-size: 13px;">${truck.currentJob}</div>
-					<div style="color: #059669; font-weight: 600; font-size: 12px;">ETA: ${truck.eta}</div>
-				</div>
-			`))
-			.addTo(map!);
-
-			// Add hover effects
-			markerElement.addEventListener('mouseenter', () => {
-				markerElement.style.transform = 'scale(1.2)';
-				hoveredTruck = truck;
-			});
-
-			markerElement.addEventListener('mouseleave', () => {
-				markerElement.style.transform = 'scale(1)';
-				hoveredTruck = null;
-			});
-		});
-
-		// Fit map to show all trucks
-		if (mapTrucks.length > 0) {
-			const bounds = new maplibregl.LngLatBounds();
-			mapTrucks.forEach(truck => {
-				bounds.extend([truck.lng, truck.lat]);
-			});
-			
-			map.fitBounds(bounds, {
-				padding: 50,
-				maxZoom: 10
-			});
-		}
-	}
 
 	function openAssignment(assignment: Assignment) {
 		selectedAssignment = assignment;
@@ -545,25 +426,22 @@
 		<div class="map-container">
 			<div class="map-header">
 				<h3>Live Fleet Tracking</h3>
-				<div class="map-legend">
-					<div class="legend-item">
-						<div class="legend-dot en-route"></div>
-						<span>En Route</span>
-					</div>
-					<div class="legend-item">
-						<div class="legend-dot loading"></div>
-						<span>Loading</span>
-					</div>
-					<div class="legend-item">
-						<div class="legend-dot delivery"></div>
-						<span>Delivery</span>
+				<div class="map-status">
+					<div class="status-indicator">
+						<span class="status-dot active"></span>
+						<span class="status-text">Real-time Tracking Active</span>
 					</div>
 				</div>
 			</div>
 			
 			<div class="map-view">
-				<!-- MapLibre GL Container -->
-				<div class="map-gl-container" bind:this={mapContainer}></div>
+				<FleetTrackingMap 
+					bind:showFullscreen={showFullscreenMap}
+					autoUpdate={true}
+					trackingMode="active"
+					on:map-ready={(e: CustomEvent) => console.log('Fleet tracking map ready:', e.detail)}
+					on:fullscreen-toggle={(e: CustomEvent) => console.log('Fullscreen toggled:', e.detail)}
+				/>
 			</div>
 		</div>
 	</div>
@@ -765,38 +643,38 @@
 		margin: 0;
 	}
 
-	.map-legend {
-		display: flex;
-		gap: 16px;
-	}
-
-	.legend-item {
+	.map-status {
 		display: flex;
 		align-items: center;
-		gap: 6px;
-		font-size: 12px;
-		color: #64748b;
+		gap: 8px;
 	}
 
-	.legend-dot {
+	.status-indicator {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.status-dot {
 		width: 12px;
 		height: 12px;
 		border-radius: 50%;
+	}
+
+	.status-dot.active {
+		background-color: #10B981;
+	}
+
+	.status-text {
+		font-size: 12px;
+		color: #64748b;
 	}
 
 	.map-view {
 		flex: 1;
 		position: relative;
 		overflow: hidden;
-	}
-
-	.map-gl-container {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: #f5f5f5;
+		height: 100%;
 	}
 
 	/* MapLibre GL Popup Styling */
