@@ -201,11 +201,11 @@
 								<div class="incident-desc text-sm text-slate-600">No safety-related injuries</div>
 							</div>
 						</div>
-						<div class="incident-chart chart-card">
+						<div class="incident-chart">
 							<RealtimeChart 
 								title="Incident Trends (12 Months)"
 								color="#EF4444"
-								height={300}
+								height={350}
 								unit="incidents"
 								animated={true}
 							/>
@@ -491,7 +491,7 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 32px;
-		align-items: start;
+		align-items: stretch;
 	}
 
 	.incident-summary {
@@ -505,7 +505,7 @@
 		border-radius: 12px;
 		border-left: 4px solid;
 		cursor: pointer;
-		transition: all 0.2s ease;
+		transition: all 0.3s ease;
 		position: relative;
 		background: white;
 		border: 1px solid #e2e8f0;
@@ -513,12 +513,15 @@
 	}
 
 	.incident-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+		transform: translateY(-3px);
+		box-shadow: 0 12px 32px rgba(30, 64, 175, 0.2);
+		border-color: #3B82F6;
+		border-left-color: #1E40AF !important;
+		background: linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(30, 64, 175, 0.05) 100%);
 	}
 
 	.incident-card:active {
-		transform: translateY(0);
+		transform: translateY(-1px);
 	}
 
 	.incident-card::after {
@@ -529,12 +532,14 @@
 		font-size: 10px;
 		color: #64748b;
 		opacity: 0;
-		transition: opacity 0.2s ease;
+		transition: all 0.3s ease;
 		font-weight: 500;
 	}
 
 	.incident-card:hover::after {
 		opacity: 1;
+		color: #1E40AF;
+		font-weight: 600;
 	}
 
 	.incident-card.minor {
@@ -547,6 +552,21 @@
 
 	.incident-card.critical {
 		border-left-color: #10b981;
+	}
+
+	/* Enhanced Chart Card */
+	.incident-chart {
+		min-height: 500px;
+		background: #1a1a1a;
+		border-radius: 16px;
+		padding: 24px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.incident-chart :global(.chart-container) {
+		flex: 1;
+		min-height: 450px;
 	}
 
 	/* Regional */

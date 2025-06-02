@@ -290,6 +290,7 @@
 				type="line" 
 				data={chartData} 
 				options={chartOptions}
+				height={Math.max(height - 80, 320)}
 			/>
 		{:else}
 			<div class="chart-loading">
@@ -381,7 +382,7 @@
 	.chart-wrapper {
 		height: calc(100% - 45px); /* More space for chart */
 		position: relative;
-		min-height: 420px; /* Increased from 350px to make background taller */
+		min-height: 450px; /* Increased from 420px to match safety modal container */
 		overflow: visible; /* Ensure labels aren't clipped */
 	}
 
