@@ -130,6 +130,12 @@
 	// NEW: Handle workflow step clicks (direct view navigation)
 	function handleStepClick(event: CustomEvent) {
 		const { step } = event.detail;
+		
+		// IMPORTANT: If clicking directly on 'to-delivery', ensure all prerequisites are met
+		if (step === 'to-delivery') {
+			setDeliveryProgressState();
+		}
+		
 		currentWorkflowView = step;
 		
 		// NEW: Scroll to top when clicking to to-pickup step
@@ -138,6 +144,16 @@
 				window.scrollTo({ top: 0, behavior: 'smooth' });
 			}, 100);
 		}
+	}
+
+	// Helper function to set proper delivery progress state
+	function setDeliveryProgressState() {
+		workflowProgress['job-overview'] = true;
+		workflowProgress['pre-trip'] = true;
+		workflowProgress['to-pickup'] = true;
+		workflowProgress['loading'] = true;
+		workflowProgress = { ...workflowProgress }; // Trigger reactivity
+		console.log('✅ Set delivery state - all previous steps marked as complete');
 	}
 
 	// NEW: Mark workflow step as complete
@@ -150,6 +166,16 @@
 	function navigateToStep(step: WorkflowStep) {
 		markStepComplete(currentWorkflowView);
 		currentWorkflowView = step;
+		
+		// IMPORTANT: When navigating to 'to-delivery', ensure all previous steps are marked complete
+		if (step === 'to-delivery') {
+			workflowProgress['job-overview'] = true;
+			workflowProgress['pre-trip'] = true;
+			workflowProgress['to-pickup'] = true;
+			workflowProgress['loading'] = true;
+			workflowProgress = { ...workflowProgress }; // Trigger reactivity
+			console.log('✅ Navigated to delivery - marking all previous steps as complete');
+		}
 		
 		// NEW: Scroll to top when navigating to any workflow step
 		setTimeout(() => {

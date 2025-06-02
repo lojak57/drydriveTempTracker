@@ -12,6 +12,12 @@
 	let searchTerm = '';
 	let selectedTrucks: string[] = [];
 
+	// Percentage color logic function
+	function getPercentageColor(value: number, threshold = 80): string {
+		if (value < threshold) return 'text-red-500 font-semibold';
+		return 'text-slate-200';
+	}
+
 	// Filtered and sorted truck data
 	$: filteredTrucks = $fleetData
 		.filter(truck => {
@@ -121,6 +127,14 @@
 	function scheduleCalibration(truckIds: string[]) {
 		dispatch('schedule-calibration', { truckIds });
 	}
+
+	// Mock percentage for demonstration - in real app would come from truck data
+	function getCalibrationPercentage(truck: TruckMetrics): number {
+		// Simulate calibration percentage based on status
+		if (truck.status === 'good') return Math.random() * 15 + 85; // 85-100%
+		if (truck.status === 'warning') return Math.random() * 20 + 60; // 60-80%
+		return Math.random() * 40 + 20; // 20-60% for critical
+	}
 </script>
 
 <div class="truck-status-container">
@@ -207,6 +221,7 @@
 								<span class="sort-icon">{sortDirection === 'asc' ? '↑' : '↓'}</span>
 							{/if}
 						</th>
+						<th>Calibration %</th>
 						<th class="sortable" on:click={() => handleSort('status')}>
 							Status
 							{#if sortBy === 'status'}
@@ -219,6 +234,7 @@
 				</thead>
 				<tbody>
 					{#each filteredTrucks as truck (truck.id)}
+						{@const calibrationPercent = getCalibrationPercentage(truck)}
 						<tr 
 							class="truck-row"
 							class:selected={selectedTrucks.includes(truck.id)}
@@ -241,6 +257,11 @@
 							</td>
 							<td class="load-delta" class:positive={truck.avgLoadDelta > 0} class:negative={truck.avgLoadDelta < 0}>
 								{formatDelta(truck.avgLoadDelta)}
+							</td>
+							<td class="calibration-percent">
+								<span class={getPercentageColor(calibrationPercent)}>
+									{calibrationPercent.toFixed(1)}%
+								</span>
 							</td>
 							<td class="status-cell">
 								<div class="status-badge" class:good={truck.status === 'good'} class:warning={truck.status === 'warning'} class:critical={truck.status === 'critical'}>
@@ -272,6 +293,7 @@
 	{#if viewMode === 'grid'}
 		<div class="grid-container">
 			{#each filteredTrucks as truck (truck.id)}
+				{@const calibrationPercent = getCalibrationPercentage(truck)}
 				<div 
 					class="truck-card"
 					class:selected={selectedTrucks.includes(truck.id)}
@@ -299,6 +321,12 @@
 							</span>
 						</div>
 						<div class="metric">
+							<span class="metric-label">Cal %</span>
+							<span class="metric-value {getPercentageColor(calibrationPercent)}">
+								{calibrationPercent.toFixed(1)}%
+							</span>
+						</div>
+						<div class="metric">
 							<span class="metric-label">Loads</span>
 							<span class="metric-value">{truck.totalLoads}</span>
 						</div>
@@ -319,17 +347,17 @@
 
 <style>
 	.truck-status-container {
-		background: rgba(255, 255, 255, 0.95);
-		border: 1px solid rgba(0, 0, 0, 0.1);
+		background: rgba(15, 23, 42, 0.95);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
 		overflow: hidden;
-		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 	}
 
 	.controls-section {
-		background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+		background: linear-gradient(135deg, #1e293b, #334155);
 		padding: 20px;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -346,47 +374,61 @@
 
 	.search-input {
 		padding: 8px 12px;
-		border: 1px solid rgba(0, 0, 0, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: rgba(30, 41, 59, 0.8);
+		color: #e2e8f0;
 		border-radius: 6px;
 		font-size: 14px;
 		min-width: 200px;
-		background: white;
+		transition: all 0.2s ease;
+	}
+
+	.search-input::placeholder {
+		color: #94a3b8;
 	}
 
 	.search-input:focus {
 		outline: none;
 		border-color: #3b82f6;
-		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+		box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 	}
 
 	.filter-select {
 		padding: 8px 12px;
-		border: 1px solid rgba(0, 0, 0, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: rgba(30, 41, 59, 0.8);
+		color: #e2e8f0;
 		border-radius: 6px;
 		font-size: 14px;
-		background: white;
 		cursor: pointer;
+	}
+
+	.filter-select option {
+		background: #1e293b;
+		color: #e2e8f0;
 	}
 
 	.view-toggle {
 		display: flex;
-		border: 1px solid rgba(0, 0, 0, 0.1);
+		background: rgba(30, 41, 59, 0.8);
 		border-radius: 6px;
 		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, 0.2);
 	}
 
 	.view-btn {
 		padding: 8px 12px;
+		background: transparent;
 		border: none;
-		background: white;
-		color: #64748b;
-		font-size: 13px;
+		color: #94a3b8;
 		cursor: pointer;
 		transition: all 0.2s ease;
+		font-size: 12px;
 	}
 
 	.view-btn:hover {
-		background: #f1f5f9;
+		background: rgba(51, 65, 85, 0.5);
+		color: #e2e8f0;
 	}
 
 	.view-btn.active {
@@ -398,12 +440,12 @@
 		display: flex;
 		align-items: center;
 		gap: 16px;
+		color: #e2e8f0;
 	}
 
 	.results-count {
 		font-size: 14px;
-		color: #64748b;
-		font-weight: 500;
+		color: #94a3b8;
 	}
 
 	.selection-actions {
@@ -413,19 +455,22 @@
 	}
 
 	.selection-count {
-		font-size: 13px;
+		font-size: 14px;
+		font-weight: 500;
 		color: #3b82f6;
-		font-weight: 600;
 	}
 
 	.action-btn {
 		padding: 6px 12px;
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		border-radius: 4px;
+		border: 1px solid transparent;
+		border-radius: 6px;
 		font-size: 12px;
 		font-weight: 500;
 		cursor: pointer;
 		transition: all 0.2s ease;
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
 	}
 
 	.action-btn.small {
@@ -459,7 +504,7 @@
 
 	.action-btn:hover {
 		transform: translateY(-1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 	}
 
 	/* Table Styles */
@@ -467,21 +512,23 @@
 		overflow-x: auto;
 		max-height: 600px;
 		overflow-y: auto;
+		background: #0f172a;
 	}
 
 	.trucks-table {
 		width: 100%;
 		border-collapse: collapse;
 		font-size: 14px;
+		background: #0f172a;
 	}
 
 	.trucks-table th {
-		background: #f8fafc;
+		background: #1e293b;
 		padding: 12px 8px;
 		text-align: left;
 		font-weight: 600;
-		color: #475569;
-		border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+		color: #e2e8f0;
+		border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 		position: sticky;
 		top: 0;
 		z-index: 10;
@@ -494,7 +541,7 @@
 	}
 
 	.trucks-table th.sortable:hover {
-		background: #e2e8f0;
+		background: #334155;
 	}
 
 	.sort-icon {
@@ -505,21 +552,31 @@
 
 	.trucks-table td {
 		padding: 10px 8px;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 		vertical-align: middle;
+		color: #cbd5e1;
 	}
 
 	.truck-row {
 		transition: all 0.2s ease;
 		cursor: pointer;
+		background: #0f172a;
+	}
+
+	.truck-row:nth-child(even) {
+		background: #1e293b;
+	}
+
+	.truck-row:nth-child(odd) {
+		background: #0f172a;
 	}
 
 	.truck-row:hover {
-		background: rgba(59, 130, 246, 0.02);
+		background: #334155 !important;
 	}
 
 	.truck-row.selected {
-		background: rgba(59, 130, 246, 0.05);
+		background: rgba(59, 130, 246, 0.1) !important;
 		border-left: 3px solid #3b82f6;
 	}
 
@@ -543,6 +600,7 @@
 	.truck-id {
 		font-weight: 600;
 		font-family: 'JetBrains Mono', monospace;
+		color: #e2e8f0;
 	}
 
 	.load-delta {
@@ -558,6 +616,11 @@
 		color: #3b82f6;
 	}
 
+	.calibration-percent {
+		font-family: 'JetBrains Mono', monospace;
+		font-weight: 600;
+	}
+
 	.status-badge {
 		display: inline-flex;
 		align-items: center;
@@ -566,6 +629,9 @@
 		border-radius: 12px;
 		font-size: 12px;
 		font-weight: 500;
+		background: #374151;
+		color: #d1d5db;
+		border: 1px solid #4b5563;
 	}
 
 	.status-badge.good {
@@ -599,11 +665,12 @@
 		padding: 20px;
 		max-height: 600px;
 		overflow-y: auto;
+		background: #0f172a;
 	}
 
 	.truck-card {
-		background: white;
-		border: 1px solid rgba(0, 0, 0, 0.1);
+		background: #1e293b;
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px;
 		padding: 16px;
 		cursor: pointer;
@@ -613,7 +680,8 @@
 
 	.truck-card:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		background: #334155;
 	}
 
 	.truck-card.selected {
@@ -644,12 +712,12 @@
 		font-size: 16px;
 		font-weight: 700;
 		font-family: 'JetBrains Mono', monospace;
-		color: #0f172a;
+		color: #e2e8f0;
 	}
 
 	.card-metrics {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(2, 1fr);
 		gap: 12px;
 		margin-bottom: 12px;
 	}
@@ -661,17 +729,17 @@
 	.metric-label {
 		display: block;
 		font-size: 11px;
-		color: #64748b;
-		margin-bottom: 2px;
+		color: #94a3b8;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
+		margin-bottom: 4px;
 	}
 
 	.metric-value {
 		display: block;
 		font-size: 13px;
 		font-weight: 600;
-		color: #0f172a;
+		color: #e2e8f0;
 		font-family: 'JetBrains Mono', monospace;
 	}
 
@@ -684,7 +752,7 @@
 	}
 
 	.card-actions {
-		border-top: 1px solid rgba(0, 0, 0, 0.05);
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
 		padding-top: 12px;
 		margin-top: 12px;
 	}
@@ -720,6 +788,10 @@
 		.trucks-table th,
 		.trucks-table td {
 			padding: 8px 4px;
+		}
+
+		.card-metrics {
+			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 </style> 

@@ -10,8 +10,14 @@
 		{
 			title: 'Role Dashboards',
 			items: [
-				{ href: '/', label: 'Dashboard', icon: Home, description: 'Role selection and main dashboard' },
-				{ href: '/master-dispatch', label: 'Master Dispatch View', icon: BarChart3, description: 'Executive fleet intelligence and analytics' }
+				{ href: '/', label: 'Dashboard', icon: Home, description: 'Role selection and main dashboard' }
+			]
+		},
+		{
+			title: 'Operations',
+			items: [
+				{ href: '/dispatch', label: 'Dispatch Hub', icon: MapPin, description: 'Operations and fleet management' },
+				{ href: '/master-dispatch', label: 'Fleet Intelligence Nexus', icon: BarChart3, description: 'Executive fleet intelligence and analytics' }
 			]
 		},
 		{
@@ -172,10 +178,10 @@
 		right: 0;
 		z-index: 1000;
 		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-		background: rgba(255, 255, 255, 0.95);
+		background: rgba(15, 23, 42, 0.95);
 		backdrop-filter: blur(24px);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 	}
 
 	/* Mobile Navigation (Default) */
@@ -191,8 +197,8 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 12px 16px;
-		height: 64px;
+		padding: 8px 16px;
+		height: 56px;
 	}
 
 	.mobile-logo {
@@ -205,13 +211,13 @@
 	.mobile-brand {
 		font-size: 16px;
 		font-weight: 700;
-		color: #0f172a;
+		color: #ffffff;
 	}
 
 	.mobile-menu-toggle {
 		background: none;
 		border: none;
-		color: #374151;
+		color: #e2e8f0;
 		cursor: pointer;
 		padding: 8px;
 		border-radius: 8px;
@@ -219,13 +225,13 @@
 	}
 
 	.mobile-menu-toggle:hover {
-		background: rgba(124, 179, 66, 0.1);
-		color: #558B2F;
+		background: rgba(124, 179, 66, 0.2);
+		color: #7CB342;
 	}
 
 	.mobile-backdrop {
 		position: fixed;
-		top: 64px;
+		top: 56px;
 		left: 0;
 		right: 0;
 		bottom: 0;
@@ -243,11 +249,11 @@
 
 	.mobile-menu {
 		position: fixed;
-		top: 64px;
+		top: 56px;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background: rgba(255, 255, 255, 0.98);
+		background: rgba(15, 23, 42, 0.98);
 		backdrop-filter: blur(24px);
 		overflow-y: auto;
 		z-index: 999;
@@ -271,12 +277,12 @@
 	.mobile-section-title {
 		font-size: 12px;
 		font-weight: 600;
-		color: #6b7280;
+		color: #94a3b8;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 		margin-bottom: 12px;
 		padding-bottom: 8px;
-		border-bottom: 1px solid rgba(124, 179, 66, 0.1);
+		border-bottom: 1px solid rgba(124, 179, 66, 0.2);
 	}
 
 	.mobile-section-items {
@@ -293,18 +299,18 @@
 		border-radius: 12px;
 		text-decoration: none;
 		transition: all 0.2s ease;
-		color: #374151;
+		color: #e2e8f0;
 	}
 
 	.mobile-nav-item:hover {
-		background: rgba(124, 179, 66, 0.08);
-		color: #558B2F;
+		background: rgba(124, 179, 66, 0.15);
+		color: #7CB342;
 	}
 
 	.mobile-nav-item.active {
-		background: linear-gradient(135deg, rgba(124, 179, 66, 0.15) 0%, rgba(85, 139, 47, 0.1) 100%);
-		color: #558B2F;
-		border: 1px solid rgba(124, 179, 66, 0.2);
+		background: linear-gradient(135deg, rgba(124, 179, 66, 0.25) 0%, rgba(85, 139, 47, 0.2) 100%);
+		color: #7CB342;
+		border: 1px solid rgba(124, 179, 66, 0.3);
 	}
 
 	.mobile-item-content {
@@ -323,7 +329,7 @@
 	.mobile-item-description {
 		font-size: 13px;
 		font-weight: 400;
-		color: #9ca3af;
+		color: #94a3b8;
 		line-height: 1.2;
 	}
 
@@ -356,9 +362,9 @@
 		}
 
 		.nav-header {
-			padding: 20px;
-			border-bottom: 1px solid rgba(124, 179, 66, 0.1);
-			background: linear-gradient(135deg, rgba(124, 179, 66, 0.05) 0%, rgba(85, 139, 47, 0.02) 100%);
+			padding: 16px;
+			border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+			background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
 		}
 
 		.logo-container {
@@ -381,7 +387,7 @@
 		.brand-name {
 			font-size: 18px;
 			font-weight: 700;
-			color: #0f172a;
+			color: #ffffff;
 			line-height: 1.2;
 		}
 

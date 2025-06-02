@@ -24,7 +24,7 @@
 	.main-content {
 		flex: 1;
 		padding: 12px;
-		padding-top: 76px; /* Account for fixed mobile header */
+		padding-top: 68px; /* Reduced from 76px to account for 56px header */
 		min-height: 100vh;
 		overflow-x: auto;
 		overflow-y: auto;
@@ -47,7 +47,7 @@
 	@media (min-width: 641px) and (max-width: 1024px) {
 		.main-content {
 			padding: 16px;
-			padding-top: 76px;
+			padding-top: 68px; /* Updated for new header height */
 		}
 	}
 </style>

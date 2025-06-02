@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { CheckCircle, AlertTriangle, XCircle, Camera, FileText } from 'lucide-svelte';
+	import { CheckCircle, AlertTriangle, XCircle, Camera, FileText, Wrench, Cog, Settings, Shield, Truck, Beaker } from 'lucide-svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -136,176 +136,195 @@
 		}
 	}
 
-	function getCategoryColor(category: string) {
-		const colors: Record<string, string> = {
-			'Exterior': 'border-blue-200 bg-blue-50',
-			'Engine': 'border-orange-200 bg-orange-50',
-			'Interior': 'border-green-200 bg-green-50',
-			'Brakes': 'border-red-200 bg-red-50',
-			'Coupling': 'border-purple-200 bg-purple-50',
-			'Tank': 'border-indigo-200 bg-indigo-50',
-			'Safety': 'border-yellow-200 bg-yellow-50'
+	function getCategoryIcon(category: string) {
+		const icons: Record<string, any> = {
+			'Exterior': Truck,
+			'Engine': Cog,
+			'Interior': Settings,
+			'Brakes': Shield,
+			'Coupling': Wrench,
+			'Tank': Beaker,
+			'Safety': Shield
 		};
-		return colors[category] || 'border-gray-200 bg-gray-50';
+		return icons[category] || Shield;
 	}
 </script>
 
-<div class="pre-trip-inspection mobile-container">
+<div class="pre-trip-inspection font-sans text-sm text-slate-800">
 	<!-- Header -->
-	<div class="inspection-header mobile-sticky">
-		<div class="header-content">
-			<div class="truck-info">
-				<h1 class="inspection-title">Pre-Trip Inspection</h1>
-				<div class="vehicle-details">
-					<span class="truck-id">{truckId}</span>
-					<span class="separator">•</span>
-					<span class="trailer-id">{trailerNumber}</span>
+	<div class="inspection-header bg-white border-b border-slate-200 p-4 sticky top-0 z-20">
+		<div class="header-content max-w-4xl mx-auto flex justify-between items-center">
+			<div class="truck-info flex-1">
+				<h1 class="text-xl font-semibold text-slate-800">Pre-Trip Inspection</h1>
+				<div class="vehicle-details flex items-center gap-2 text-sm text-slate-600">
+					<span class="font-mono font-semibold text-slate-800">{truckId}</span>
+					<span>•</span>
+					<span class="font-mono font-semibold text-slate-800">{trailerNumber}</span>
 				</div>
-				<div class="inspection-meta">
-					<span class="driver-name">{driverName}</span>
-					<span class="separator">•</span>
-					<span class="inspection-date">{currentDate.toLocaleDateString()}</span>
+				<div class="inspection-meta flex items-center gap-2 text-xs text-slate-500">
+					<span>{driverName}</span>
+					<span>•</span>
+					<span>{currentDate.toLocaleDateString()}</span>
 				</div>
 			</div>
-			<div class="progress-indicator">
-				<div class="progress-circle">
-					<svg class="progress-ring" width="60" height="60">
-						<circle class="progress-ring-background" cx="30" cy="30" r="25" />
-						<circle 
-							class="progress-ring-progress" 
-							cx="30" cy="30" r="25"
-							style="stroke-dasharray: {157}; stroke-dashoffset: {157 - (157 * completionPercent / 100)}"
-						/>
+			<div class="progress-indicator flex flex-col items-center gap-2">
+				<div class="progress-circle relative w-16 h-16">
+					<svg class="progress-ring w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+						<circle class="progress-ring-background" cx="32" cy="32" r="28" 
+							fill="none" stroke="#e5e7eb" stroke-width="4" />
+						<circle class="progress-ring-progress" cx="32" cy="32" r="28"
+							fill="none" stroke="#059669" stroke-width="4" stroke-linecap="round"
+							style="stroke-dasharray: {176}; stroke-dashoffset: {176 - (176 * completionPercent / 100)}; transition: stroke-dashoffset 0.3s ease" />
 					</svg>
-					<span class="progress-text">{completionPercent}%</span>
+					<span class="absolute inset-0 flex items-center justify-center text-sm font-semibold text-slate-800">{completionPercent}%</span>
 				</div>
-				<div class="progress-stats">
-					<span class="completed-count">{completedItems}/{totalItems}</span>
+				<div class="progress-stats text-center text-xs">
+					<span class="text-green-600 font-semibold">{completedItems}/{totalItems}</span>
 					{#if failedItems > 0}
-						<span class="failed-count">{failedItems} defects</span>
+						<div class="text-red-500 font-semibold">{failedItems} defects</div>
 					{/if}
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<!-- Page Break Separator -->
+	<div class="page-break-separator border-t-2 border-slate-300 mt-6 pt-6 bg-slate-100">
+		<div class="max-w-4xl mx-auto px-4">
+			<h2 class="text-lg font-semibold text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-3">
+				<CheckCircle size={20} class="text-slate-600" />
+				Start Inspection
+			</h2>
+			<p class="text-sm text-slate-600">Complete all vehicle inspection categories below to proceed with your shift</p>
 		</div>
 	</div>
 
 	<!-- Inspection Form -->
-	<div class="inspection-content">
-		{#each Object.entries(groupedItems) as [category, items]}
-			<div class="category-section {getCategoryColor(category)}">
-				<div class="category-header">
-					<h2 class="category-title">{category} Inspection</h2>
-					<div class="category-progress">
-						<span class="completed-items">{items.filter(item => item.status !== 'pending').length}/{items.length}</span>
-						<span class="category-status">
-							{#if items.every(item => item.status === 'pass')}
-								✅ Complete
-							{:else if items.some(item => item.status === 'fail' || item.status === 'defect')}
-								⚠️ Issues Found
-							{:else if items.some(item => item.status !== 'pending')}
-								🔄 In Progress
-							{:else}
-								⏳ Pending
-							{/if}
-						</span>
+	<div class="inspection-content max-w-4xl mx-auto p-4">
+		<div class="inspection-grid grid gap-6">
+			{#each Object.entries(groupedItems) as [category, items]}
+				<div class="inspection-card rounded-lg border border-slate-300 bg-white p-4 shadow-sm">
+					<div class="inspection-card-header flex items-center justify-between mb-4 pb-3 border-b border-slate-200">
+						<h3 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+							<svelte:component this={getCategoryIcon(category)} size={16} class="text-slate-600" />
+							{category} Inspection
+						</h3>
+						<div class="category-progress flex items-center gap-3 text-xs">
+							<span class="bg-slate-100 text-slate-600 px-2 py-1 rounded font-mono font-semibold">
+								{items.filter(item => item.status !== 'pending').length}/{items.length}
+							</span>
+							<span class="text-slate-600 font-medium">
+								{#if items.every(item => item.status === 'pass')}
+									✅ Complete
+								{:else if items.some(item => item.status === 'fail' || item.status === 'defect')}
+									⚠️ Issues Found
+								{:else if items.some(item => item.status !== 'pending')}
+									🔄 In Progress
+								{:else}
+									⏳ Pending
+								{/if}
+							</span>
+						</div>
+					</div>
+					
+					<div class="category-description mb-4 p-3 bg-slate-50 rounded border-l-3 border-blue-300">
+						{#if category === 'Exterior'}
+							<p class="text-sm text-slate-600 italic">Inspect vehicle exterior components including tires, lights, and body condition</p>
+						{:else if category === 'Engine'}
+							<p class="text-sm text-slate-600 italic">Check engine compartment fluids, belts, and mechanical components</p>
+						{:else if category === 'Interior'}
+							<p class="text-sm text-slate-600 italic">Verify cab safety equipment and operational controls</p>
+						{:else if category === 'Brakes'}
+							<p class="text-sm text-slate-600 italic">Test braking system components and air pressure systems</p>
+						{:else if category === 'Coupling'}
+							<p class="text-sm text-slate-600 italic">Inspect trailer connection points and electrical systems</p>
+						{:else if category === 'Tank'}
+							<p class="text-sm text-slate-600 italic">Verify tank integrity and valve operation for safe transport</p>
+						{:else if category === 'Safety'}
+							<p class="text-sm text-slate-600 italic">Confirm emergency equipment and regulatory compliance</p>
+						{/if}
+					</div>
+
+					<div class="category-items grid grid-cols-2 gap-3">
+						{#each items as item}
+							<div class="inspection-item bg-white border border-slate-200 rounded p-3 {item.critical ? 'border-l-4 border-l-red-500' : ''}">
+								<div class="item-header flex justify-between items-start gap-3 mb-3">
+									<div class="item-description flex-1">
+										<span class="text-sm text-slate-700 leading-tight block">{item.description}</span>
+										{#if item.critical}
+											<span class="critical-badge bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded-full mt-1 inline-block">
+												Critical Safety Item
+											</span>
+										{/if}
+									</div>
+									<div class="item-actions flex-shrink-0">
+										{#if item.photoRequired || item.status === 'fail' || item.status === 'defect'}
+											<button 
+												class="photo-btn border border-blue-300 text-blue-600 bg-blue-50 hover:bg-blue-100 p-1.5 rounded flex items-center gap-1 transition-colors {item.photoTaken ? 'border-green-300 text-green-600 bg-green-50' : ''}"
+												on:click={() => takePhoto(item)}
+											>
+												<Camera size={14} />
+												{#if item.photoTaken}
+													<span class="text-xs">✓</span>
+												{/if}
+											</button>
+										{/if}
+									</div>
+								</div>
+								
+								<div class="status-controls grid grid-cols-3 gap-2">
+									<button 
+										class="status-btn border border-slate-400 text-slate-700 bg-transparent hover:bg-slate-100 px-2 py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 transition-colors {item.status === 'pass' ? 'border-green-500 text-green-700 bg-green-50' : ''}"
+										on:click={() => updateItemStatus(item.id, 'pass')}
+									>
+										<CheckCircle size={14} />
+										<span>Pass</span>
+									</button>
+									<button 
+										class="status-btn border border-slate-400 text-slate-700 bg-transparent hover:bg-slate-100 px-2 py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 transition-colors {item.status === 'fail' ? 'border-red-500 text-red-700 bg-red-50' : ''}"
+										on:click={() => updateItemStatus(item.id, 'fail')}
+									>
+										<XCircle size={14} />
+										<span>Fail</span>
+									</button>
+									<button 
+										class="status-btn border border-slate-400 text-slate-700 bg-transparent hover:bg-slate-100 px-2 py-1.5 rounded text-xs font-medium flex items-center justify-center gap-1 transition-colors {item.status === 'defect' ? 'border-orange-500 text-orange-700 bg-orange-50' : ''}"
+										on:click={() => updateItemStatus(item.id, 'defect')}
+									>
+										<AlertTriangle size={14} />
+										<span>Defect</span>
+									</button>
+								</div>
+
+								{#if item.status === 'fail' || item.status === 'defect'}
+									<div class="notes-section mt-3">
+										<textarea 
+											class="notes-input w-full min-h-[60px] border border-slate-300 rounded p-2 text-sm resize-vertical"
+											placeholder="Describe the issue (required for failures/defects)..."
+											value={item.notes || ''}
+											on:input={(e) => addNotes(item.id, (e.target as HTMLTextAreaElement)?.value || '')}
+										></textarea>
+									</div>
+								{/if}
+							</div>
+						{/each}
 					</div>
 				</div>
-				
-				<div class="category-description">
-					{#if category === 'Exterior'}
-						<p>Inspect vehicle exterior components including tires, lights, and body condition</p>
-					{:else if category === 'Engine'}
-						<p>Check engine compartment fluids, belts, and mechanical components</p>
-					{:else if category === 'Interior'}
-						<p>Verify cab safety equipment and operational controls</p>
-					{:else if category === 'Brakes'}
-						<p>Test braking system components and air pressure systems</p>
-					{:else if category === 'Coupling'}
-						<p>Inspect trailer connection points and electrical systems</p>
-					{:else if category === 'Tank'}
-						<p>Verify tank integrity and valve operation for safe transport</p>
-					{:else if category === 'Safety'}
-						<p>Confirm emergency equipment and regulatory compliance</p>
-					{/if}
-				</div>
-
-				<div class="category-items">
-					{#each items as item}
-						<div class="inspection-item {item.critical ? 'critical-item' : ''}">
-							<div class="item-header">
-								<div class="item-description">
-									<span class="item-text">{item.description}</span>
-									{#if item.critical}
-										<span class="critical-badge">Critical Safety Item</span>
-									{/if}
-								</div>
-								<div class="item-actions">
-									{#if item.photoRequired || item.status === 'fail' || item.status === 'defect'}
-										<button 
-											class="photo-btn tap-target {item.photoTaken ? 'photo-taken' : ''}"
-											on:click={() => takePhoto(item)}
-										>
-											<Camera size={16} />
-											{#if item.photoTaken}
-												<span class="photo-indicator">✓</span>
-											{/if}
-										</button>
-									{/if}
-								</div>
-							</div>
-							
-							<div class="status-controls">
-								<button 
-									class="status-btn pass-btn tap-target {item.status === 'pass' ? 'active' : ''}"
-									on:click={() => updateItemStatus(item.id, 'pass')}
-								>
-									<CheckCircle size={18} />
-									<span>Pass</span>
-								</button>
-								<button 
-									class="status-btn fail-btn tap-target {item.status === 'fail' ? 'active' : ''}"
-									on:click={() => updateItemStatus(item.id, 'fail')}
-								>
-									<XCircle size={18} />
-									<span>Fail</span>
-								</button>
-								<button 
-									class="status-btn defect-btn tap-target {item.status === 'defect' ? 'active' : ''}"
-									on:click={() => updateItemStatus(item.id, 'defect')}
-								>
-									<AlertTriangle size={18} />
-									<span>Defect</span>
-								</button>
-							</div>
-
-							{#if item.status === 'fail' || item.status === 'defect'}
-								<div class="notes-section">
-									<textarea 
-										class="notes-input mobile-input"
-										placeholder="Describe the issue (required for failures/defects)..."
-										value={item.notes || ''}
-										on:input={(e) => addNotes(item.id, (e.target as HTMLTextAreaElement)?.value || '')}
-									></textarea>
-								</div>
-							{/if}
-						</div>
-					{/each}
-				</div>
-			</div>
-		{/each}
+			{/each}
+		</div>
 	</div>
 
 	<!-- General Notes Section -->
-	<div class="general-notes-section">
-		<div class="notes-header">
-			<FileText size={20} />
-			<h3 class="notes-title">General Notes</h3>
+	<div class="general-notes-section max-w-4xl mx-auto m-4 p-5 bg-white border border-slate-200 rounded-lg shadow-sm">
+		<div class="notes-header flex items-center gap-2 mb-2">
+			<FileText size={20} class="text-slate-600" />
+			<h3 class="text-base font-semibold text-slate-800">General Notes</h3>
 		</div>
-		<div class="notes-description">
-			<p>Add any additional observations, concerns, or maintenance recommendations</p>
+		<div class="notes-description mb-3">
+			<p class="text-sm text-slate-600">Add any additional observations, concerns, or maintenance recommendations</p>
 		</div>
 		<textarea 
-			class="general-notes-input mobile-input"
+			class="general-notes-input w-full min-h-[100px] p-3 border border-slate-300 rounded text-sm leading-relaxed text-slate-700 bg-slate-50 resize-vertical transition-colors focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
 			placeholder="Enter any general observations, maintenance notes, or recommendations..."
 			bind:value={generalNotes}
 			rows="4"
@@ -313,45 +332,45 @@
 	</div>
 
 	<!-- Completion Section -->
-	<div class="completion-section">
+	<div class="completion-section max-w-4xl mx-auto p-4 bg-white border-t border-slate-200">
 		{#if failedItems > 0}
-			<div class="defect-summary">
-				<h3 class="defect-title">Defects Summary</h3>
+			<div class="defect-summary mb-4">
+				<h3 class="text-base font-semibold text-red-600 mb-2">Defects Summary</h3>
 				<textarea 
-					class="defect-notes mobile-input"
+					class="defect-notes w-full min-h-[80px] p-3 border border-slate-300 rounded text-sm resize-vertical"
 					placeholder="Additional notes about defects and corrective actions taken..."
 					bind:value={defectNotes}
 				></textarea>
 			</div>
 		{/if}
 
-		<div class="completion-actions">
-			<div class="completion-status">
+		<div class="completion-actions flex flex-col gap-3">
+			<div class="completion-status flex items-center gap-2 p-3 rounded border">
 				{#if criticalFailures > 0}
-					<div class="status-warning">
+					<div class="status-warning bg-red-50 border-red-200 text-red-700 flex items-center gap-2">
 						<AlertTriangle size={20} />
-						<span>Vehicle cannot operate with critical defects</span>
+						<span class="text-sm font-medium">Vehicle cannot operate with critical defects</span>
 					</div>
 				{:else if failedItems > 0}
-					<div class="status-defects">
+					<div class="status-defects bg-yellow-50 border-yellow-200 text-yellow-700 flex items-center gap-2">
 						<FileText size={20} />
-						<span>Defects noted - maintenance required</span>
+						<span class="text-sm font-medium">Defects noted - maintenance required</span>
 					</div>
 				{:else if canComplete}
-					<div class="status-ready">
+					<div class="status-ready bg-green-50 border-green-200 text-green-700 flex items-center gap-2">
 						<CheckCircle size={20} />
-						<span>Vehicle ready for operation</span>
+						<span class="text-sm font-medium">Vehicle ready for operation</span>
 					</div>
 				{:else}
-					<div class="status-incomplete">
+					<div class="status-incomplete bg-slate-50 border-slate-200 text-slate-700 flex items-center gap-2">
 						<AlertTriangle size={20} />
-						<span>Complete all inspections to continue</span>
+						<span class="text-sm font-medium">Complete all inspections to continue</span>
 					</div>
 				{/if}
 			</div>
 
 			<button 
-				class="complete-btn tap-target {canComplete ? 'enabled' : 'disabled'}"
+				class="complete-btn w-full p-4 rounded-lg text-base font-semibold border transition-all flex items-center justify-center gap-2 {canComplete ? 'border-green-500 text-green-700 bg-green-50 hover:bg-green-100' : 'border-slate-300 text-slate-400 bg-slate-50 cursor-not-allowed'}"
 				disabled={!canComplete}
 				on:click={completeInspection}
 			>
@@ -367,25 +386,25 @@
 
 <!-- Photo Modal -->
 {#if showPhotoModal && selectedItemForPhoto}
-	<div class="photo-modal-overlay">
-		<div class="photo-modal">
-			<div class="modal-header">
-				<h3>Photo Documentation</h3>
-				<button class="close-btn" on:click={() => showPhotoModal = false}>×</button>
+	<div class="photo-modal-overlay fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+		<div class="photo-modal bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+			<div class="modal-header flex justify-between items-center p-4 border-b border-slate-200">
+				<h3 class="text-lg font-semibold text-slate-800">Photo Documentation</h3>
+				<button class="close-btn text-slate-600 hover:text-slate-800 text-2xl w-8 h-8 flex items-center justify-center" on:click={() => showPhotoModal = false}>×</button>
 			</div>
-			<div class="modal-content">
-				<p class="photo-instruction">Take a photo of: {selectedItemForPhoto.description}</p>
-				<div class="camera-placeholder">
-					<Camera size={48} />
+			<div class="modal-content p-4 flex-1">
+				<p class="photo-instruction text-sm text-slate-700 mb-4">Take a photo of: {selectedItemForPhoto.description}</p>
+				<div class="camera-placeholder bg-slate-100 border-2 border-dashed border-slate-300 rounded p-8 text-center text-slate-600">
+					<Camera size={48} class="mx-auto mb-2" />
 					<p>Camera interface would appear here</p>
-					<p class="camera-note">(In production: live camera feed)</p>
+					<p class="camera-note text-xs text-slate-500 mt-2">(In production: live camera feed)</p>
 				</div>
 			</div>
-			<div class="modal-actions">
-				<button class="cancel-btn tap-target" on:click={() => showPhotoModal = false}>
+			<div class="modal-actions flex gap-3 p-4 border-t border-slate-200">
+				<button class="cancel-btn flex-1 border border-slate-300 text-slate-700 bg-slate-50 hover:bg-slate-100 py-3 rounded font-medium transition-colors" on:click={() => showPhotoModal = false}>
 					Cancel
 				</button>
-				<button class="capture-btn tap-target" on:click={completePhotoCapture}>
+				<button class="capture-btn flex-1 border border-blue-500 text-blue-700 bg-blue-50 hover:bg-blue-100 py-3 rounded font-medium transition-colors" on:click={completePhotoCapture}>
 					Capture Photo
 				</button>
 			</div>
@@ -394,607 +413,12 @@
 {/if}
 
 <style>
-	.pre-trip-inspection {
-		min-height: 100vh;
-		background: linear-gradient(135deg, #f8fafc 0%, #f0f9f0 50%, #e8f5e8 100%);
-		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-	}
-
-	.mobile-container {
-		max-width: 100%;
-		margin: 0 auto;
-		padding: 0;
-	}
-
-	@media (min-width: 768px) {
-		.mobile-container {
-			max-width: 768px;
-			padding: 0 16px;
-		}
-	}
-
-	/* Header */
-	.inspection-header {
-		background: rgba(255, 255, 255, 0.95);
-		backdrop-filter: blur(20px);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-		padding: 16px;
-		position: sticky;
-		top: 0;
-		z-index: 100;
-	}
-
-	.header-content {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 16px;
-	}
-
-	.truck-info {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.inspection-title {
-		font-size: 20px;
-		font-weight: 700;
-		color: #1e293b;
-		margin: 0 0 4px 0;
-	}
-
-	.vehicle-details {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		margin-bottom: 4px;
-	}
-
-	.truck-id, .trailer-id {
-		font-family: 'JetBrains Mono', monospace;
-		font-weight: 600;
-		color: #059669;
-		font-size: 14px;
-	}
-
-	.separator {
-		color: #6b7280;
-		font-weight: 300;
-	}
-
-	.inspection-meta {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 13px;
-		color: #6b7280;
-	}
-
-	/* Progress Indicator */
-	.progress-indicator {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 8px;
-	}
-
-	.progress-circle {
-		position: relative;
-		width: 60px;
-		height: 60px;
-	}
-
-	.progress-ring {
-		transform: rotate(-90deg);
-	}
-
-	.progress-ring-background {
-		fill: none;
-		stroke: #e5e7eb;
-		stroke-width: 3;
-	}
-
-	.progress-ring-progress {
-		fill: none;
-		stroke: #059669;
-		stroke-width: 3;
-		stroke-linecap: round;
-		transition: stroke-dashoffset 0.3s ease;
-	}
-
-	.progress-text {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		font-size: 14px;
-		font-weight: 600;
-		color: #1e293b;
-	}
-
-	.progress-stats {
-		text-align: center;
-		font-size: 12px;
-	}
-
-	.completed-count {
-		color: #059669;
-		font-weight: 600;
-	}
-
-	.failed-count {
-		color: #dc2626;
-		font-weight: 600;
-		display: block;
-		margin-top: 2px;
-	}
-
-	/* Content */
-	.inspection-content {
-		padding: 16px;
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
-	}
-
-	.category-section {
-		border: 1px solid;
-		border-radius: 12px;
-		padding: 16px;
-		background: rgba(255, 255, 255, 0.8);
-		backdrop-filter: blur(10px);
-		margin-bottom: 16px;
-	}
-
-	.category-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 12px;
-		padding-bottom: 8px;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-	}
-
-	.category-title {
-		font-size: 18px;
-		font-weight: 600;
-		color: #1e293b;
-		margin: 0;
-	}
-
-	.category-progress {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		font-size: 12px;
-	}
-
-	.completed-items {
-		background: rgba(148, 163, 184, 0.1);
-		color: #475569;
-		padding: 4px 8px;
-		border-radius: 6px;
-		font-weight: 600;
-		font-family: 'JetBrains Mono', monospace;
-	}
-
-	.category-status {
-		font-weight: 500;
-		color: #6b7280;
-	}
-
-	.category-description {
-		margin-bottom: 16px;
-		padding: 12px;
-		background: rgba(0, 0, 0, 0.02);
-		border-radius: 8px;
-		border-left: 3px solid rgba(59, 130, 246, 0.3);
-	}
-
-	.category-description p {
-		margin: 0;
-		font-size: 14px;
-		color: #4b5563;
-		line-height: 1.4;
-		font-style: italic;
-	}
-
-	.category-items {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 12px;
-		max-height: 80vh;
-		overflow-y: auto;
-	}
-
-	@media (min-width: 640px) {
+	/* Mobile responsiveness for inspection grid */
+	@media (max-width: 768px) {
 		.category-items {
-			grid-template-columns: repeat(2, 1fr);
+			grid-template-columns: 1fr;
 		}
-	}
-
-	@media (min-width: 768px) {
-		.category-items {
-			grid-template-columns: repeat(3, 1fr);
-		}
-	}
-
-	/* Inspection Items */
-	.inspection-item {
-		background: rgba(255, 255, 255, 0.9);
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		border-radius: 8px;
-		padding: 12px;
-		transition: all 0.2s ease;
-	}
-
-	.inspection-item.critical-item {
-		border-left: 4px solid #dc2626;
-		background: rgba(255, 255, 255, 0.95);
-	}
-
-	.item-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		gap: 12px;
-		margin-bottom: 12px;
-	}
-
-	.item-description {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.item-text {
-		font-size: 14px;
-		color: #374151;
-		line-height: 1.4;
-		display: block;
-	}
-
-	.critical-badge {
-		background: #fecaca;
-		color: #991b1b;
-		font-size: 10px;
-		font-weight: 600;
-		padding: 2px 6px;
-		border-radius: 8px;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		margin-top: 4px;
-		display: inline-block;
-	}
-
-	.item-actions {
-		flex-shrink: 0;
-	}
-
-	.photo-btn {
-		background: rgba(59, 130, 246, 0.1);
-		border: 1px solid rgba(59, 130, 246, 0.2);
-		border-radius: 6px;
-		color: #3b82f6;
-		padding: 6px;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		gap: 4px;
-		position: relative;
-		transition: all 0.2s ease;
-	}
-
-	.photo-btn.photo-taken {
-		background: rgba(16, 185, 129, 0.1);
-		border-color: rgba(16, 185, 129, 0.3);
-		color: #10b981;
-	}
-
-	.photo-indicator {
-		position: absolute;
-		top: -4px;
-		right: -4px;
-		background: #10b981;
-		color: white;
-		font-size: 10px;
-		width: 16px;
-		height: 16px;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	/* Status Controls */
-	.status-controls {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 8px;
-	}
-
-	.status-btn {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 6px;
-		padding: 10px 8px;
-		border-radius: 6px;
-		border: 1px solid;
-		background: rgba(255, 255, 255, 0.8);
-		cursor: pointer;
-		transition: all 0.2s ease;
-		font-size: 13px;
-		font-weight: 500;
-	}
-
-	.pass-btn {
-		border-color: #d1fae5;
-		color: #065f46;
-	}
-
-	.pass-btn.active {
-		background: #d1fae5;
-		border-color: #10b981;
-		color: #065f46;
-	}
-
-	.fail-btn {
-		border-color: #e5e7eb;
-		color: #991b1b;
-	}
-
-	.fail-btn.active {
-		background: #e5e7eb;
-		border-color: #dc2626;
-		color: #991b1b;
-	}
-
-	.defect-btn {
-		border-color: #e5e7eb;
-		color: #9a3412;
-	}
-
-	.defect-btn.active {
-		background: #e5e7eb;
-		border-color: #ea580c;
-		color: #9a3412;
-	}
-
-	/* Notes Section */
-	.notes-section {
-		margin-top: 12px;
-	}
-
-	.notes-input {
-		width: 100%;
-		min-height: 60px;
-		resize: vertical;
-		border: 1px solid #d1d5db;
-		border-radius: 6px;
-		padding: 8px 12px;
-		font-size: 14px;
-		font-family: inherit;
-		background: white;
-	}
-
-	/* Completion Section */
-	.completion-section {
-		padding: 16px;
-		background: rgba(255, 255, 255, 0.95);
-		border-top: 1px solid rgba(0, 0, 0, 0.1);
-		margin-top: auto;
-	}
-
-	.defect-summary {
-		margin-bottom: 16px;
-	}
-
-	.defect-title {
-		font-size: 16px;
-		font-weight: 600;
-		color: #dc2626;
-		margin: 0 0 8px 0;
-	}
-
-	.defect-notes {
-		width: 100%;
-		min-height: 80px;
-		resize: vertical;
-	}
-
-	.completion-actions {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-	}
-
-	.completion-status {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 12px;
-		border-radius: 8px;
-		font-size: 14px;
-		font-weight: 500;
-	}
-
-	.status-warning {
-		background: #fef2f2;
-		color: #991b1b;
-		border: 1px solid #fecaca;
-	}
-
-	.status-defects {
-		background: #fffbeb;
-		color: #92400e;
-		border: 1px solid #fde68a;
-	}
-
-	.status-ready {
-		background: #f0fdf4;
-		color: #166534;
-		border: 1px solid #bbf7d0;
-	}
-
-	.status-incomplete {
-		background: #f9fafb;
-		color: #374151;
-		border: 1px solid #d1d5db;
-	}
-
-	.complete-btn {
-		width: 100%;
-		padding: 16px;
-		border-radius: 12px;
-		font-size: 16px;
-		font-weight: 600;
-		border: none;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-	}
-
-	.complete-btn.enabled {
-		background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-		color: white;
-		box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-	}
-
-	.complete-btn.enabled:hover {
-		transform: translateY(-1px);
-		box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
-	}
-
-	.complete-btn.disabled {
-		background: #f3f4f6;
-		color: #9ca3af;
-		cursor: not-allowed;
-	}
-
-	/* Photo Modal */
-	.photo-modal-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.8);
-		z-index: 1000;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 16px;
-	}
-
-	.photo-modal {
-		background: white;
-		border-radius: 12px;
-		width: 100%;
-		max-width: 400px;
-		max-height: 90vh;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.modal-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 16px;
-		border-bottom: 1px solid #e5e7eb;
-	}
-
-	.modal-header h3 {
-		font-size: 18px;
-		font-weight: 600;
-		color: #1e293b;
-		margin: 0;
-	}
-
-	.close-btn {
-		background: none;
-		border: none;
-		font-size: 24px;
-		color: #6b7280;
-		cursor: pointer;
-		padding: 0;
-		width: 32px;
-		height: 32px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.modal-content {
-		padding: 16px;
-		flex: 1;
-	}
-
-	.photo-instruction {
-		font-size: 14px;
-		color: #374151;
-		margin: 0 0 16px 0;
-	}
-
-	.camera-placeholder {
-		background: #f3f4f6;
-		border: 2px dashed #d1d5db;
-		border-radius: 8px;
-		padding: 32px;
-		text-align: center;
-		color: #6b7280;
-	}
-
-	.camera-note {
-		font-size: 12px;
-		color: #9ca3af;
-		margin-top: 8px;
-	}
-
-	.modal-actions {
-		display: flex;
-		gap: 12px;
-		padding: 16px;
-		border-top: 1px solid #e5e7eb;
-	}
-
-	.cancel-btn, .capture-btn {
-		flex: 1;
-		padding: 12px;
-		border-radius: 8px;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.cancel-btn {
-		background: #f3f4f6;
-		color: #374151;
-		border: 1px solid #d1d5db;
-	}
-
-	.capture-btn {
-		background: #3b82f6;
-		color: white;
-		border: 1px solid #3b82f6;
-	}
-
-	.capture-btn:hover {
-		background: #2563eb;
-		transform: translateY(-1px);
-	}
-
-	/* Mobile Responsive */
-	@media (max-width: 480px) {
-		.inspection-header {
-			padding: 12px;
-		}
-
+		
 		.header-content {
 			flex-direction: column;
 			align-items: flex-start;
@@ -1005,81 +429,19 @@
 			align-self: flex-end;
 		}
 
-		.inspection-title {
-			font-size: 18px;
-		}
-
 		.status-controls {
 			grid-template-columns: 1fr;
 			gap: 6px;
 		}
+	}
 
-		.status-btn {
-			padding: 12px;
+	@media (max-width: 640px) {
+		.inspection-grid {
+			gap: 16px;
 		}
-	}
-
-	/* General Notes Section */
-	.general-notes-section {
-		margin: 16px;
-		padding: 20px;
-		background: rgba(255, 255, 255, 0.95);
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		border-radius: 12px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-	}
-
-	.notes-header {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		margin-bottom: 8px;
-	}
-
-	.notes-header svg {
-		color: #6b7280;
-	}
-
-	.notes-title {
-		font-size: 16px;
-		font-weight: 600;
-		color: #1e293b;
-		margin: 0;
-	}
-
-	.notes-description {
-		margin-bottom: 12px;
-	}
-
-	.notes-description p {
-		font-size: 13px;
-		color: #6b7280;
-		margin: 0;
-		line-height: 1.4;
-	}
-
-	.general-notes-input {
-		width: 100%;
-		min-height: 100px;
-		padding: 12px;
-		border: 1px solid rgba(0, 0, 0, 0.15);
-		border-radius: 8px;
-		font-size: 14px;
-		line-height: 1.5;
-		color: #374151;
-		background: rgba(255, 255, 255, 0.8);
-		resize: vertical;
-		font-family: inherit;
-		transition: border-color 0.2s ease, box-shadow 0.2s ease;
-	}
-
-	.general-notes-input:focus {
-		outline: none;
-		border-color: #3b82f6;
-		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-	}
-
-	.general-notes-input::placeholder {
-		color: #9ca3af;
+		
+		.inspection-card {
+			padding: 16px;
+		}
 	}
 </style> 

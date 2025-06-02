@@ -28,12 +28,24 @@
 	<!-- Header -->
 	<div class="dashboard-header">
 		<div class="header-content">
-			<div class="header-icon">
-				<TrendingUp size={32} />
+			<div class="header-left">
+				<div class="header-icon">
+					<TrendingUp size={24} />
+				</div>
+				<div class="header-text">
+					<h1 class="header-title">Executive Dashboard</h1>
+					<p class="header-subtitle">Strategic insights for PAA leadership</p>
+				</div>
 			</div>
-			<div class="header-text">
-				<h1 class="header-title">VeriHaul Executive Dashboard – Strategic Insights for PAA Leadership</h1>
-				<p class="header-subtitle">Strategic overview, KPIs, and financial performance</p>
+			<div class="header-actions">
+				<button class="action-button outline" type="button">
+					<BarChart3 size={16} />
+					<span>Export Report</span>
+				</button>
+				<button class="action-button outline" type="button">
+					<TrendingUp size={16} />
+					<span>Refresh Data</span>
+				</button>
 			</div>
 		</div>
 	</div>
@@ -256,57 +268,98 @@
 <style>
 	.executive-dashboard {
 		min-height: 100vh;
-		background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 50%, #e8f5e8 100%);
+		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f0f9ff 100%);
 		padding: 20px;
 	}
 
 	.dashboard-header {
-		background: rgba(255, 255, 255, 0.95);
+		background: rgba(255, 255, 255, 0.8);
 		backdrop-filter: blur(20px);
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		border-radius: 20px;
-		padding: 32px;
+		border: 1px solid rgba(226, 232, 240, 0.8);
+		border-radius: 12px;
+		padding: 16px 24px;
 		margin-bottom: 24px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	}
 
 	.header-content {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: 20px;
+		flex-wrap: wrap;
+	}
+
+	.header-left {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		flex: 1;
+		min-width: 0;
 	}
 
 	.header-icon {
-		font-size: 48px;
-		width: 80px;
-		height: 80px;
+		font-size: 32px;
+		width: 56px;
+		height: 56px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
-		border-radius: 20px;
+		border-radius: 16px;
 		color: white;
-		box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+		box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+		flex-shrink: 0;
 	}
 
 	.header-text h1 {
-		font-size: 32px;
+		font-size: 24px;
 		font-weight: 700;
 		color: #1e293b;
-		margin: 0 0 8px 0;
+		margin: 0 0 4px 0;
 		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+		white-space: nowrap;
 	}
 
 	.header-text p {
-		font-size: 16px;
+		font-size: 14px;
 		color: #64748b;
 		margin: 0;
+		white-space: nowrap;
+	}
+
+	.header-actions {
+		display: flex;
+		gap: 8px;
+		flex-shrink: 0;
+	}
+
+	.action-button {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 8px 16px;
+		background: transparent;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		color: #64748b;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.action-button:hover {
+		background: #f8fafc;
+		border-color: #cbd5e1;
+		color: #1e293b;
 	}
 
 	.nav-tabs {
 		display: flex;
-		gap: 12px;
-		margin-bottom: 32px;
+		gap: 8px;
+		margin-bottom: 24px;
 		overflow-x: auto;
 		padding: 4px;
 	}
@@ -314,31 +367,29 @@
 	.nav-tab {
 		display: flex;
 		align-items: center;
-		gap: 10px;
-		padding: 16px 24px;
-		background: rgba(255, 255, 255, 0.8);
-		border: 2px solid transparent;
-		border-radius: 12px;
+		gap: 8px;
+		padding: 12px 20px;
+		background: transparent;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
 		color: #64748b;
-		font-weight: 600;
+		font-size: 14px;
+		font-weight: 500;
 		cursor: pointer;
-		transition: all 0.3s ease;
-		backdrop-filter: blur(10px);
+		transition: all 0.2s ease;
 		white-space: nowrap;
 	}
 
 	.nav-tab:hover {
-		background: rgba(255, 255, 255, 0.95);
-		transform: translateY(-2px);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+		background: rgba(248, 250, 252, 0.8);
+		border-color: #cbd5e1;
 		color: #1e293b;
 	}
 
 	.nav-tab.active {
-		background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+		background: #1e293b;
 		color: white;
-		border-color: #10B981;
-		box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+		border-color: #1e293b;
 	}
 
 	.tab-icon {
@@ -350,12 +401,12 @@
 	}
 
 	.tab-content {
-		background: rgba(255, 255, 255, 0.95);
+		background: rgba(255, 255, 255, 0.8);
 		backdrop-filter: blur(20px);
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		border-radius: 20px;
-		padding: 32px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		border: 1px solid rgba(226, 232, 240, 0.8);
+		border-radius: 12px;
+		padding: 24px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	}
 
 	/* Metrics Grids */
@@ -365,29 +416,29 @@
 	.strategic-metrics {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: 24px;
-		margin-bottom: 40px;
+		gap: 20px;
+		margin-bottom: 32px;
 	}
 
 	/* Charts */
 	.charts-section {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-		gap: 32px;
+		gap: 24px;
 	}
 
 	.financial-charts {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-		gap: 32px;
+		gap: 24px;
 	}
 
 	.chart-container {
-		background: white;
-		border: 1px solid #e2e8f0;
-		border-radius: 16px;
-		padding: 24px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		background: rgba(255, 255, 255, 0.9);
+		border: 1px solid rgba(226, 232, 240, 0.8);
+		border-radius: 12px;
+		padding: 20px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	}
 
 	/* Mobile Responsiveness */
@@ -397,45 +448,55 @@
 		}
 
 		.dashboard-header {
-			padding: 24px 20px;
-			margin-bottom: 20px;
+			padding: 16px;
+			margin-bottom: 16px;
 		}
 
 		.header-content {
 			flex-direction: column;
-			text-align: center;
+			align-items: stretch;
 			gap: 16px;
 		}
 
-		.header-icon {
-			font-size: 40px;
-			width: 60px;
-			height: 60px;
+		.header-left {
+			flex-direction: column;
+			text-align: center;
+			gap: 12px;
 		}
 
-		.header-text h1 {
-			font-size: 28px;
-		}
-
-		.header-text p {
-			font-size: 14px;
-		}
-
-		.nav-tab {
-			padding: 12px 16px;
+		.header-actions {
+			flex-direction: column;
 			gap: 8px;
 		}
 
-		.tab-icon {
-			font-size: 16px;
+		.action-button {
+			justify-content: center;
+			width: 100%;
 		}
 
-		.tab-label {
+		.header-icon {
+			width: 48px;
+			height: 48px;
+			font-size: 24px;
+			align-self: center;
+		}
+
+		.header-text h1 {
+			font-size: 20px;
+		}
+
+		.header-text p {
+			font-size: 13px;
+		}
+
+		.nav-tab {
+			padding: 10px 14px;
+			gap: 6px;
 			font-size: 13px;
 		}
 
 		.tab-content {
-			padding: 24px 16px;
+			padding: 16px;
 		}
 
 		.hero-metrics,
@@ -444,13 +505,13 @@
 		.strategic-metrics {
 			grid-template-columns: 1fr;
 			gap: 16px;
-			margin-bottom: 32px;
+			margin-bottom: 24px;
 		}
 
 		.charts-section,
 		.financial-charts {
 			grid-template-columns: 1fr;
-			gap: 24px;
+			gap: 16px;
 		}
 
 		.chart-container {

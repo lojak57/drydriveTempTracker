@@ -5,9 +5,8 @@
   // Import all step components (will create these next)
   import JobOverviewStep from './steps/JobOverviewStep.svelte';
   import PreTripStep from './steps/PreTripStep.svelte';
-  import ToPickupStep from './steps/ToPickupStep.svelte';
+  import ToTransitStep from './steps/ToTransitStep.svelte';
   import LoadingStep from './steps/LoadingStep.svelte';
-  import ToDeliveryStep from './steps/ToDeliveryStep.svelte';
   import UnloadingStep from './steps/UnloadingStep.svelte';
   import PostTripStep from './steps/PostTripStep.svelte';
   
@@ -49,10 +48,11 @@
       on:inspection-complete={eventHandlers.handleInspectionComplete}
     />
   {:else if currentWorkflowView === 'to-pickup'}
-    <ToPickupStep 
+    <ToTransitStep 
       {pickupSubStep}
       {sharedState}
       {eventHandlers}
+      transitType="pickup"
     />
   {:else if currentWorkflowView === 'loading'}
     <LoadingStep 
@@ -61,11 +61,11 @@
       on:back-to-pickup={() => eventHandlers.navigateToStep('to-pickup')}
     />
   {:else if currentWorkflowView === 'to-delivery'}
-    <ToDeliveryStep 
+    <ToTransitStep 
       {deliverySubStep}
       {sharedState}
       {eventHandlers}
-      on:arrive-delivery={() => eventHandlers.navigateToStep('unloading')}
+      transitType="delivery"
     />
   {:else if currentWorkflowView === 'unloading'}
     <UnloadingStep 

@@ -1,14 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="font-sans bg-slate-50 text-slate-800">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>DryDrive - Oil Field Temperature Tracker</title>
 		<meta name="description" content="Professional oil field temperature tracking and fleet management system" />
+		<!-- Add Inter font from Google Fonts for consistency -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 		%sveltekit.head%
 	</head>
-	<body data-sveltekit-preload-data="hover" class="bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 min-h-screen">
+	<body data-sveltekit-preload-data="hover" class="font-sans bg-gradient-to-br from-slate-50 via-blue-50 to-emerald-50 min-h-screen antialiased">
 		<div style="display: contents">%sveltekit.body%</div>
 	</body>
 </html>

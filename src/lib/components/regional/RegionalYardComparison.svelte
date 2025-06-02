@@ -30,7 +30,7 @@
 			barrelsPerHour: 185.3,
 			utilizationRate: 85.7,
 			efficiency: 94.2,
-			rank: 1,
+			rank: 2,
 			trend: 'up',
 			status: 'excellent',
 			notes: 'Peak performer - model yard',
@@ -163,13 +163,14 @@
 		}
 	}
 
-	// Get rank badge color
-	function getRankColor(rank: number) {
-		switch (rank) {
-			case 1: return 'bg-yellow-500 text-white';
-			case 2: return 'bg-gray-400 text-white';
-			case 3: return 'bg-amber-600 text-white';
-			default: return 'bg-gray-300 text-gray-700';
+	// Get rank badge color - unified with performance status colors
+	function getRankColor(rank: number, status: string) {
+		// Color based on performance status, not arbitrary rank colors
+		switch (status) {
+			case 'excellent': return 'bg-green-600 text-white'; // Green for excellent performers
+			case 'good': return 'bg-blue-600 text-white';       // Blue for good performers  
+			case 'attention': return 'bg-red-600 text-white';   // Red for needs attention
+			default: return 'bg-slate-400 text-white';          // Neutral for unknown status
 		}
 	}
 
@@ -326,7 +327,7 @@
 						{#each yardComparison as yard}
 							<tr class="yard-row">
 								<td class="rank-cell">
-									<div class="rank-badge {getRankColor(yard.rank)}">
+									<div class="rank-badge {getRankColor(yard.rank, yard.status)}">
 										{yard.rank}
 									</div>
 								</td>

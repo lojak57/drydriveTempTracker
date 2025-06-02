@@ -3,12 +3,14 @@
 	import OptimizationPanel from './OptimizationPanel.svelte';
 	import { fleetStats, calibrationConfig } from '$lib/stores/calibrationData';
 	import { createEventDispatcher } from 'svelte';
+	import { Info } from 'lucide-svelte';
 
 	const dispatch = createEventDispatcher();
 
 	let selectedView: 'overview' | 'fleet' | 'optimization' = 'overview';
 	let truckViewMode: 'table' | 'grid' = 'table';
 	let filterStatus: 'all' | 'good' | 'warning' | 'critical' = 'all';
+	let activeTab: 'overview' | 'calibrations' | 'alerts' = 'overview';
 
 	// Status distribution for overview
 	$: statusDistribution = {
@@ -36,7 +38,7 @@
 	<div class="recommender-header">
 		<div class="header-content">
 			<div class="title-section">
-				<h1 class="main-title">Smart Calibration Recommender</h1>
+				<h1 class="main-title">Coriolis Calibration Status</h1>
 				<p class="subtitle">AI-powered fleet monitoring • Data-driven calibration recommendations</p>
 			</div>
 			
@@ -47,11 +49,21 @@
 				</div>
 				<div class="stat-item">
 					<span class="stat-value">{$fleetStats.calibrationsAvoided}</span>
-					<span class="stat-label">Avoided This Month</span>
+					<span class="stat-label">Calibrations Skipped This Month</span>
+					<div class="tooltip-container">
+						<Info size={14} class="info-icon" />
+						<div class="tooltip">Scheduled calibrations that were bypassed or postponed</div>
+					</div>
 				</div>
 				<div class="stat-item">
 					<span class="stat-value">{statusDistribution.good.toFixed(0)}%</span>
-					<span class="stat-label">Fleet Health</span>
+					<span class="stat-label">
+						Fleet Health
+						<div class="tooltip-container">
+							<Info size={14} class="info-icon" />
+							<div class="tooltip">Fleet Health is calculated using calibration consistency, calibration recency, and load deviation thresholds.</div>
+						</div>
+					</span>
 				</div>
 			</div>
 		</div>
@@ -86,7 +98,7 @@
 	<div class="content-area">
 		{#if selectedView === 'overview'}
 			<div class="overview-layout">
-				<!-- Fleet Health Overview -->
+				<!-- Fleet Health Overview - Resized and centered -->
 				<div class="health-overview">
 					<h3 class="section-title">Fleet Consistency Overview</h3>
 					
@@ -129,32 +141,115 @@
 					</div>
 				</div>
 
-				<!-- Quick Actions -->
-				<div class="quick-actions">
-					<h3 class="section-title">Quick Actions</h3>
-					
-					<div class="actions-grid">
-						<button class="action-card" on:click={() => selectedView = 'fleet'}>
-							<div class="action-icon">📋</div>
-							<div class="action-title">View Fleet Details</div>
-							<div class="action-description">See individual truck status and metrics</div>
+				<!-- Tabbed Content Section -->
+				<div class="tabbed-section">
+					<div class="tabs-header">
+						<button 
+							class="tab-btn" 
+							class:active={activeTab === 'overview'}
+							on:click={() => activeTab = 'overview'}
+						>
+							Overview
 						</button>
-						
-						<button class="action-card" on:click={() => filterStatus = 'critical'}>
-							<div class="action-icon">🚨</div>
-							<div class="action-title">Critical Trucks</div>
-							<div class="action-description">View {$fleetStats.critical} trucks needing immediate attention</div>
+						<button 
+							class="tab-btn" 
+							class:active={activeTab === 'calibrations'}
+							on:click={() => activeTab = 'calibrations'}
+						>
+							Calibration History
 						</button>
-						
-						<button class="action-card" on:click={() => selectedView = 'optimization'}>
-							<div class="action-icon">📈</div>
-							<div class="action-title">View Savings</div>
-							<div class="action-description">See optimization impact and recommendations</div>
+						<button 
+							class="tab-btn" 
+							class:active={activeTab === 'alerts'}
+							on:click={() => activeTab = 'alerts'}
+						>
+							Calibration Alerts
 						</button>
+					</div>
+
+					<div class="tab-content">
+						{#if activeTab === 'overview'}
+							<div class="tab-panel">
+								<div class="actions-grid">
+									<button class="action-card" on:click={() => selectedView = 'fleet'}>
+										<div class="action-icon">📋</div>
+										<div class="action-title">View Fleet Details</div>
+										<div class="action-description">See individual truck status and metrics</div>
+									</button>
+									
+									<button class="action-card" on:click={() => filterStatus = 'critical'}>
+										<div class="action-icon">🚨</div>
+										<div class="action-title">Critical Trucks</div>
+										<div class="action-description">View {$fleetStats.critical} trucks needing immediate attention</div>
+									</button>
+									
+									<button class="action-card" on:click={() => selectedView = 'optimization'}>
+										<div class="action-icon">📈</div>
+										<div class="action-title">View Savings</div>
+										<div class="action-description">See optimization impact and recommendations</div>
+									</button>
+								</div>
+							</div>
+						{:else if activeTab === 'calibrations'}
+							<div class="tab-panel">
+								<div class="history-content">
+									<h4>Recent Calibration Activity</h4>
+									<div class="activity-list">
+										<div class="activity-item">
+											<div class="activity-icon">✅</div>
+											<div class="activity-content">
+												<div class="activity-title">PLN-027 Calibrated</div>
+												<div class="activity-time">2 days ago</div>
+											</div>
+										</div>
+										<div class="activity-item">
+											<div class="activity-icon">✅</div>
+											<div class="activity-content">
+												<div class="activity-title">PLN-156 Calibrated</div>
+												<div class="activity-time">5 days ago</div>
+											</div>
+										</div>
+										<div class="activity-item">
+											<div class="activity-icon">⏸️</div>
+											<div class="activity-content">
+												<div class="activity-title">PLN-089 Calibration Skipped</div>
+												<div class="activity-time">1 week ago</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						{:else if activeTab === 'alerts'}
+							<div class="tab-panel">
+								<div class="alerts-content">
+									<h4>Active Calibration Alerts</h4>
+									<div class="alert-list">
+										{#if $fleetStats.critical > 0}
+											<div class="alert-item critical">
+												<div class="alert-icon">🔴</div>
+												<div class="alert-content">
+													<div class="alert-title">{$fleetStats.critical} Critical Trucks</div>
+													<div class="alert-description">Immediate calibration required</div>
+												</div>
+											</div>
+										{/if}
+										{#if $fleetStats.warning > 0}
+											<div class="alert-item warning">
+												<div class="alert-icon">⚠️</div>
+												<div class="alert-content">
+													<div class="alert-title">{$fleetStats.warning} Trucks Need Attention</div>
+													<div class="alert-description">Schedule calibration within 7 days</div>
+												</div>
+											</div>
+										{/if}
+									</div>
+								</div>
+							</div>
+						{/if}
 					</div>
 				</div>
 
-				<!-- Recent Activity -->
+				<!-- System Intelligence -->
 				<div class="recent-activity">
 					<h3 class="section-title">System Intelligence</h3>
 					
@@ -235,15 +330,16 @@
 <style>
 	.recommender-container {
 		min-height: 100vh;
-		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+		background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+		color: #e2e8f0;
 	}
 
 	.recommender-header {
-		background: rgba(255, 255, 255, 0.95);
+		background: rgba(15, 23, 42, 0.95);
 		backdrop-filter: blur(20px);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 		padding: 24px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 	}
 
 	.header-content {
@@ -263,17 +359,13 @@
 	.main-title {
 		font-size: 32px;
 		font-weight: 800;
-		color: #0f172a;
+		color: #e2e8f0;
 		margin: 0 0 8px 0;
-		background: linear-gradient(135deg, #059669, #047857);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
 	}
 
 	.subtitle {
 		font-size: 16px;
-		color: #64748b;
+		color: #94a3b8;
 		margin: 0;
 	}
 
@@ -285,26 +377,67 @@
 	.stat-item {
 		text-align: center;
 		padding: 12px 16px;
-		background: rgba(248, 250, 252, 0.8);
+		background: rgba(30, 41, 59, 0.8);
 		border-radius: 8px;
-		border: 1px solid rgba(0, 0, 0, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		position: relative;
 	}
 
 	.stat-value {
 		display: block;
 		font-size: 24px;
 		font-weight: 700;
-		color: #0f172a;
+		color: #e2e8f0;
 		font-family: 'JetBrains Mono', monospace;
 	}
 
 	.stat-label {
-		display: block;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 4px;
 		font-size: 11px;
-		color: #64748b;
+		color: #94a3b8;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 		margin-top: 2px;
+	}
+
+	.tooltip-container {
+		position: relative;
+		display: inline-block;
+	}
+
+	.info-icon {
+		color: #64748b;
+		cursor: pointer;
+	}
+
+	.info-icon:hover {
+		color: #94a3b8;
+	}
+
+	.tooltip {
+		position: absolute;
+		bottom: 100%;
+		left: 50%;
+		transform: translateX(-50%);
+		background: rgba(15, 23, 42, 0.95);
+		color: #e2e8f0;
+		padding: 8px 12px;
+		border-radius: 6px;
+		font-size: 12px;
+		white-space: nowrap;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		z-index: 1000;
+		margin-bottom: 8px;
+	}
+
+	.tooltip-container:hover .tooltip {
+		opacity: 1;
 	}
 
 	.nav-tabs {
@@ -316,9 +449,9 @@
 
 	.nav-tab {
 		padding: 12px 20px;
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		background: rgba(255, 255, 255, 0.8);
-		color: #64748b;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: rgba(30, 41, 59, 0.8);
+		color: #94a3b8;
 		font-weight: 500;
 		cursor: pointer;
 		transition: all 0.2s ease;
@@ -327,15 +460,15 @@
 	}
 
 	.nav-tab:hover {
-		background: rgba(255, 255, 255, 0.9);
-		border-color: rgba(0, 0, 0, 0.15);
+		background: rgba(51, 65, 85, 0.9);
+		border-color: rgba(255, 255, 255, 0.2);
 	}
 
 	.nav-tab.active {
-		background: white;
-		color: #059669;
-		border-bottom-color: white;
-		box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+		background: rgba(51, 65, 85, 0.95);
+		color: #e2e8f0;
+		border-bottom-color: rgba(51, 65, 85, 0.95);
+		box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 	}
 
 	.content-area {
@@ -346,23 +479,24 @@
 
 	.overview-layout {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: 480px 1fr;
 		grid-template-rows: auto auto;
 		gap: 24px;
 	}
 
 	.health-overview {
-		background: rgba(255, 255, 255, 0.95);
-		border: 1px solid rgba(0, 0, 0, 0.1);
+		background: rgba(30, 41, 59, 0.95);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
-		padding: 20px;
-		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+		padding: 16px;
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+		max-width: 480px;
 	}
 
 	.section-title {
 		font-size: 18px;
 		font-weight: 600;
-		color: #0f172a;
+		color: #e2e8f0;
 		margin: 0 0 16px 0;
 	}
 
@@ -378,28 +512,14 @@
 		gap: 16px;
 		padding: 16px;
 		border-radius: 8px;
-		border: 1px solid rgba(0, 0, 0, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		transition: all 0.2s ease;
+		background: rgba(51, 65, 85, 0.3);
 	}
 
 	.health-card:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	}
-
-	.health-card.good {
-		background: rgba(34, 197, 94, 0.05);
-		border-color: rgba(34, 197, 94, 0.2);
-	}
-
-	.health-card.warning {
-		background: rgba(245, 158, 11, 0.05);
-		border-color: rgba(245, 158, 11, 0.2);
-	}
-
-	.health-card.critical {
-		background: rgba(239, 68, 68, 0.05);
-		border-color: rgba(239, 68, 68, 0.2);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 	}
 
 	.health-icon {
@@ -413,36 +533,73 @@
 	.health-count {
 		font-size: 24px;
 		font-weight: 700;
-		color: #0f172a;
+		color: #e2e8f0;
 		font-family: 'JetBrains Mono', monospace;
 	}
 
 	.health-label {
 		font-size: 14px;
 		font-weight: 500;
-		color: #475569;
+		color: #cbd5e1;
 		margin-top: 2px;
 	}
 
 	.health-percentage {
 		font-size: 12px;
-		color: #64748b;
+		color: #94a3b8;
 		font-weight: 600;
 	}
 
 	.health-description {
 		font-size: 11px;
-		color: #94a3b8;
+		color: #64748b;
 		text-align: right;
 		line-height: 1.3;
 	}
 
-	.quick-actions {
-		background: rgba(255, 255, 255, 0.95);
-		border: 1px solid rgba(0, 0, 0, 0.1);
+	.tabbed-section {
+		background: rgba(30, 41, 59, 0.95);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
+		overflow: hidden;
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+	}
+
+	.tabs-header {
+		display: flex;
+		background: rgba(15, 23, 42, 0.5);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.tab-btn {
+		flex: 1;
+		padding: 12px 16px;
+		background: transparent;
+		border: none;
+		color: #94a3b8;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		border-bottom: 2px solid transparent;
+	}
+
+	.tab-btn:hover {
+		background: rgba(51, 65, 85, 0.3);
+		color: #cbd5e1;
+	}
+
+	.tab-btn.active {
+		color: #e2e8f0;
+		border-bottom-color: #3b82f6;
+		background: rgba(51, 65, 85, 0.5);
+	}
+
+	.tab-content {
 		padding: 20px;
-		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+	}
+
+	.tab-panel {
+		min-height: 200px;
 	}
 
 	.actions-grid {
@@ -456,8 +613,8 @@
 		align-items: center;
 		gap: 16px;
 		padding: 16px;
-		background: rgba(248, 250, 252, 0.8);
-		border: 1px solid rgba(0, 0, 0, 0.05);
+		background: rgba(51, 65, 85, 0.3);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px;
 		cursor: pointer;
 		transition: all 0.2s ease;
@@ -465,9 +622,9 @@
 	}
 
 	.action-card:hover {
-		background: rgba(255, 255, 255, 0.9);
+		background: rgba(71, 85, 105, 0.4);
 		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 	}
 
 	.action-icon {
@@ -479,29 +636,67 @@
 	.action-title {
 		font-size: 14px;
 		font-weight: 600;
-		color: #0f172a;
+		color: #e2e8f0;
 		margin-bottom: 4px;
 	}
 
 	.action-description {
 		font-size: 12px;
-		color: #64748b;
+		color: #94a3b8;
 		line-height: 1.3;
+	}
+
+	.history-content, .alerts-content {
+		color: #e2e8f0;
+	}
+
+	.history-content h4, .alerts-content h4 {
+		color: #e2e8f0;
+		margin-bottom: 16px;
+	}
+
+	.activity-list, .alert-list {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.alert-item {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 12px;
+		border-radius: 8px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	.alert-item.critical {
+		background: rgba(239, 68, 68, 0.1);
+		border-color: rgba(239, 68, 68, 0.3);
+	}
+
+	.alert-item.warning {
+		background: rgba(245, 158, 11, 0.1);
+		border-color: rgba(245, 158, 11, 0.3);
+	}
+
+	.alert-title {
+		font-weight: 600;
+		color: #e2e8f0;
+	}
+
+	.alert-description {
+		font-size: 12px;
+		color: #94a3b8;
 	}
 
 	.recent-activity {
 		grid-column: 1 / -1;
-		background: rgba(255, 255, 255, 0.95);
-		border: 1px solid rgba(0, 0, 0, 0.1);
+		background: rgba(30, 41, 59, 0.95);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 12px;
 		padding: 20px;
-		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-	}
-
-	.activity-list {
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 	}
 
 	.activity-item {
@@ -509,9 +704,10 @@
 		align-items: flex-start;
 		gap: 16px;
 		padding: 16px;
-		background: rgba(248, 250, 252, 0.8);
-		border: 1px solid rgba(0, 0, 0, 0.05);
+		background: rgba(51, 65, 85, 0.3);
+		border: 1px solid rgba(255, 255, 255, 0.1);
 		border-radius: 8px;
+		margin-bottom: 12px;
 	}
 
 	.activity-icon {
@@ -524,20 +720,20 @@
 	.activity-title {
 		font-size: 14px;
 		font-weight: 600;
-		color: #0f172a;
+		color: #e2e8f0;
 		margin-bottom: 4px;
 	}
 
 	.activity-description {
 		font-size: 13px;
-		color: #64748b;
+		color: #94a3b8;
 		line-height: 1.4;
 		margin-bottom: 4px;
 	}
 
 	.activity-time {
 		font-size: 11px;
-		color: #94a3b8;
+		color: #64748b;
 		font-weight: 500;
 	}
 
@@ -612,6 +808,10 @@
 			grid-template-rows: auto;
 		}
 
+		.health-overview {
+			max-width: 100%;
+		}
+
 		.recent-activity {
 			grid-column: 1;
 		}
@@ -627,6 +827,7 @@
 		.header-stats {
 			align-self: stretch;
 			justify-content: space-between;
+			flex-wrap: wrap;
 		}
 
 		.nav-tabs {

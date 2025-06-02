@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { DemoYardData } from '$lib/stores/dispatchAnalytics';
 	import { AlertTriangle, TrendingUp, TrendingDown, MapPin, Truck, Activity } from 'lucide-svelte';
+	import { STATUS_INDICATORS, LABELS } from '$lib/constants';
 
 	export let yard: DemoYardData;
 	export let handleDrillDown: (targetLevel: string, id?: string) => void;
@@ -11,11 +12,11 @@
 
 	function getStatusColor(status: string) {
 		switch (status) {
-			case 'excellent': return 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/20';
-			case 'good': return 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/20';
-			case 'attention': return 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/20';
-			case 'critical': return 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/20';
-			default: return 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/20';
+			case 'excellent': return 'text-success bg-green-100 text-success-dark dark:bg-green-900/20';
+			case 'good': return 'text-info bg-blue-100 text-info-dark dark:bg-blue-900/20';
+			case 'attention': return 'text-warning bg-yellow-100 text-warning-dark dark:bg-yellow-900/20';
+			case 'critical': return 'text-error bg-red-100 text-error-dark dark:bg-red-900/20';
+			default: return 'text-neutral bg-gray-100 text-neutral-dark dark:bg-gray-900/20';
 		}
 	}
 
@@ -71,11 +72,11 @@
 				<div class="metric-label">Efficiency</div>
 				<div class="metric-value efficiency-metric">
 					{#if efficiencyTrend === 'up'}
-						<TrendingUp class="w-4 h-4 text-green-500" />
+						<TrendingUp class="w-4 h-4 text-success" />
 					{:else}
-						<TrendingDown class="w-4 h-4 text-red-500" />
+						<TrendingDown class="w-4 h-4 text-error" />
 					{/if}
-					{yard.efficiency.toFixed(1)}%
+					<span class="text-highlight">{yard.efficiency.toFixed(1)}%</span>
 				</div>
 			</div>
 			
@@ -89,7 +90,9 @@
 			<div class="metric">
 				<div class="metric-label">Volume Loss</div>
 				<div class="metric-value">
-					{yard.avgVolumeLoss.toFixed(1)}%
+					<span class="{yard.avgVolumeLoss > 3 ? 'text-error' : yard.avgVolumeLoss > 1.5 ? 'text-warning' : 'text-success'}">
+						{yard.avgVolumeLoss.toFixed(1)}%
+					</span>
 				</div>
 			</div>
 			
@@ -181,19 +184,19 @@
 	}
 
 	.alert-item.severity-low {
-		@apply text-blue-600 dark:text-blue-400;
+		@apply text-info text-info-dark;
 	}
 
 	.alert-item.severity-medium {
-		@apply text-yellow-600 dark:text-yellow-400;
+		@apply text-warning text-warning-dark;
 	}
 
 	.alert-item.severity-high {
-		@apply text-orange-600 dark:text-orange-400;
+		@apply text-warning text-warning-dark;
 	}
 
 	.alert-item.severity-critical {
-		@apply text-red-600 dark:text-red-400;
+		@apply text-error text-error-dark;
 	}
 
 	.card-footer {
@@ -201,6 +204,6 @@
 	}
 
 	.click-hint {
-		@apply text-xs text-gray-400 dark:text-gray-500;
+		@apply text-xs text-neutral text-neutral-dark;
 	}
 </style> 

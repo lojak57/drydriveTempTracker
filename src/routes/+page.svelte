@@ -6,37 +6,37 @@
 		{
 			id: 'executive',
 			title: 'Executive',
-			icon: 'TrendingUp',
+			icon: 'TrendingUp' as const,
 			description: 'Strategic overview, KPIs, and financial performance',
 			href: '/executive'
 		},
 		{
+			id: 'regional',
+			title: 'Regional Manager',
+			icon: 'MapPin' as const,
+			description: 'Multi-yard oversight, regional analytics, and strategic planning',
+			href: '/regional'
+		},
+		{
+			id: 'yard',
+			title: 'Yard Manager',
+			icon: 'Warehouse' as const,
+			description: 'Fleet overview, driver management, and yard operations',
+			href: '/yard'
+		},
+		{
 			id: 'driver',
 			title: 'Driver',
-			icon: 'Truck',
+			icon: 'Truck' as const,
 			description: 'Schedule, pre-trip inspection, and job management',
 			href: '/driver'
 		},
 		{
 			id: 'dispatch',
 			title: 'Dispatch',
-			icon: 'Radio',
+			icon: 'Radio' as const,
 			description: 'Route planning, fleet status, and active hauls',
 			href: '/dispatch'
-		},
-		{
-			id: 'yard',
-			title: 'Yard Manager',
-			icon: 'Warehouse',
-			description: 'Fleet overview, driver management, and yard operations',
-			href: '/yard'
-		},
-		{
-			id: 'regional',
-			title: 'Regional Manager',
-			icon: 'MapPin',
-			description: 'Multi-yard oversight, regional analytics, and strategic planning',
-			href: '/regional'
 		}
 	];
 </script>

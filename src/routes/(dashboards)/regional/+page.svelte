@@ -1,7 +1,6 @@
 <script lang="ts">
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import RegionalYardComparison from '$lib/components/regional/RegionalYardComparison.svelte';
-	import { MapPin, Truck, BarChart3, Shield, TrendingUp, Users, Clock, Target } from 'lucide-svelte';
 
 	// Regional comparison state
 	let showYardComparison = false;
@@ -10,31 +9,27 @@
 	// Active region filter
 	let activeRegion = 'Gulf Coast';
 	
-	// Regional data structure - modular and scalable with industrial colors
+	// Regional data structure - consolidated to regional rollups only (no states)
 	const regions = [
 		{
 			id: 'gulf-coast',
 			name: 'Gulf Coast',
-			color: '#475569', // Steel gray
-			states: ['TX', 'LA', 'MS', 'AL', 'FL']
+			color: '#475569' // Steel gray
 		},
 		{
 			id: 'southwest',
-			name: 'Southwest (TX)',
-			color: '#B45309', // Industrial orange
-			states: ['TX']
+			name: 'Southwest TX',
+			color: '#B45309' // Industrial orange
 		},
 		{
 			id: 'rockies',
 			name: 'Rockies',
-			color: '#374151', // Dark charcoal
-			states: ['CO', 'WY', 'MT', 'ND']
+			color: '#374151' // Dark charcoal
 		},
 		{
 			id: 'midcon',
-			name: 'Midcon (OK, OH, VA, PA)',
-			color: '#7C2D12', // Deep rust red
-			states: ['OK', 'OH', 'VA', 'PA']
+			name: 'Midcon',
+			color: '#7C2D12' // Deep rust red
 		}
 	];
 
@@ -65,7 +60,7 @@
 			trend: 'up',
 			status: 'excellent'
 		},
-		'Southwest (TX)': {
+		'Southwest TX': {
 			fleetSize: 89,
 			activeTrucks: 78,
 			driversAssigned: 156,
@@ -89,7 +84,7 @@
 			trend: 'down',
 			status: 'attention'
 		},
-		'Midcon (OK, OH, VA, PA)': {
+		'Midcon': {
 			fleetSize: 104,
 			activeTrucks: 92,
 			driversAssigned: 178,
@@ -122,22 +117,22 @@
 		selectedRegion = '';
 	}
 
-	// Status color mapping - industrial palette
+	// Status color mapping - using only green/red for performance indicators
 	function getStatusColor(status: string) {
 		switch (status) {
-			case 'excellent': return 'bg-slate-700'; // Dark steel for excellent
-			case 'good': return 'bg-orange-600'; // Industrial orange for good
-			case 'attention': return 'bg-red-700'; // Deep red for attention
-			default: return 'bg-gray-500';
+			case 'excellent': return 'bg-green-600'; // Green for excellent
+			case 'good': return 'bg-slate-600'; // Neutral for good
+			case 'attention': return 'bg-red-600'; // Red for attention
+			default: return 'bg-slate-500';
 		}
 	}
 
-	// Trend color mapping - industrial palette
+	// Trend color mapping - only green/red for performance indicators
 	function getTrendColor(trend: string) {
 		switch (trend) {
-			case 'up': return 'text-slate-700'; // Dark steel for positive
-			case 'down': return 'text-red-700'; // Deep red for negative
-			default: return 'text-gray-600';
+			case 'up': return 'text-green-600'; // Green for positive
+			case 'down': return 'text-red-600'; // Red for negative
+			default: return 'text-slate-600';
 		}
 	}
 
@@ -146,51 +141,113 @@
 		const region = regions.find(r => r.name === regionName);
 		return region ? region.color : '#6B7280';
 	}
+
+	// Get performance-based bar color (dark default, red for low performers)
+	function getPerformanceBarColor(value: number, metric: string) {
+		let threshold = 0;
+		switch (metric) {
+			case 'bpd': threshold = 2000; break;
+			case 'efficiency': threshold = 88; break;
+			case 'bph': threshold = 150; break;
+			default: threshold = 0;
+		}
+		
+		return value < threshold ? '#ef4444' : '#1e293b'; // Red for low performers, navy for others
+	}
+
+	// Check if region needs attention (for alert icons)
+	function needsAttention(value: number, metric: string) {
+		let threshold = 0;
+		switch (metric) {
+			case 'bpd': threshold = 2000; break;
+			case 'efficiency': threshold = 88; break;
+			case 'bph': threshold = 150; break;
+			default: threshold = 0;
+		}
+		
+		return value < threshold;
+	}
+
+	// Dropdown menu state
+	let hoveredRegion = '';
+	let dropdownTimeout: number;
+
+	// Handle dropdown visibility
+	function showDropdown(regionName: string) {
+		clearTimeout(dropdownTimeout);
+		hoveredRegion = regionName;
+	}
+
+	function hideDropdown() {
+		dropdownTimeout = setTimeout(() => {
+			hoveredRegion = '';
+		}, 150);
+	}
+
+	function keepDropdown() {
+		clearTimeout(dropdownTimeout);
+	}
 </script>
 
 <svelte:head>
 	<title>Regional Manager Dashboard - Oil Field Temp Tracker</title>
 </svelte:head>
 
-<div class="regional-dashboard">
-	<!-- Header -->
-	<div class="dashboard-header">
+<div class="regional-dashboard font-sans text-sm text-slate-800">
+	<!-- Darker Header Banner -->
+	<div class="dashboard-header bg-slate-800 text-white">
 		<div class="header-content">
-			<div class="header-icon">
-				<MapPin size={32} />
-			</div>
 			<div class="header-text">
-				<h1 class="header-title">Regional Manager Dashboard</h1>
-				<p class="header-subtitle">Multi-region oversight and performance comparison</p>
+				<h1 class="header-title text-xl font-semibold">Regional Manager Dashboard</h1>
+				<p class="header-subtitle text-slate-300">Multi-region oversight and performance comparison</p>
 			</div>
 		</div>
 	</div>
 
-	<!-- Region Filters -->
+	<!-- Region Filters with Hover Dropdowns -->
 	<div class="region-filters">
 		{#each regions as region}
-			<button 
-				class="region-filter"
-				class:active={activeRegion === region.name}
-				style="--region-color: {region.color}"
-				on:click={() => selectRegion(region.name)}
-			>
-				<div class="filter-indicator" style="background-color: {region.color}"></div>
-				<div class="filter-content">
-					<span class="filter-name">{region.name}</span>
-					<span class="filter-states">{region.states.join(', ')}</span>
-				</div>
-			</button>
+			<div class="region-dropdown-container">
+				<button 
+					class="region-filter"
+					class:active={activeRegion === region.name}
+					style="--region-color: {region.color}"
+					on:click={() => selectRegion(region.name)}
+					on:mouseenter={() => showDropdown(region.name)}
+					on:mouseleave={hideDropdown}
+				>
+					<div class="filter-indicator" style="background-color: {region.color}"></div>
+					<div class="filter-content">
+						<span class="filter-name text-slate-800">{region.name}</span>
+					</div>
+					<span class="dropdown-arrow text-slate-600">▾</span>
+				</button>
+
+				<!-- Hover Dropdown Menu -->
+				{#if hoveredRegion === region.name}
+					<div 
+						class="dropdown-menu"
+						on:mouseenter={keepDropdown}
+						on:mouseleave={hideDropdown}
+					>
+						<ul class="text-sm text-slate-800 divide-y divide-slate-200">
+							<li><button class="dropdown-item" on:click={() => openYardComparison(region.name)}>Regional Fleet</button></li>
+							<li><button class="dropdown-item" on:click={() => openYardComparison(region.name)}>Active Trucks</button></li>
+							<li><button class="dropdown-item" on:click={() => openYardComparison(region.name)}>Drivers Assigned</button></li>
+							<li><button class="dropdown-item" on:click={() => openYardComparison(region.name)}>Regional Efficiency</button></li>
+						</ul>
+					</div>
+				{/if}
+			</div>
 		{/each}
 	</div>
 
-	<!-- Regional Overview Cards -->
+	<!-- Regional Overview Cards (no icons) -->
 	<div class="overview-metrics">
 		<MetricCard 
 			title="Regional Fleet" 
 			value={currentRegionData.fleetSize.toString()} 
 			unit="trucks" 
-			icon={Truck}
 			status="normal"
 			trend={currentRegionData.trend}
 			trendValue={currentRegionData.trend === 'up' ? '+8' : currentRegionData.trend === 'down' ? '-3' : '0'}
@@ -200,7 +257,6 @@
 			title="Active Trucks" 
 			value={currentRegionData.activeTrucks.toString()} 
 			unit="operating" 
-			icon={Truck}
 			status="normal"
 			trend={currentRegionData.trend}
 			trendValue={`${Math.round(currentRegionData.utilization)}% util`}
@@ -210,7 +266,6 @@
 			title="Drivers Assigned" 
 			value={currentRegionData.driversAssigned.toString()} 
 			unit="certified" 
-			icon={Users}
 			status="normal"
 			trend="stable"
 			trendValue="full staffed"
@@ -220,7 +275,6 @@
 			title="Regional Efficiency" 
 			value={currentRegionData.efficiency.toString()} 
 			unit="%" 
-			icon={BarChart3}
 			status="normal"
 			trend={currentRegionData.trend}
 			trendValue={currentRegionData.trend === 'up' ? '+2.1%' : currentRegionData.trend === 'down' ? '-1.5%' : '0%'}
@@ -230,110 +284,92 @@
 
 	<!-- Main Content -->
 	<div class="main-content">
-		<!-- Enhanced Regional Performance Section -->
+		<!-- Enhanced Regional Performance Section (removed footer verbiage) -->
 		<div class="content-section regional-performance-section">
 			<div class="section-header">
-				<h2>{activeRegion} Performance Overview</h2>
-				<p>Detailed operational metrics for regional comparison</p>
+				<h2 class="text-xl font-semibold text-slate-800">{activeRegion} Performance Overview</h2>
+				<p class="text-slate-600">Detailed operational metrics for regional comparison</p>
 			</div>
 			
-			<!-- Performance Cards -->
+			<!-- Performance Cards (no icons) -->
 			<div class="performance-cards">
 				<div class="perf-card clickable" on:click={() => openYardComparison(activeRegion)}>
 					<div class="perf-header">
-						<div class="perf-icon">
-							<BarChart3 size={24} />
-						</div>
 						<div class="perf-status {getStatusColor(currentRegionData.status)}">
 							{currentRegionData.status.toUpperCase()}
 						</div>
 					</div>
-					<h3>Total BPD</h3>
-					<div class="perf-value">{currentRegionData.totalBPD.toLocaleString()}</div>
-					<p class="{getTrendColor(currentRegionData.trend)}">
-						Regional daily output
-					</p>
-					<div class="click-hint">Click to compare yards</div>
+					<h3 class="text-base font-semibold text-slate-800">Total BPD</h3>
+					<div class="perf-value text-2xl font-bold text-slate-800">{currentRegionData.totalBPD.toLocaleString()}</div>
+					<div class="click-hint text-xs text-slate-500">Click to compare yards</div>
 				</div>
 
 				<div class="perf-card clickable" on:click={() => openYardComparison(activeRegion)}>
 					<div class="perf-header">
-						<div class="perf-icon">
-							<Clock size={24} />
-						</div>
-						<div class="perf-status bg-blue-500">OPTIMIZED</div>
+						<div class="perf-status bg-slate-500">OPTIMIZED</div>
 					</div>
-					<h3>Avg Drive Time</h3>
-					<div class="perf-value">{currentRegionData.avgDriveTime}h</div>
-					<p class="text-blue-600">
-						Per haul efficiency
-					</p>
-					<div class="click-hint">View yard breakdown</div>
+					<h3 class="text-base font-semibold text-slate-800">Avg Drive Time</h3>
+					<div class="perf-value text-2xl font-bold text-slate-800">{currentRegionData.avgDriveTime}h</div>
+					<div class="click-hint text-xs text-slate-500">View yard breakdown</div>
 				</div>
 
 				<div class="perf-card clickable" on:click={() => openYardComparison(activeRegion)}>
 					<div class="perf-header">
-						<div class="perf-icon">
-							<Target size={24} />
-						</div>
-						<div class="perf-status bg-emerald-500">TARGET</div>
+						<div class="perf-status bg-slate-500">TARGET</div>
 					</div>
-					<h3>Barrels per Hour</h3>
-					<div class="perf-value">{currentRegionData.barrelsPerHour}</div>
-					<p class="text-emerald-600">
-						Operational efficiency
-					</p>
-					<div class="click-hint">Analyze performance</div>
+					<h3 class="text-base font-semibold text-slate-800">Barrels per Hour</h3>
+					<div class="perf-value text-2xl font-bold text-slate-800">{currentRegionData.barrelsPerHour}</div>
+					<div class="click-hint text-xs text-slate-500">Analyze performance</div>
 				</div>
 			</div>
 
 			<!-- Quick Regional Stats -->
 			<div class="regional-stats">
 				<div class="stat-item">
-					<span class="stat-label">Fleet Utilization</span>
-					<span class="stat-value">{currentRegionData.utilization}%</span>
+					<span class="stat-label text-slate-600">Fleet Utilization</span>
+					<span class="stat-value font-mono font-semibold text-slate-800">{currentRegionData.utilization}%</span>
 				</div>
 				<div class="stat-item">
-					<span class="stat-label">Regional Efficiency</span>
-					<span class="stat-value">{currentRegionData.efficiency}%</span>
+					<span class="stat-label text-slate-600">Regional Efficiency</span>
+					<span class="stat-value font-mono font-semibold text-slate-800">{currentRegionData.efficiency}%</span>
 				</div>
 				<div class="stat-item">
-					<span class="stat-label">Active/Total Ratio</span>
-					<span class="stat-value">{Math.round((currentRegionData.activeTrucks / currentRegionData.fleetSize) * 100)}%</span>
+					<span class="stat-label text-slate-600">Active/Total Ratio</span>
+					<span class="stat-value font-mono font-semibold text-slate-800">{Math.round((currentRegionData.activeTrucks / currentRegionData.fleetSize) * 100)}%</span>
 				</div>
 				<div class="stat-item">
-					<span class="stat-label">Driver Coverage</span>
-					<span class="stat-value">{Math.round((currentRegionData.driversAssigned / currentRegionData.fleetSize) * 100)}%</span>
+					<span class="stat-label text-slate-600">Driver Coverage</span>
+					<span class="stat-value font-mono font-semibold text-slate-800">{Math.round((currentRegionData.driversAssigned / currentRegionData.fleetSize) * 100)}%</span>
 				</div>
 			</div>
 		</div>
 
 		<!-- Regional Comparison Summary -->
 		<div class="content-section">
-			<h2>Cross-Regional Performance</h2>
+			<h2 class="text-xl font-semibold text-slate-800 mb-6">Cross-Regional Performance</h2>
 			<div class="comparison-grid">
 				{#each Object.entries(regionalData) as [regionName, data]}
 					<div class="region-summary-card" class:active={regionName === activeRegion} style="--region-color: {getRegionColor(regionName)}">
 						<div class="region-header">
-							<h3>{regionName}</h3>
+							<h3 class="text-lg font-semibold text-slate-800">{regionName}</h3>
 							<div class="region-status {getStatusColor(data.status)}"></div>
 						</div>
 						<div class="region-metrics">
 							<div class="metric-row">
-								<span>Fleet Size:</span>
-								<span class="metric-value">{data.fleetSize}</span>
+								<span class="text-slate-600">Fleet Size:</span>
+								<span class="metric-value font-mono font-semibold text-slate-800">{data.fleetSize}</span>
 							</div>
 							<div class="metric-row">
-								<span>Total BPD:</span>
-								<span class="metric-value">{data.totalBPD.toLocaleString()}</span>
+								<span class="text-slate-600">Total BPD:</span>
+								<span class="metric-value font-mono font-semibold text-slate-800">{data.totalBPD.toLocaleString()}</span>
 							</div>
 							<div class="metric-row">
-								<span>Efficiency:</span>
-								<span class="metric-value">{data.efficiency}%</span>
+								<span class="text-slate-600">Efficiency:</span>
+								<span class="metric-value font-mono font-semibold {data.efficiency >= 93 ? 'text-green-600' : data.efficiency >= 90 ? 'text-slate-800' : 'text-red-600'}">{data.efficiency}%</span>
 							</div>
 						</div>
 						<button 
-							class="compare-btn"
+							class="compare-btn border border-slate-400 text-slate-700 bg-transparent hover:bg-slate-100 px-4 py-2 rounded text-sm font-medium transition-colors"
 							on:click={() => openYardComparison(regionName)}
 						>
 							Compare Yards →
@@ -346,16 +382,16 @@
 		<!-- Visual Comparison Charts -->
 		<div class="content-section">
 			<div class="section-header">
-				<h2>Regional Performance Comparison Charts</h2>
-				<p>Visual analysis of key operational metrics across all regions</p>
+				<h2 class="text-xl font-semibold text-slate-800">Regional Performance Comparison Charts</h2>
+				<p class="text-slate-600">Visual analysis of key operational metrics across all regions</p>
 			</div>
 			
-			<div class="charts-grid">
+			<div class="charts-grid chart-card-container">
 				<!-- Fleet Size Comparison -->
 				<div class="chart-card">
 					<div class="chart-header">
-						<h3>Fleet Size Distribution</h3>
-						<span class="chart-subtitle">Total trucks by region</span>
+						<h3 class="text-base font-semibold text-slate-800">Fleet Size Distribution</h3>
+						<span class="chart-subtitle text-sm text-slate-600">Total trucks by region</span>
 					</div>
 					<div class="chart-content">
 						<div class="bar-chart">
@@ -363,13 +399,17 @@
 								{@const maxFleet = Math.max(...Object.values(regionalData).map(d => d.fleetSize))}
 								{@const percentage = (data.fleetSize / maxFleet) * 100}
 								<div class="chart-row">
-									<div class="chart-label">{regionName.replace(' (TX)', '').replace(' (OK, OH, VA, PA)', '')}</div>
+									<div class="chart-label text-slate-700">{regionName}</div>
 									<div class="chart-bar-container">
 										<div 
-											class="chart-bar"
-											style="width: {percentage}%; background: linear-gradient(90deg, {getRegionColor(regionName)}, {getRegionColor(regionName)}aa);"
-										></div>
-										<span class="chart-value">{data.fleetSize}</span>
+											class="chart-bar chart-bar-with-value"
+											style="width: {percentage}%; background: {getPerformanceBarColor(data.fleetSize, 'fleet')};"
+										>
+											<span class="chart-value-inside">{data.fleetSize}</span>
+											{#if needsAttention(data.fleetSize, 'fleet')}
+												<span class="alert-icon">❗</span>
+											{/if}
+										</div>
 									</div>
 								</div>
 							{/each}
@@ -380,8 +420,8 @@
 				<!-- BPD Production Comparison -->
 				<div class="chart-card">
 					<div class="chart-header">
-						<h3>Total BPD Production</h3>
-						<span class="chart-subtitle">Daily barrels produced</span>
+						<h3 class="text-base font-semibold text-slate-800">Total BPD Production</h3>
+						<span class="chart-subtitle text-sm text-slate-600">Daily barrels produced</span>
 					</div>
 					<div class="chart-content">
 						<div class="bar-chart">
@@ -389,13 +429,17 @@
 								{@const maxBPD = Math.max(...Object.values(regionalData).map(d => d.totalBPD))}
 								{@const percentage = (data.totalBPD / maxBPD) * 100}
 								<div class="chart-row">
-									<div class="chart-label">{regionName.replace(' (TX)', '').replace(' (OK, OH, VA, PA)', '')}</div>
+									<div class="chart-label text-slate-700">{regionName}</div>
 									<div class="chart-bar-container">
 										<div 
-											class="chart-bar"
-											style="width: {percentage}%; background: linear-gradient(90deg, {getRegionColor(regionName)}, {getRegionColor(regionName)}aa);"
-										></div>
-										<span class="chart-value">{data.totalBPD.toLocaleString()}</span>
+											class="chart-bar chart-bar-with-value"
+											style="width: {percentage}%; background: {getPerformanceBarColor(data.totalBPD, 'bpd')};"
+										>
+											<span class="chart-value-inside">{data.totalBPD.toLocaleString()}</span>
+											{#if needsAttention(data.totalBPD, 'bpd')}
+												<span class="alert-icon">❗</span>
+											{/if}
+										</div>
 									</div>
 								</div>
 							{/each}
@@ -406,30 +450,34 @@
 				<!-- Efficiency Comparison -->
 				<div class="chart-card">
 					<div class="chart-header">
-						<h3>Regional Efficiency</h3>
-						<span class="chart-subtitle">Operational efficiency percentage</span>
+						<h3 class="text-base font-semibold text-slate-800">Regional Efficiency</h3>
+						<span class="chart-subtitle text-sm text-slate-600">Operational efficiency percentage</span>
 					</div>
 					<div class="chart-content">
 						<div class="efficiency-chart">
 							{#each Object.entries(regionalData) as [regionName, data]}
 								<div class="efficiency-item">
 									<div class="efficiency-header">
-										<span class="efficiency-label">{regionName.replace(' (TX)', '').replace(' (OK, OH, VA, PA)', '')}</span>
-										<span class="efficiency-value" style="color: {getRegionColor(regionName)}">{data.efficiency}%</span>
+										<span class="efficiency-label text-slate-700">{regionName}</span>
 									</div>
 									<div class="efficiency-bar-bg">
 										<div 
-											class="efficiency-bar"
-											style="width: {data.efficiency}%; background: linear-gradient(90deg, {getRegionColor(regionName)}, {getRegionColor(regionName)}aa);"
-										></div>
+											class="efficiency-bar chart-bar-with-value"
+											style="width: {data.efficiency}%; background: {getPerformanceBarColor(data.efficiency, 'efficiency')};"
+										>
+											<span class="chart-value-inside">{data.efficiency}%</span>
+											{#if needsAttention(data.efficiency, 'efficiency')}
+												<span class="alert-icon">❗</span>
+											{/if}
+										</div>
 									</div>
 									<div class="efficiency-status">
 										{#if data.efficiency >= 93}
-											<span class="status-excellent">Excellent</span>
-										{:else if data.efficiency >= 90}
-											<span class="status-good">Good</span>
+											<span class="status-excellent text-green-600 font-medium">Excellent</span>
+										{:else if data.efficiency >= 88}
+											<span class="status-good text-slate-700 font-medium">Good</span>
 										{:else}
-											<span class="status-attention">Needs Attention</span>
+											<span class="status-attention text-red-600 font-medium">Needs Attention</span>
 										{/if}
 									</div>
 								</div>
@@ -441,8 +489,8 @@
 				<!-- Productivity Comparison -->
 				<div class="chart-card">
 					<div class="chart-header">
-						<h3>Barrels per Hour</h3>
-						<span class="chart-subtitle">Average productivity rate</span>
+						<h3 class="text-base font-semibold text-slate-800">Barrels per Hour</h3>
+						<span class="chart-subtitle text-sm text-slate-600">Average productivity rate</span>
 					</div>
 					<div class="chart-content">
 						<div class="bar-chart">
@@ -450,13 +498,17 @@
 								{@const maxBPH = Math.max(...Object.values(regionalData).map(d => d.barrelsPerHour))}
 								{@const percentage = (data.barrelsPerHour / maxBPH) * 100}
 								<div class="chart-row">
-									<div class="chart-label">{regionName.replace(' (TX)', '').replace(' (OK, OH, VA, PA)', '')}</div>
+									<div class="chart-label text-slate-700">{regionName}</div>
 									<div class="chart-bar-container">
 										<div 
-											class="chart-bar"
-											style="width: {percentage}%; background: linear-gradient(90deg, {getRegionColor(regionName)}, {getRegionColor(regionName)}aa);"
-										></div>
-										<span class="chart-value">{data.barrelsPerHour}</span>
+											class="chart-bar chart-bar-with-value"
+											style="width: {percentage}%; background: {getPerformanceBarColor(data.barrelsPerHour, 'bph')};"
+										>
+											<span class="chart-value-inside">{data.barrelsPerHour}</span>
+											{#if needsAttention(data.barrelsPerHour, 'bph')}
+												<span class="alert-icon">❗</span>
+											{/if}
+										</div>
 									</div>
 								</div>
 							{/each}
@@ -481,13 +533,11 @@
 		min-height: 100vh;
 		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
 		padding: 20px;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 	}
 
 	.dashboard-header {
-		background: white;
 		border-radius: 16px;
-		padding: 32px;
+		padding: 24px 32px;
 		margin-bottom: 24px;
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 	}
@@ -498,28 +548,11 @@
 		justify-content: space-between;
 	}
 
-	.header-icon {
-		width: 60px;
-		height: 60px;
-		background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-		border-radius: 12px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: white;
-		margin-right: 20px;
-	}
-
 	.header-text h1 {
-		font-size: 28px;
-		font-weight: 700;
-		color: #1e293b;
 		margin: 0 0 4px 0;
 	}
 
 	.header-text p {
-		font-size: 16px;
-		color: #64748b;
 		margin: 0;
 	}
 
@@ -527,6 +560,10 @@
 		display: flex;
 		gap: 12px;
 		margin-bottom: 32px;
+	}
+
+	.region-dropdown-container {
+		position: relative;
 	}
 
 	.region-filter {
@@ -581,6 +618,10 @@
 		background: rgba(255, 255, 255, 0.3);
 	}
 
+	.region-filter.active .filter-name {
+		color: white;
+	}
+
 	.filter-indicator {
 		width: 12px;
 		height: 12px;
@@ -591,17 +632,45 @@
 	.filter-content {
 		display: flex;
 		flex-direction: column;
+		flex: 1;
 	}
 
 	.filter-name {
 		font-size: 14px;
 		font-weight: 600;
-		margin-bottom: 2px;
 	}
 
-	.filter-states {
+	.dropdown-arrow {
 		font-size: 12px;
-		opacity: 0.7;
+		transition: transform 0.2s ease;
+	}
+
+	.dropdown-menu {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		z-index: 10;
+		background: white;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+		margin-top: 4px;
+	}
+
+	.dropdown-item {
+		width: 100%;
+		padding: 12px 16px;
+		text-align: left;
+		background: none;
+		border: none;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+		font-size: 14px;
+	}
+
+	.dropdown-item:hover {
+		background-color: #f1f5f9;
 	}
 
 	.overview-metrics {
@@ -619,17 +688,16 @@
 		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 	}
 
-	.content-section h2 {
-		font-size: 24px;
-		font-weight: 700;
-		color: #1e293b;
+	.section-header {
+		margin-bottom: 24px;
+	}
+
+	.section-header h2 {
 		margin: 0 0 8px 0;
 	}
 
-	.content-section p {
-		font-size: 16px;
-		color: #64748b;
-		margin: 0 0 24px 0;
+	.section-header p {
+		margin: 0;
 	}
 
 	.performance-cards {
@@ -684,96 +752,51 @@
 		margin-bottom: 20px;
 	}
 
-	.perf-icon {
-		width: 48px;
-		height: 48px;
-		background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-		border-radius: 12px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: #475569;
-	}
-
 	.perf-status {
-		padding: 6px 12px;
-		border-radius: 6px;
+		padding: 4px 12px;
+		border-radius: 20px;
 		font-size: 11px;
 		font-weight: 700;
 		letter-spacing: 0.5px;
-		text-transform: uppercase;
 		color: white;
 	}
 
 	.perf-card h3 {
-		font-size: 16px;
-		font-weight: 600;
-		color: #475569;
-		margin: 0 0 12px 0;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		margin: 0 0 16px 0;
 	}
 
 	.perf-value {
-		font-size: 36px;
-		font-weight: 700;
-		font-family: 'SF Mono', Monaco, monospace;
-		color: #1e293b;
-		margin-bottom: 8px;
-	}
-
-	.perf-card p {
-		margin: 0 0 16px 0;
-		font-weight: 500;
+		margin: 0 0 12px 0;
 	}
 
 	.click-hint {
-		font-size: 12px;
-		color: #64748b;
-		opacity: 0;
-		transition: opacity 0.3s ease;
-	}
-
-	.perf-card:hover .click-hint {
-		opacity: 1;
+		margin-top: 12px;
 	}
 
 	.regional-stats {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
 		gap: 24px;
-		margin-bottom: 32px;
+		padding: 20px;
+		background: #f8fafc;
+		border-radius: 12px;
+		border: 1px solid #e2e8f0;
 	}
 
 	.stat-item {
-		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-		border: 1px solid #e2e8f0;
-		border-radius: 12px;
-		padding: 20px;
 		text-align: center;
-		transition: all 0.3s ease;
-	}
-
-	.stat-item:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-		border-color: #3b82f6;
 	}
 
 	.stat-label {
+		display: block;
 		font-size: 12px;
-		color: #64748b;
+		font-weight: 500;
 		margin-bottom: 8px;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		font-weight: 600;
 	}
 
 	.stat-value {
-		font-size: 24px;
-		font-weight: 700;
-		font-family: 'SF Mono', Monaco, monospace;
-		color: #1e293b;
+		display: block;
+		font-size: 18px;
 	}
 
 	.comparison-grid {
@@ -784,7 +807,7 @@
 
 	.region-summary-card {
 		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-		border: 2px solid #e2e8f0;
+		border: 1px solid #e2e8f0;
 		border-radius: 16px;
 		padding: 24px;
 		transition: all 0.3s ease;
@@ -832,9 +855,6 @@
 	}
 
 	.region-header h3 {
-		font-size: 18px;
-		font-weight: 700;
-		color: #1e293b;
 		margin: 0;
 	}
 
@@ -863,32 +883,7 @@
 
 	.metric-row span:first-child {
 		font-size: 14px;
-		color: #64748b;
 		font-weight: 500;
-	}
-
-	.metric-value {
-		font-weight: 700;
-		color: #1e293b;
-		font-family: 'SF Mono', Monaco, monospace;
-	}
-
-	.compare-btn {
-		background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-		border: none;
-		border-radius: 8px;
-		padding: 12px 20px;
-		font-size: 14px;
-		color: white;
-		cursor: pointer;
-		font-weight: 600;
-		transition: all 0.3s ease;
-		width: 100%;
-	}
-
-	.compare-btn:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
 	}
 
 	.charts-grid {
@@ -898,192 +893,164 @@
 	}
 
 	.chart-card {
-		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+		background: white;
 		border: 1px solid #e2e8f0;
-		border-radius: 16px;
-		padding: 24px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-		transition: all 0.3s ease;
-	}
-
-	.chart-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-		border-color: #3b82f6;
+		border-radius: 12px;
+		padding: 20px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 	}
 
 	.chart-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 24px;
-		padding-bottom: 16px;
-		border-bottom: 2px solid #f1f5f9;
+		margin-bottom: 16px;
+		border-bottom: 1px solid #f1f5f9;
+		padding-bottom: 12px;
 	}
 
 	.chart-header h3 {
-		font-size: 18px;
-		font-weight: 700;
-		color: #1e293b;
-		margin: 0;
+		margin: 0 0 4px 0;
 	}
 
 	.chart-subtitle {
-		font-size: 12px;
-		color: #64748b;
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
-
-	.chart-content {
-		min-height: 200px;
+		margin: 0;
 	}
 
 	.bar-chart {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
-		height: 100%;
+		gap: 12px;
 	}
 
 	.chart-row {
 		display: flex;
 		align-items: center;
-		gap: 16px;
+		gap: 12px;
 	}
 
 	.chart-label {
-		font-size: 14px;
-		color: #64748b;
-		font-weight: 600;
-		min-width: 100px;
-		text-align: right;
+		min-width: 80px;
+		font-size: 12px;
+		font-weight: 500;
 	}
 
 	.chart-bar-container {
+		display: flex;
+		align-items: center;
 		flex: 1;
-		height: 32px;
-		background: #f1f5f9;
-		border-radius: 6px;
-		position: relative;
-		overflow: hidden;
+		gap: 8px;
 	}
 
 	.chart-bar {
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 100%;
-		border-radius: 6px;
-		transition: all 0.6s ease;
-		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+		height: 20px;
+		border-radius: 4px;
+		min-width: 4px;
+		transition: width 0.3s ease;
+	}
+
+	.chart-bar-with-value {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 8px;
+		min-height: 24px;
+	}
+
+	.chart-value-inside {
+		color: white;
+		font-weight: 700;
+		font-size: 11px;
+		font-family: 'JetBrains Mono', monospace;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+		white-space: nowrap;
+	}
+
+	.alert-icon {
+		color: #fef3c7;
+		font-size: 12px;
+		font-weight: 700;
+		margin-left: 4px;
+		animation: pulse 2s infinite;
+	}
+
+	@keyframes pulse {
+		0%, 100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.7;
+		}
 	}
 
 	.chart-value {
-		position: absolute;
-		right: 8px;
-		top: 50%;
-		transform: translateY(-50%);
 		font-size: 12px;
-		font-weight: 700;
-		color: white;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-		font-family: 'SF Mono', Monaco, monospace;
+		min-width: 40px;
+		text-align: right;
 	}
 
 	.efficiency-chart {
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
-		height: 100%;
+		gap: 16px;
 	}
 
 	.efficiency-item {
-		margin-bottom: 16px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 	}
 
 	.efficiency-header {
 		display: flex;
-		align-items: center;
 		justify-content: space-between;
-		margin-bottom: 8px;
+		align-items: center;
 	}
 
 	.efficiency-label {
-		font-size: 14px;
-		color: #64748b;
-		font-weight: 600;
+		font-size: 12px;
+		font-weight: 500;
 	}
 
 	.efficiency-value {
 		font-size: 14px;
-		font-weight: 700;
-		font-family: 'SF Mono', Monaco, monospace;
 	}
 
 	.efficiency-bar-bg {
-		height: 20px;
-		border-radius: 10px;
+		height: 24px;
 		background: #f1f5f9;
-		margin-bottom: 8px;
+		border-radius: 8px;
 		overflow: hidden;
 	}
 
 	.efficiency-bar {
 		height: 100%;
-		border-radius: 10px;
-		transition: all 0.6s ease;
-		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+		border-radius: 8px;
+		transition: width 0.3s ease;
+		min-width: 60px; /* Ensure enough space for percentage values */
 	}
 
 	.efficiency-status {
 		font-size: 11px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
+		text-align: center;
 	}
 
-	.status-excellent {
-		color: #059669;
-	}
-
-	.status-good {
-		color: #d97706;
-	}
-
-	.status-attention {
-		color: #dc2626;
-	}
-
-	/* Mobile Responsiveness */
+	/* Responsive design */
 	@media (max-width: 768px) {
-		.region-filters {
-			flex-wrap: wrap;
-		}
-
-		.region-filter {
-			flex: 1 1 calc(50% - 6px);
-		}
-
-		.overview-metrics {
-			grid-template-columns: repeat(2, 1fr);
-		}
-
+		.overview-metrics,
 		.performance-cards {
 			grid-template-columns: 1fr;
 		}
-
+		
 		.regional-stats {
 			grid-template-columns: repeat(2, 1fr);
 		}
 
-		.comparison-grid {
+		.comparison-grid,
+		.charts-grid {
 			grid-template-columns: 1fr;
 		}
 
-		.charts-grid {
-			grid-template-columns: 1fr;
+		.region-filters {
+			flex-direction: column;
 		}
 	}
 </style> 

@@ -26,56 +26,56 @@
 		}
 	}
 
-	// Enhanced color mappings for industrial look
+	// Enhanced color mappings for cleaner, more subdued look
 	const colorMap = {
 		blue: { 
-			primary: '#004E89', 
-			bg: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)',
-			accent: 'rgba(0, 78, 137, 0.1)',
-			border: 'rgba(0, 78, 137, 0.2)'
+			primary: '#1e293b', // Neutral dark for primary text
+			bg: 'rgba(248, 250, 252, 0.8)', // Very light neutral background
+			accent: 'rgba(226, 232, 240, 0.4)', // Light gray accent
+			border: 'rgba(226, 232, 240, 0.6)'
 		},
 		orange: { 
-			primary: '#FF6B35', 
-			bg: 'linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%)',
-			accent: 'rgba(255, 107, 53, 0.1)',
-			border: 'rgba(255, 107, 53, 0.2)'
+			primary: '#1e293b',
+			bg: 'rgba(248, 250, 252, 0.8)',
+			accent: 'rgba(226, 232, 240, 0.4)',
+			border: 'rgba(226, 232, 240, 0.6)'
 		},
 		emerald: { 
-			primary: '#10b981', 
-			bg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%)',
-			accent: 'rgba(16, 185, 129, 0.1)',
-			border: 'rgba(16, 185, 129, 0.2)'
+			primary: '#1e293b',
+			bg: 'rgba(248, 250, 252, 0.8)',
+			accent: 'rgba(226, 232, 240, 0.4)',
+			border: 'rgba(226, 232, 240, 0.6)'
 		},
 		amber: { 
-			primary: '#f59e0b', 
-			bg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
-			accent: 'rgba(245, 158, 11, 0.1)',
-			border: 'rgba(245, 158, 11, 0.2)'
+			primary: '#1e293b',
+			bg: 'rgba(248, 250, 252, 0.8)',
+			accent: 'rgba(226, 232, 240, 0.4)',
+			border: 'rgba(226, 232, 240, 0.6)'
 		},
 		red: { 
-			primary: '#ef4444', 
-			bg: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%)',
-			accent: 'rgba(239, 68, 68, 0.1)',
-			border: 'rgba(239, 68, 68, 0.2)'
+			primary: '#1e293b',
+			bg: 'rgba(248, 250, 252, 0.8)',
+			accent: 'rgba(226, 232, 240, 0.4)',
+			border: 'rgba(226, 232, 240, 0.6)'
 		},
 		gray: { 
-			primary: '#6b7280', 
-			bg: 'linear-gradient(135deg, rgba(107, 114, 128, 0.1) 0%, rgba(107, 114, 128, 0.05) 100%)',
-			accent: 'rgba(107, 114, 128, 0.1)',
-			border: 'rgba(107, 114, 128, 0.2)'
+			primary: '#1e293b',
+			bg: 'rgba(248, 250, 252, 0.8)',
+			accent: 'rgba(226, 232, 240, 0.4)',
+			border: 'rgba(226, 232, 240, 0.6)'
 		}
 	};
 
 	$: colors = colorMap[color as keyof typeof colorMap] || colorMap.blue;
 
-	// Status indicator styling
+	// Status indicator styling - keep these colorful for importance
 	$: statusClasses = {
 		normal: 'bg-emerald-100/80 text-emerald-700 border-emerald-200/60',
 		warning: 'bg-amber-100/80 text-amber-700 border-amber-200/60',
 		critical: 'bg-red-100/80 text-red-700 border-red-200/60'
 	}[status];
 
-	// Trend indicator with Lucide icons
+	// Trend indicator with Lucide icons - keep trend colors for clarity
 	$: trendIconComponent = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : ArrowRight;
 	$: trendColor = trend === 'up' ? '#10b981' : trend === 'down' ? '#ef4444' : '#6b7280';
 </script>
@@ -141,13 +141,13 @@
 <style>
 	.metric-card {
 		position: relative;
-		padding: 16px;
-		background: rgba(255, 255, 255, 0.25);
+		padding: 20px;
+		background: rgba(255, 255, 255, 0.8);
 		backdrop-filter: blur(20px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 16px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		border: 1px solid rgba(226, 232, 240, 0.8);
+		border-radius: 12px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		transition: all 0.2s ease;
 		overflow: hidden;
 		min-height: 120px;
 		display: flex;
@@ -156,8 +156,9 @@
 	}
 	
 	.metric-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+		border-color: rgba(203, 213, 225, 0.8);
 	}
 
 	.metric-card.clickable {
@@ -165,13 +166,13 @@
 	}
 
 	.metric-card.clickable:hover {
-		transform: translateY(-4px);
-		box-shadow: 0 16px 50px rgba(0, 0, 0, 0.2);
-		border-color: var(--primary-color);
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+		border-color: #cbd5e1;
 	}
 
 	.metric-card.clickable:focus {
-		outline: 2px solid var(--primary-color);
+		outline: 2px solid #3b82f6;
 		outline-offset: 2px;
 	}
 

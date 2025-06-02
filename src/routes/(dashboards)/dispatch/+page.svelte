@@ -2,6 +2,7 @@
 	import { Radio, Truck, Users, Clock, MapPin, AlertTriangle, Settings, Phone } from 'lucide-svelte';
 	import { onMount, onDestroy } from 'svelte';
 	import maplibregl from 'maplibre-gl';
+	import CollapsibleSection from '$lib/components/ui/CollapsibleSection.svelte';
 
 	// TypeScript interfaces
 	interface Driver {
@@ -46,6 +47,15 @@
 		pickupTime: string;
 		estimatedDuration: string;
 	}
+
+	// Section state management
+	let sectionStates: Record<string, boolean> = {
+		pendingAssignments: true,  // Always open if pending > 0
+		availableDrivers: true,    // Default open 
+		activeRoutes: true,        // Default open
+		outOfService: false,       // Default collapsed
+		fleetStatus: false         // Default collapsed
+	};
 
 	// Mock data for dispatch operations
 	let availableDrivers: Driver[] = [
@@ -159,6 +169,13 @@
 			priority: 'normal',
 			pickupTime: '10:30',
 			estimatedDuration: '5.2h'
+		},
+		{ 
+			id: 'PA003', 
+			route: 'Corpus Christi → Galveston Port', 
+			priority: 'high',
+			pickupTime: '06:30',
+			estimatedDuration: '4.5h'
 		}
 	];
 
@@ -171,6 +188,21 @@
 	let mapContainer: HTMLDivElement;
 	let map: maplibregl.Map | null = null;
 	let hoveredTruck: MapTruck | null = null;
+
+	// Reactive statements
+	$: pendingCount = pendingAssignments.length;
+	$: hasPendingAssignments = pendingCount > 0;
+	
+	// Auto-open pending assignments if count > 0
+	$: if (hasPendingAssignments) {
+		sectionStates.pendingAssignments = true;
+	}
+
+	// Handle section toggle events
+	function handleSectionToggle(event: CustomEvent, sectionKey: string) {
+		const { isOpen } = event.detail;
+		sectionStates[sectionKey] = isOpen;
+	}
 
 	// Initialize map on mount
 	onMount(() => {
@@ -374,131 +406,139 @@
 	<div class="dispatch-layout">
 		<!-- Left Pane: Dispatch Snapshot -->
 		<div class="dispatch-snapshot">
-			<!-- Available Drivers -->
-			<div class="snapshot-card">
-				<div class="card-header">
-					<div class="card-title">
-						<Users size={20} />
-						Available Drivers
-					</div>
-					<div class="driver-count">{availableDrivers.length}</div>
-				</div>
-				<div class="driver-list">
-					{#each availableDrivers as driver}
-						<div class="driver-item">
-							<div class="driver-info">
-								<span class="driver-name">{driver.name}</span>
-								<span class="driver-location">{driver.lastLocation}</span>
-							</div>
-							<div class="driver-hours">
-								<span class="hours-remaining">{driver.hoursRemaining}h</span>
-								<span class="hours-label">remaining</span>
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-
-			<!-- Unavailable Drivers -->
-			<div class="snapshot-card">
-				<div class="card-header">
-					<div class="card-title">
-						<AlertTriangle size={20} />
-						Out of Service
-					</div>
-					<div class="driver-count unavailable">{unavailableDrivers.length}</div>
-				</div>
-				<div class="unavailable-list">
-					{#each unavailableDrivers as driver}
-						<div class="unavailable-item">
-							<div class="unavailable-info">
-								<span class="driver-name">{driver.name}</span>
-								<span class="unavailable-reason">{driver.reason}</span>
-							</div>
-							<div class="return-date">Returns {driver.returnDate}</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-
-			<!-- Truck Status -->
-			<div class="snapshot-card">
-				<div class="card-header">
-					<div class="card-title">
-						<Truck size={20} />
-						Fleet Status
-					</div>
-				</div>
-				<div class="truck-status">
-					<div class="status-item available">
-						<span class="status-number">{truckStatus.available}</span>
-						<span class="status-label">Available</span>
-					</div>
-					<div class="status-item maintenance">
-						<span class="status-number">{truckStatus.inMaintenance}</span>
-						<span class="status-label">Maintenance</span>
-					</div>
-					<div class="status-item total">
-						<span class="status-number">{truckStatus.total}</span>
-						<span class="status-label">Total Fleet</span>
-					</div>
-				</div>
-			</div>
-
-			<!-- Active Routes -->
-			<div class="snapshot-card">
-				<div class="card-header">
-					<div class="card-title">
-						<MapPin size={20} />
-						Active Routes
-					</div>
-					<div class="route-count">{activeRoutes.length}</div>
-				</div>
-				<div class="routes-list">
-					{#each activeRoutes as route}
-						<div class="route-item">
-							<div class="route-info">
-								<span class="route-id">{route.truck}</span>
-								<span class="driver-name">{route.driver}</span>
-								<span class="route-path">{route.route}</span>
-							</div>
-							<div class="route-status">
-								<span class="status-badge {route.status}">{route.currentJob}</span>
-								<span class="eta">ETA: {route.eta}</span>
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-
-			<!-- Pending Assignments -->
-			<div class="snapshot-card">
-				<div class="card-header">
-					<div class="card-title">
-						<Clock size={20} />
-						Pending Assignments
-					</div>
-					<div class="assignment-count">{pendingAssignments.length}</div>
-				</div>
-				<div class="assignments-list">
+			
+			<!-- 🚨 PENDING ASSIGNMENTS - Moved to Top -->
+			<CollapsibleSection 
+				title="🚨 Pending Assignments"
+				count={pendingCount}
+				icon={Clock}
+				defaultOpen={sectionStates.pendingAssignments}
+				highlight={true}
+				flashIf={hasPendingAssignments}
+				urgent={true}
+				on:toggle={(e) => handleSectionToggle(e, 'pendingAssignments')}
+			>
+				<div class="assignments-list p-4">
 					{#each pendingAssignments as assignment}
-						<div class="assignment-item">
-							<div class="assignment-info">
-								<span class="assignment-route">{assignment.route}</span>
-								<span class="assignment-details">
+						<div class="assignment-item mb-4 p-4 border border-slate-200 rounded-lg last:mb-0">
+							<div class="assignment-info mb-2">
+								<span class="assignment-route font-semibold text-slate-800 block">{assignment.route}</span>
+								<span class="assignment-details text-sm text-slate-600">
 									Pickup: {assignment.pickupTime} • Duration: {assignment.estimatedDuration}
 								</span>
 							</div>
-							<div class="assignment-actions">
-								<span class="priority-badge {assignment.priority}">{assignment.priority.toUpperCase()}</span>
-								<button class="assign-btn" on:click={() => openAssignment(assignment)}>
+							<div class="assignment-actions flex items-center justify-between">
+								<span class="priority-badge {assignment.priority} px-2 py-1 rounded text-xs font-semibold uppercase">
+									{assignment.priority}
+								</span>
+								<button class="assign-btn px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors" 
+										on:click={() => openAssignment(assignment)}>
 									Assign Driver
 								</button>
 							</div>
 						</div>
 					{/each}
 				</div>
-			</div>
+			</CollapsibleSection>
+
+			<!-- AVAILABLE DRIVERS -->
+			<CollapsibleSection 
+				title="Available Drivers"
+				count={availableDrivers.length}
+				icon={Users}
+				defaultOpen={sectionStates.availableDrivers}
+				on:toggle={(e) => handleSectionToggle(e, 'availableDrivers')}
+			>
+				<div class="driver-list p-4">
+					{#each availableDrivers as driver}
+						<div class="driver-item flex items-center justify-between p-3 border-b border-slate-100 last:border-b-0">
+							<div class="driver-info">
+								<span class="driver-name font-medium text-slate-800 block">{driver.name}</span>
+								<span class="driver-location text-sm text-slate-600">{driver.lastLocation}</span>
+							</div>
+							<div class="driver-hours text-right">
+								<span class="hours-remaining font-semibold text-green-600">{driver.hoursRemaining}h</span>
+								<span class="hours-label text-xs text-slate-500 block">remaining</span>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</CollapsibleSection>
+
+			<!-- ACTIVE ROUTES -->
+			<CollapsibleSection 
+				title="Active Routes"
+				count={activeRoutes.length}
+				icon={MapPin}
+				defaultOpen={sectionStates.activeRoutes}
+				on:toggle={(e) => handleSectionToggle(e, 'activeRoutes')}
+			>
+				<div class="routes-list p-4">
+					{#each activeRoutes as route}
+						<div class="route-item mb-3 p-3 border border-slate-200 rounded-lg last:mb-0">
+							<div class="route-info mb-2">
+								<div class="flex items-center justify-between">
+									<span class="route-id font-semibold text-slate-800">{route.truck}</span>
+									<span class="status-badge {route.status} px-2 py-1 rounded text-xs font-medium">
+										{route.currentJob}
+									</span>
+								</div>
+								<span class="driver-name text-sm text-slate-600">{route.driver}</span>
+								<span class="route-path text-sm text-slate-700 block">{route.route}</span>
+							</div>
+							<div class="route-status">
+								<span class="eta text-xs text-slate-500">ETA: {route.eta}</span>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</CollapsibleSection>
+
+			<!-- FLEET STATUS -->
+			<CollapsibleSection 
+				title="Fleet Status"
+				count={truckStatus.total}
+				icon={Truck}
+				defaultOpen={sectionStates.fleetStatus}
+				on:toggle={(e) => handleSectionToggle(e, 'fleetStatus')}
+			>
+				<div class="truck-status grid grid-cols-3 gap-4 p-4">
+					<div class="status-item available text-center p-3 bg-green-50 rounded-lg">
+						<span class="status-number text-xl font-bold text-green-600 block">{truckStatus.available}</span>
+						<span class="status-label text-sm text-green-700">Available</span>
+					</div>
+					<div class="status-item maintenance text-center p-3 bg-orange-50 rounded-lg">
+						<span class="status-number text-xl font-bold text-orange-600 block">{truckStatus.inMaintenance}</span>
+						<span class="status-label text-sm text-orange-700">Maintenance</span>
+					</div>
+					<div class="status-item total text-center p-3 bg-slate-50 rounded-lg">
+						<span class="status-number text-xl font-bold text-slate-600 block">{truckStatus.total}</span>
+						<span class="status-label text-sm text-slate-700">Total Fleet</span>
+					</div>
+				</div>
+			</CollapsibleSection>
+
+			<!-- OUT OF SERVICE -->
+			<CollapsibleSection 
+				title="Out of Service"
+				count={unavailableDrivers.length}
+				icon={AlertTriangle}
+				defaultOpen={sectionStates.outOfService}
+				on:toggle={(e) => handleSectionToggle(e, 'outOfService')}
+			>
+				<div class="unavailable-list p-4">
+					{#each unavailableDrivers as driver}
+						<div class="unavailable-item flex items-center justify-between p-3 border-b border-slate-100 last:border-b-0">
+							<div class="unavailable-info">
+								<span class="driver-name font-medium text-slate-800 block">{driver.name}</span>
+								<span class="unavailable-reason text-sm text-red-600">{driver.reason}</span>
+							</div>
+							<div class="return-date text-sm text-slate-500">Returns {driver.returnDate}</div>
+						</div>
+					{/each}
+				</div>
+			</CollapsibleSection>
+
 		</div>
 
 		<!-- Right Pane: Interactive Map -->
@@ -658,262 +698,55 @@
 		max-height: calc(100vh - 140px);
 	}
 
-	.snapshot-card {
-		background: rgba(255, 255, 255, 0.95);
-		backdrop-filter: blur(20px);
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		border-radius: 16px;
-		padding: 20px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	/* Priority Badge Styles */
+	.priority-badge.high {
+		background: #fecaca;
+		color: #dc2626;
+		border: 1px solid #fca5a5;
+	}
+	
+	.priority-badge.normal {
+		background: #e0e7ff;
+		color: #3730a3;
+		border: 1px solid #c7d2fe;
+	}
+	
+	.priority-badge.low {
+		background: #f3f4f6;
+		color: #6b7280;
+		border: 1px solid #e5e7eb;
 	}
 
-	.card-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 16px;
-		padding-bottom: 12px;
-		border-bottom: 1px solid #e2e8f0;
-	}
-
-	.card-title {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-weight: 600;
-		color: #1e293b;
-	}
-
-	.driver-count, .route-count, .assignment-count {
-		background: #475569;
-		color: white;
-		padding: 4px 12px;
-		border-radius: 12px;
-		font-weight: 600;
-		font-size: 14px;
-	}
-
-	.driver-count.unavailable {
-		background: #ef4444;
-	}
-
-	/* Driver Lists */
-	.driver-list, .unavailable-list, .routes-list, .assignments-list {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-	}
-
-	.driver-item, .unavailable-item, .route-item, .assignment-item {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 12px;
-		background: #f8fafc;
-		border-radius: 8px;
-		border-left: 3px solid #475569;
-	}
-
-	.driver-name {
-		font-weight: 600;
-		color: #1e293b;
-		display: block;
-	}
-
-	.driver-location, .unavailable-reason {
-		font-size: 12px;
-		color: #64748b;
-	}
-
-	.hours-remaining {
-		font-weight: 700;
-		color: #059669;
-	}
-
-	.hours-label {
-		font-size: 12px;
-		color: #64748b;
-	}
-
-	.return-date {
-		font-size: 12px;
-		color: #ef4444;
-		font-weight: 500;
-	}
-
-	/* Truck Status */
-	.truck-status {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		gap: 16px;
-	}
-
-	.status-item {
-		text-align: center;
-		padding: 16px 8px;
-		border-radius: 8px;
-		border: 1px solid #e2e8f0;
-	}
-
-	.status-item.available {
-		background: #f0fdf4;
-		border-color: #bbf7d0;
-	}
-
-	.status-item.maintenance {
-		background: #fefce8;
-		border-color: #fde047;
-	}
-
-	.status-item.total {
-		background: #f1f5f9;
-		border-color: #cbd5e1;
-	}
-
-	.status-number {
-		display: block;
-		font-size: 24px;
-		font-weight: 700;
-		color: #1e293b;
-	}
-
-	.status-label {
-		font-size: 12px;
-		color: #64748b;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
-
-	/* Route Items */
-	.route-info {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.route-id {
-		font-weight: 700;
-		color: #1e293b;
-		font-size: 14px;
-	}
-
-	.route-path {
-		font-size: 12px;
-		color: #64748b;
-	}
-
-	.route-status {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 4px;
-	}
-
-	.status-badge {
-		padding: 4px 8px;
-		border-radius: 4px;
-		font-size: 11px;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
-
+	/* Status Badge Styles */
 	.status-badge.en-route {
 		background: #dbeafe;
-		color: #1d4ed8;
+		color: #1e40af;
 	}
-
+	
 	.status-badge.loading {
 		background: #fef3c7;
 		color: #d97706;
 	}
-
+	
 	.status-badge.delivery {
-		background: #d1fae5;
-		color: #059669;
+		background: #dcfce7;
+		color: #16a34a;
 	}
-
+	
 	.status-badge.assigned {
 		background: #ede9fe;
 		color: #7c3aed;
 	}
 
-	.eta {
-		font-size: 12px;
-		color: #64748b;
-		font-weight: 500;
-	}
-
-	/* Assignment Items */
-	.assignment-info {
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.assignment-route {
-		font-weight: 600;
-		color: #1e293b;
-	}
-
-	.assignment-details {
-		font-size: 12px;
-		color: #64748b;
-	}
-
-	.assignment-actions {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-		gap: 8px;
-	}
-
-	.priority-badge {
-		padding: 2px 6px;
-		border-radius: 4px;
-		font-size: 10px;
-		font-weight: 700;
-		letter-spacing: 0.5px;
-	}
-
-	.priority-badge.high {
-		background: #fecaca;
-		color: #dc2626;
-	}
-
-	.priority-badge.normal {
-		background: #e5e7eb;
-		color: #374151;
-	}
-
-	.assign-btn {
-		padding: 6px 12px;
-		background: #475569;
-		color: white;
-		border: none;
-		border-radius: 6px;
-		font-size: 12px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.assign-btn:hover {
-		background: #334155;
-		transform: translateY(-1px);
-	}
-
-	/* Right Pane: Map */
+	/* Right Pane: Map Container */
 	.map-container {
 		flex: 1;
 		background: rgba(255, 255, 255, 0.95);
 		backdrop-filter: blur(20px);
 		border: 1px solid rgba(0, 0, 0, 0.1);
 		border-radius: 16px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-		display: flex;
-		flex-direction: column;
 		overflow: hidden;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 	}
 
 	.map-header {
@@ -949,18 +782,6 @@
 		width: 12px;
 		height: 12px;
 		border-radius: 50%;
-	}
-
-	.legend-dot.en-route {
-		background: #3B82F6;
-	}
-
-	.legend-dot.loading {
-		background: #F59E0B;
-	}
-
-	.legend-dot.delivery {
-		background: #10B981;
 	}
 
 	.map-view {
@@ -1180,10 +1001,6 @@
 
 		.dispatch-layout {
 			padding: 0 12px 12px 12px;
-		}
-
-		.snapshot-card {
-			padding: 16px;
 		}
 
 		.assignment-modal {

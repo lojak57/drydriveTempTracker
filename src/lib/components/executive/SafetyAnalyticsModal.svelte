@@ -77,8 +77,8 @@
 						<Shield size={32} />
 					</div>
 					<div class="header-text">
-						<h1>Safety Analytics Deep Dive</h1>
-						<p>Comprehensive breakdown of your 96.8% safety score</p>
+						<h1 class="text-xl font-semibold">Safety Analytics Deep Dive</h1>
+						<p class="text-sm">Comprehensive breakdown of your 96.8% safety score</p>
 					</div>
 				</div>
 				<button class="close-btn" on:click={closeModal}>×</button>
@@ -90,44 +90,44 @@
 				<div class="score-header">
 					<div class="main-score">
 						<div class="score-circle">
-							<div class="score-value">96.8<span class="score-unit">%</span></div>
-							<div class="score-label">Overall Safety Score</div>
+							<div class="score-value font-mono text-4xl font-bold">96.8<span class="score-unit text-lg opacity-80">%</span></div>
+							<div class="score-label text-xs opacity-90">Overall Safety Score</div>
 						</div>
 						<div class="score-trend">
 							<TrendingUp size={20} />
-							<span>+1.2% vs last month</span>
+							<span class="text-green-600 font-semibold text-sm">+1.2% vs last month</span>
 						</div>
 					</div>
 					<div class="score-composition">
-						<h3>Score Composition</h3>
+						<h3 class="text-lg font-semibold text-slate-800 mb-5">Score Composition</h3>
 						<div class="composition-breakdown">
 							<div class="composition-item">
-								<span class="component-name">Incident Rate (40%)</span>
+								<span class="component-name text-sm text-slate-600 font-medium">Incident Rate (40%)</span>
 								<div class="component-bar">
 									<div class="component-fill" style="width: 94.5%"></div>
 								</div>
-								<span class="component-score">94.5%</span>
+								<span class="component-score text-sm font-mono font-semibold text-slate-800">94.5%</span>
 							</div>
 							<div class="composition-item">
-								<span class="component-name">Training Compliance (25%)</span>
+								<span class="component-name text-sm text-slate-600 font-medium">Training Compliance (25%)</span>
 								<div class="component-bar">
 									<div class="component-fill" style="width: 96.9%"></div>
 								</div>
-								<span class="component-score">96.9%</span>
+								<span class="component-score text-sm font-mono font-semibold text-slate-800">96.9%</span>
 							</div>
 							<div class="composition-item">
-								<span class="component-name">Vehicle Inspections (20%)</span>
+								<span class="component-name text-sm text-slate-600 font-medium">Vehicle Inspections (20%)</span>
 								<div class="component-bar">
 									<div class="component-fill" style="width: 98.8%"></div>
 								</div>
-								<span class="component-score">98.8%</span>
+								<span class="component-score text-sm font-mono font-semibold text-slate-800">98.8%</span>
 							</div>
 							<div class="composition-item">
-								<span class="component-name">Regulatory Compliance (15%)</span>
+								<span class="component-name text-sm text-slate-600 font-medium">Regulatory Compliance (15%)</span>
 								<div class="component-bar">
 									<div class="component-fill" style="width: 97.7%"></div>
 								</div>
-								<span class="component-score">97.7%</span>
+								<span class="component-score text-sm font-mono font-semibold text-slate-800">97.7%</span>
 							</div>
 						</div>
 					</div>
@@ -135,8 +135,8 @@
 
 				<!-- Key Metrics Grid -->
 				<div class="metrics-section">
-					<h2>Key Safety Metrics</h2>
-					<div class="metrics-grid">
+					<h2 class="text-xl font-semibold text-slate-800 mb-6">Key Safety Metrics</h2>
+					<div class="metrics-grid chart-card-container">
 						<MetricCard 
 							title="Days Without Incident" 
 							value="23" 
@@ -182,26 +182,26 @@
 
 				<!-- Incident Analysis -->
 				<div class="incidents-section">
-					<h2>Incident Analysis (Last 90 Days)</h2>
+					<h2 class="text-xl font-semibold text-slate-800 mb-6">Incident Analysis (Last 90 Days)</h2>
 					<div class="incidents-overview">
 						<div class="incident-summary">
 							<div class="incident-card minor" on:click={() => openIncidentDetails('minor')}>
-								<div class="incident-count">2</div>
-								<div class="incident-type">Minor Incidents</div>
-								<div class="incident-desc">Equipment scratches, minor delays</div>
+								<div class="incident-count font-mono text-3xl font-bold text-amber-600">2</div>
+								<div class="incident-type text-base font-semibold text-slate-800">Minor Incidents</div>
+								<div class="incident-desc text-sm text-slate-600">Equipment scratches, minor delays</div>
 							</div>
 							<div class="incident-card major" on:click={() => openIncidentDetails('major')}>
-								<div class="incident-count">1</div>
-								<div class="incident-type">Major Incident</div>
-								<div class="incident-desc">Vehicle breakdown requiring tow</div>
+								<div class="incident-count font-mono text-3xl font-bold text-red-500">1</div>
+								<div class="incident-type text-base font-semibold text-slate-800">Major Incident</div>
+								<div class="incident-desc text-sm text-slate-600">Vehicle breakdown requiring tow</div>
 							</div>
 							<div class="incident-card critical" on:click={() => openIncidentDetails('critical')}>
-								<div class="incident-count">0</div>
-								<div class="incident-type">Critical Incidents</div>
-								<div class="incident-desc">No safety-related injuries</div>
+								<div class="incident-count font-mono text-3xl font-bold text-green-600">0</div>
+								<div class="incident-type text-base font-semibold text-slate-800">Critical Incidents</div>
+								<div class="incident-desc text-sm text-slate-600">No safety-related injuries</div>
 							</div>
 						</div>
-						<div class="incident-chart">
+						<div class="incident-chart chart-card">
 							<RealtimeChart 
 								title="Incident Trends (12 Months)"
 								color="#EF4444"
@@ -215,24 +215,24 @@
 
 				<!-- Regional Safety Performance -->
 				<div class="regional-section">
-					<h2>Regional Safety Performance</h2>
-					<div class="regional-grid">
+					<h2 class="text-xl font-semibold text-slate-800 mb-6">Regional Safety Performance</h2>
+					<div class="regional-grid chart-card-container">
 						{#each regionalSafety as region}
-							<div class="regional-card">
+							<div class="regional-card chart-card">
 								<div class="regional-header">
-									<h3>{region.region}</h3>
-									<div class="regional-score {region.score >= 97 ? 'excellent' : region.score >= 95 ? 'good' : 'attention'}">
+									<h3 class="text-base font-semibold text-slate-800">{region.region}</h3>
+									<div class="regional-score font-mono text-lg font-bold {region.score >= 97 ? 'text-green-600' : region.score >= 95 ? 'text-amber-600' : 'text-red-500'}">
 										{region.score}%
 									</div>
 								</div>
 								<div class="regional-details">
 									<div class="detail-item">
-										<span class="detail-label">Incidents (90 days)</span>
-										<span class="detail-value">{region.incidents}</span>
+										<span class="detail-label text-sm text-slate-600">Incidents (90 days)</span>
+										<span class="detail-value text-sm font-mono font-semibold {region.incidents === 0 ? 'text-green-600' : region.incidents <= 1 ? 'text-amber-600' : 'text-red-500'}">{region.incidents}</span>
 									</div>
 									<div class="detail-item">
-										<span class="detail-label">Trend</span>
-										<span class="detail-value trend-{region.trend}">
+										<span class="detail-label text-sm text-slate-600">Trend</span>
+										<span class="detail-value text-sm font-semibold {region.trend === 'up' ? 'text-green-600' : region.trend === 'down' ? 'text-red-500' : 'text-slate-700'}">
 											{#if region.trend === 'up'}↗️ Improving
 											{:else if region.trend === 'down'}↘️ Needs attention
 											{:else}→ Stable{/if}
@@ -246,42 +246,42 @@
 
 				<!-- Compliance Dashboard -->
 				<div class="compliance-section">
-					<h2>Regulatory Compliance</h2>
-					<div class="compliance-grid">
-						<div class="compliance-item">
+					<h2 class="text-xl font-semibold text-slate-800 mb-6">Regulatory Compliance</h2>
+					<div class="compliance-grid chart-card-container">
+						<div class="compliance-item chart-card">
 							<div class="compliance-header">
-								<span class="compliance-name">DOT Compliance</span>
-								<span class="compliance-score">98.2%</span>
+								<span class="compliance-name text-base font-semibold text-slate-800">DOT Compliance</span>
+								<span class="compliance-score text-lg font-mono font-bold {safetyBreakdown.compliance.dot >= 98 ? 'text-green-600' : safetyBreakdown.compliance.dot >= 95 ? 'text-amber-600' : 'text-red-500'}">{safetyBreakdown.compliance.dot}%</span>
 							</div>
 							<div class="compliance-bar">
-								<div class="compliance-fill" style="width: 98.2%"></div>
+								<div class="compliance-fill" style="width: {safetyBreakdown.compliance.dot}%"></div>
 							</div>
 						</div>
-						<div class="compliance-item">
+						<div class="compliance-item chart-card">
 							<div class="compliance-header">
-								<span class="compliance-name">OSHA Standards</span>
-								<span class="compliance-score">97.5%</span>
+								<span class="compliance-name text-base font-semibold text-slate-800">OSHA Standards</span>
+								<span class="compliance-score text-lg font-mono font-bold {safetyBreakdown.compliance.osha >= 98 ? 'text-green-600' : safetyBreakdown.compliance.osha >= 95 ? 'text-amber-600' : 'text-red-500'}">{safetyBreakdown.compliance.osha}%</span>
 							</div>
 							<div class="compliance-bar">
-								<div class="compliance-fill" style="width: 97.5%"></div>
+								<div class="compliance-fill" style="width: {safetyBreakdown.compliance.osha}%"></div>
 							</div>
 						</div>
-						<div class="compliance-item">
+						<div class="compliance-item chart-card">
 							<div class="compliance-header">
-								<span class="compliance-name">Environmental</span>
-								<span class="compliance-score">99.1%</span>
+								<span class="compliance-name text-base font-semibold text-slate-800">Environmental</span>
+								<span class="compliance-score text-lg font-mono font-bold {safetyBreakdown.compliance.environmental >= 98 ? 'text-green-600' : safetyBreakdown.compliance.environmental >= 95 ? 'text-amber-600' : 'text-red-500'}">{safetyBreakdown.compliance.environmental}%</span>
 							</div>
 							<div class="compliance-bar">
-								<div class="compliance-fill" style="width: 99.1%"></div>
+								<div class="compliance-fill" style="width: {safetyBreakdown.compliance.environmental}%"></div>
 							</div>
 						</div>
-						<div class="compliance-item">
+						<div class="compliance-item chart-card">
 							<div class="compliance-header">
-								<span class="compliance-name">Internal Policies</span>
-								<span class="compliance-score">96.3%</span>
+								<span class="compliance-name text-base font-semibold text-slate-800">Internal Policies</span>
+								<span class="compliance-score text-lg font-mono font-bold {safetyBreakdown.compliance.internal >= 98 ? 'text-green-600' : safetyBreakdown.compliance.internal >= 95 ? 'text-amber-600' : 'text-red-500'}">{safetyBreakdown.compliance.internal}%</span>
 							</div>
 							<div class="compliance-bar">
-								<div class="compliance-fill" style="width: 96.3%"></div>
+								<div class="compliance-fill" style="width: {safetyBreakdown.compliance.internal}%"></div>
 							</div>
 						</div>
 					</div>
@@ -324,6 +324,7 @@
 		box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
 		display: flex;
 		flex-direction: column;
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 	}
 
 	.modal-header {
@@ -353,14 +354,13 @@
 
 	.header-text h1 {
 		margin: 0 0 4px 0;
-		font-size: 24px;
-		font-weight: 700;
+		color: white;
 	}
 
 	.header-text p {
 		margin: 0;
 		opacity: 0.9;
-		font-size: 14px;
+		color: white;
 	}
 
 	.close-btn {
@@ -386,6 +386,26 @@
 		flex: 1;
 		overflow-y: auto;
 		padding: 32px;
+	}
+
+	/* Global Chart Card System */
+	.chart-card {
+		background: white;
+		border: 1px solid #e2e8f0;
+		border-radius: 12px;
+		padding: 20px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		transition: all 0.2s ease;
+	}
+
+	.chart-card:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	}
+
+	.chart-card-container {
+		display: grid;
+		gap: 20px;
 	}
 
 	/* Score Header */
@@ -420,37 +440,12 @@
 		position: relative;
 	}
 
-	.score-value {
-		font-size: 36px;
-		font-weight: 700;
-		font-family: 'JetBrains Mono', monospace;
-	}
-
-	.score-unit {
-		font-size: 18px;
-		opacity: 0.8;
-	}
-
-	.score-label {
-		font-size: 12px;
-		opacity: 0.9;
-		text-align: center;
-	}
-
 	.score-trend {
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		color: #10B981;
 		font-weight: 600;
 		font-size: 14px;
-	}
-
-	.score-composition h3 {
-		margin: 0 0 20px 0;
-		font-size: 18px;
-		font-weight: 700;
-		color: #1e293b;
 	}
 
 	.composition-breakdown {
@@ -466,12 +461,6 @@
 		gap: 12px;
 	}
 
-	.component-name {
-		font-size: 14px;
-		color: #64748b;
-		font-weight: 500;
-	}
-
 	.component-bar {
 		height: 8px;
 		background: #f1f5f9;
@@ -485,13 +474,6 @@
 		transition: width 0.3s ease;
 	}
 
-	.component-score {
-		font-size: 14px;
-		font-weight: 600;
-		color: #1e293b;
-		text-align: right;
-	}
-
 	/* Sections */
 	.metrics-section,
 	.incidents-section,
@@ -500,20 +482,8 @@
 		margin-bottom: 40px;
 	}
 
-	.metrics-section h2,
-	.incidents-section h2,
-	.regional-section h2,
-	.compliance-section h2 {
-		margin: 0 0 24px 0;
-		font-size: 20px;
-		font-weight: 700;
-		color: #1e293b;
-	}
-
 	.metrics-grid {
-		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-		gap: 20px;
 	}
 
 	/* Incidents */
@@ -521,6 +491,7 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: 32px;
+		align-items: start;
 	}
 
 	.incident-summary {
@@ -536,6 +507,9 @@
 		cursor: pointer;
 		transition: all 0.2s ease;
 		position: relative;
+		background: white;
+		border: 1px solid #e2e8f0;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	}
 
 	.incident-card:hover {
@@ -564,51 +538,20 @@
 	}
 
 	.incident-card.minor {
-		background: #fef3c7;
-		border-color: #f59e0b;
+		border-left-color: #f59e0b;
 	}
 
 	.incident-card.major {
-		background: #fee2e2;
-		border-color: #ef4444;
+		border-left-color: #ef4444;
 	}
 
 	.incident-card.critical {
-		background: #f3f4f6;
-		border-color: #6b7280;
-	}
-
-	.incident-count {
-		font-size: 32px;
-		font-weight: 700;
-		font-family: 'JetBrains Mono', monospace;
-		margin-bottom: 8px;
-	}
-
-	.incident-type {
-		font-size: 16px;
-		font-weight: 600;
-		margin-bottom: 4px;
-	}
-
-	.incident-desc {
-		font-size: 14px;
-		color: #64748b;
+		border-left-color: #10b981;
 	}
 
 	/* Regional */
 	.regional-grid {
-		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: 20px;
-	}
-
-	.regional-card {
-		background: white;
-		border: 1px solid #e2e8f0;
-		border-radius: 16px;
-		padding: 24px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 	}
 
 	.regional-header {
@@ -620,31 +563,6 @@
 
 	.regional-header h3 {
 		margin: 0;
-		font-size: 16px;
-		font-weight: 600;
-	}
-
-	.regional-score {
-		font-size: 18px;
-		font-weight: 700;
-		font-family: 'JetBrains Mono', monospace;
-		padding: 4px 12px;
-		border-radius: 8px;
-	}
-
-	.regional-score.excellent {
-		background: #dcfce7;
-		color: #16a34a;
-	}
-
-	.regional-score.good {
-		background: #fef3c7;
-		color: #d97706;
-	}
-
-	.regional-score.attention {
-		background: #fee2e2;
-		color: #dc2626;
 	}
 
 	.regional-details {
@@ -659,28 +577,9 @@
 		align-items: center;
 	}
 
-	.detail-label {
-		font-size: 14px;
-		color: #64748b;
-	}
-
-	.detail-value {
-		font-size: 14px;
-		font-weight: 600;
-	}
-
 	/* Compliance */
 	.compliance-grid {
-		display: flex;
-		flex-direction: column;
-		gap: 20px;
-	}
-
-	.compliance-item {
-		background: white;
-		border: 1px solid #e2e8f0;
-		border-radius: 12px;
-		padding: 20px;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 	}
 
 	.compliance-header {
@@ -688,19 +587,6 @@
 		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 12px;
-	}
-
-	.compliance-name {
-		font-size: 16px;
-		font-weight: 600;
-		color: #1e293b;
-	}
-
-	.compliance-score {
-		font-size: 18px;
-		font-weight: 700;
-		color: #10B981;
-		font-family: 'JetBrains Mono', monospace;
 	}
 
 	.compliance-bar {
@@ -717,7 +603,7 @@
 		transition: width 0.3s ease;
 	}
 
-	/* Mobile */
+	/* Mobile Responsiveness */
 	@media (max-width: 768px) {
 		.modal-backdrop {
 			padding: 10px;
@@ -734,6 +620,7 @@
 		.score-header {
 			grid-template-columns: 1fr;
 			gap: 24px;
+			padding: 20px;
 		}
 
 		.incidents-overview {
@@ -741,8 +628,29 @@
 		}
 
 		.metrics-grid,
-		.regional-grid {
+		.regional-grid,
+		.compliance-grid {
 			grid-template-columns: 1fr;
+		}
+
+		.chart-card-container {
+			gap: 16px;
+		}
+
+		.chart-card {
+			padding: 16px;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.composition-item {
+			grid-template-columns: 1fr 80px 50px;
+			gap: 8px;
+		}
+
+		.score-circle {
+			width: 140px;
+			height: 140px;
 		}
 	}
 </style> 

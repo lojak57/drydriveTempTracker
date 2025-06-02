@@ -159,14 +159,14 @@
 	});
 </script>
 
-<div class="god-view-analytics">
+<div class="fleet-intelligence-analytics">
 	<!-- Header with title and stats -->
 	<div class="analytics-header">
 		<div class="header-content">
 			<div class="title-section">
 				<h1 class="analytics-title">
 					<Activity class="w-6 h-6 text-orange-500" />
-					God View Analytics
+					Fleet Intelligence Nexus
 				</h1>
 				<p class="analytics-subtitle">
 					Real-time fleet operations intelligence • Last updated {formatLastUpdate(lastUpdate)}
@@ -319,7 +319,7 @@
 </div>
 
 <style>
-	.god-view-analytics {
+	.fleet-intelligence-analytics {
 		@apply flex flex-col h-full bg-gray-50 dark:bg-gray-900;
 	}
 

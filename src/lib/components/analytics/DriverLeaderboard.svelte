@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { STATUS_INDICATORS } from '$lib/constants';
+	
 	export let drivers: Array<{
 		id: string;
 		name: string;
@@ -23,10 +25,10 @@
 	}
 
 	function getEfficiencyColor(efficiency: number) {
-		if (efficiency >= 98) return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-		if (efficiency >= 96) return 'text-blue-600 bg-blue-50 border-blue-200';
-		if (efficiency >= 94) return 'text-amber-600 bg-amber-50 border-amber-200';
-		return 'text-red-600 bg-red-50 border-red-200';
+		if (efficiency >= 98) return 'text-success bg-green-50 border-green-200 text-success-dark';
+		if (efficiency >= 96) return 'text-info bg-blue-50 border-blue-200 text-info-dark';
+		if (efficiency >= 94) return 'text-warning bg-yellow-50 border-yellow-200 text-warning-dark';
+		return 'text-error bg-red-50 border-red-200 text-error-dark';
 	}
 </script>
 
