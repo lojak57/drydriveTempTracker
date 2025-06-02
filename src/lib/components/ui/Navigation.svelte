@@ -16,7 +16,6 @@
 		{
 			title: 'Operations',
 			items: [
-				{ href: '/dispatch', label: 'Dispatch Hub', icon: MapPin, description: 'Operations and fleet management' },
 				{ href: '/master-dispatch', label: 'Fleet Intelligence Nexus', icon: BarChart3, description: 'Executive fleet intelligence and analytics' }
 			]
 		},
@@ -29,7 +28,7 @@
 		{
 			title: 'Calibration',
 			items: [
-				{ href: '/calibration/smart-recommender', label: 'Smart Recommender', icon: BarChart3, description: 'AI-powered calibration recommendations' }
+				{ href: '/calibration/smart-recommender', label: 'Coriolis Calibration Status', icon: BarChart3, description: 'Coriolis flow meter calibration management' }
 			]
 		},
 		{
@@ -50,7 +49,7 @@
 		{ href: '/analytics', label: 'Yard Analytics', icon: TrendingUp, description: 'Performance and efficiency metrics' },
 		{ href: '/maintenance', label: 'Fleet Management', icon: Wrench, description: 'Vehicle status and maintenance tracking' },
 		{ href: '/thermal', label: 'Thermal Analysis', icon: Thermometer, description: 'DryDrive temperature insights' },
-		{ href: '/calibration', label: 'Calibration Hub', icon: Settings, description: 'Flow meter calibration management' }
+		{ href: '/calibration', label: 'Coriolis Calibration Status', icon: Settings, description: 'Flow meter calibration management' }
 	];
 
 	function isActiveRoute(href: string): boolean {
@@ -197,8 +196,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 8px 16px;
-		height: 56px;
+		padding: 6px 16px;
+		height: 48px;
+		background: linear-gradient(135deg, rgb(15, 23, 42) 0%, rgb(30, 41, 59) 100%);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.3);
 	}
 
 	.mobile-logo {
@@ -362,9 +363,9 @@
 		}
 
 		.nav-header {
-			padding: 16px;
-			border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-			background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+			padding: 12px 16px;
+			border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+			background: linear-gradient(135deg, rgb(15, 23, 42) 0%, rgb(30, 41, 59) 100%);
 		}
 
 		.logo-container {

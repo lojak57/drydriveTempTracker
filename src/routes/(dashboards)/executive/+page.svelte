@@ -418,6 +418,22 @@
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 		gap: 20px;
 		margin-bottom: 32px;
+		justify-items: center;
+	}
+
+	/* Special styling for hero metrics to ensure proper alignment */
+	.hero-metrics {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 20px;
+		margin-bottom: 32px;
+	}
+
+	.hero-metrics > :global(*) {
+		flex: 1;
+		min-width: 280px;
+		max-width: 300px;
 	}
 
 	/* Charts */

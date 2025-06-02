@@ -108,8 +108,8 @@
 				<Warehouse size={32} />
 			</div>
 			<div class="header-text">
-				<h1 class="text-xl font-semibold tracking-tight text-slate-800">Yard Manager Dashboard</h1>
-				<p class="text-sm text-slate-600 tracking-normal">Fleet overview, driver management, and yard operations</p>
+				<h1 class="text-xl font-semibold tracking-tight text-slate-100">Yard Manager Dashboard</h1>
+				<p class="text-sm text-slate-300 tracking-normal">Fleet overview, driver management, and yard operations</p>
 			</div>
 		</div>
 	</div>
@@ -285,7 +285,7 @@
 							<span class="text-slate-600 text-sm">vs yesterday</span>
 						</div>
 						<ClickToExplore 
-							label="Analyze Trends"
+							label="View Details"
 							variant="subtle"
 							on:click={openAnalyticsTable}
 						/>
@@ -319,7 +319,7 @@
 						<div class="perf-value font-mono text-slate-900">4.2</div>
 						<p class="text-slate-600 text-sm">3 trucks in maintenance</p>
 						<ClickToExplore 
-							label="View Full Story"
+							label="View Details"
 							variant="subtle"
 							on:click={openAnalyticsTable}
 						/>
@@ -387,13 +387,13 @@
 	}
 
 	.dashboard-header {
-		background: rgba(255, 255, 255, 0.95);
+		background: linear-gradient(135deg, rgb(24, 24, 27) 0%, rgb(39, 39, 42) 100%);
 		backdrop-filter: blur(20px);
-		border: 1px solid rgba(0, 0, 0, 0.1);
+		border: 1px solid rgba(161, 161, 170, 0.2);
 		border-radius: 20px;
 		padding: 32px;
 		margin-bottom: 24px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 	}
 
 	.header-content {
