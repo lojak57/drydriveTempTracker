@@ -332,7 +332,7 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 24px 32px;
-		background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+		background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
 		color: white;
 	}
 
@@ -431,7 +431,7 @@
 		width: 180px;
 		height: 180px;
 		border-radius: 50%;
-		background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+		background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -470,7 +470,7 @@
 
 	.component-fill {
 		height: 100%;
-		background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+		background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
 		transition: width 0.3s ease;
 	}
 
@@ -598,7 +598,7 @@
 
 	.compliance-fill {
 		height: 100%;
-		background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+		background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
 		border-radius: 6px;
 		transition: width 0.3s ease;
 	}
