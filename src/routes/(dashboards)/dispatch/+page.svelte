@@ -265,14 +265,11 @@
 
 <div class="dispatch-center">
 	<!-- Header -->
-	<div class="dispatch-header">
+	<div class="dispatch-header bg-slate-800 text-white">
 		<div class="header-content">
-			<div class="header-icon">
-				<Radio size={28} />
-			</div>
 			<div class="header-text">
-				<h1>Dispatch Operations Center</h1>
-				<p>Real-time fleet coordination and route management</p>
+				<h1 class="header-title text-xl font-semibold">Dispatch Operations Center</h1>
+				<p class="header-subtitle text-slate-300">Real-time fleet coordination and route management</p>
 			</div>
 			<div class="header-actions">
 				<button class="emergency-btn">
@@ -503,13 +500,10 @@
 	}
 
 	.dispatch-header {
-		background: rgba(255, 255, 255, 0.95);
-		backdrop-filter: blur(20px);
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		border-radius: 20px;
+		border-radius: 16px;
 		margin: 20px;
 		padding: 24px 32px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 	}
 
 	.header-content {
@@ -518,24 +512,11 @@
 		justify-content: space-between;
 	}
 
-	.header-icon {
-		padding: 12px;
-		background: linear-gradient(135deg, #475569 0%, #334155 100%);
-		border-radius: 12px;
-		color: white;
-		margin-right: 16px;
-	}
-
 	.header-text h1 {
-		font-size: 28px;
-		font-weight: 700;
-		color: #1e293b;
 		margin: 0 0 4px 0;
 	}
 
 	.header-text p {
-		font-size: 16px;
-		color: #64748b;
 		margin: 0;
 	}
 

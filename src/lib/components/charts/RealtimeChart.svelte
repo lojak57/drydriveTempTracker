@@ -11,6 +11,12 @@
 	export let showGrid: boolean = true;
 	export let maxDataPoints: number = 20;
 	export let updateInterval: number = 4000; // milliseconds
+	
+	// External positioning controls
+	export let paddingLeft: number = 15;
+	export let paddingRight: number = 15;
+	export let paddingTop: number = 15;
+	export let paddingBottom: number = 50;
 
 	let chartData: any = null;
 	let chartOptions: any = null;
@@ -162,10 +168,10 @@
 			maintainAspectRatio: false,
 			layout: {
 				padding: {
-					left: 15,
-					right: 15,
-					top: 15,
-					bottom: 50 // Much more padding for x-axis labels
+					left: paddingLeft,
+					right: paddingRight,
+					top: paddingTop,
+					bottom: paddingBottom
 				}
 			},
 			plugins: {
@@ -331,7 +337,7 @@
 	.chart-title {
 		font-size: 16px;
 		font-weight: 600;
-		color: #1f2937;
+		color: #ffffff;
 		margin: 0;
 		line-height: 1.2;
 	}
@@ -375,7 +381,7 @@
 	.chart-wrapper {
 		height: calc(100% - 45px); /* More space for chart */
 		position: relative;
-		min-height: 350px; /* Increased minimum height */
+		min-height: 420px; /* Increased from 350px to make background taller */
 		overflow: visible; /* Ensure labels aren't clipped */
 	}
 
@@ -432,5 +438,48 @@
 		.chart-loading {
 			color: #9ca3af;
 		}
+	}
+
+	/* Debug positioning controls */
+	.debug-controls {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.position-controls {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.horizontal-controls {
+		display: flex;
+		gap: 4px;
+	}
+
+	.pos-btn {
+		width: 24px;
+		height: 24px;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 4px;
+		color: #ffffff;
+		font-size: 12px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.pos-btn:hover {
+		background: rgba(255, 255, 255, 0.2);
+		transform: scale(1.1);
+	}
+
+	.padding-display {
+		font-size: 10px;
+		color: rgba(255, 255, 255, 0.7);
+		font-family: monospace;
 	}
 </style> 

@@ -33,7 +33,7 @@
 	$: hasAlerts = yard.alerts.length > 0;
 </script>
 
-<button class="yard-card" on:click={handleClick}>
+<button class="yard-card dashboard-card-hover" on:click={handleClick}>
 	<div class="card-header">
 		<div class="yard-info">
 			<h3 class="yard-name">{yard.name}</h3>

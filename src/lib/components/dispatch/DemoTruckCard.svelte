@@ -35,7 +35,7 @@
 	$: nextScheduledText = truck.nextScheduled ? formatDistanceToNow(truck.nextScheduled, { addSuffix: true }) : 'Not scheduled';
 </script>
 
-<button class="truck-card" on:click={handleClick} class:problem={truck.efficiency < 80}>
+<button class="truck-card dashboard-card-hover" on:click={handleClick} class:problem={truck.efficiency < 80}>
 	<div class="card-header">
 		<div class="truck-info">
 			<h3 class="truck-id">{truck.id}</h3>

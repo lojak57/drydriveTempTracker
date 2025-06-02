@@ -102,14 +102,11 @@
 
 <div class="yard-dashboard">
 	<!-- Header -->
-	<div class="dashboard-header">
+	<div class="dashboard-header bg-slate-800 text-white">
 		<div class="header-content">
-			<div class="header-icon">
-				<Warehouse size={32} />
-			</div>
 			<div class="header-text">
-				<h1 class="text-xl font-semibold tracking-tight text-slate-100">Yard Manager Dashboard</h1>
-				<p class="text-sm text-slate-300 tracking-normal">Fleet overview, driver management, and yard operations</p>
+				<h1 class="header-title text-xl font-semibold">Yard Manager Dashboard</h1>
+				<p class="header-subtitle text-slate-300">Fleet overview, driver management, and yard operations</p>
 			</div>
 		</div>
 	</div>
@@ -387,32 +384,24 @@
 	}
 
 	.dashboard-header {
-		background: linear-gradient(135deg, rgb(24, 24, 27) 0%, rgb(39, 39, 42) 100%);
-		backdrop-filter: blur(20px);
-		border: 1px solid rgba(161, 161, 170, 0.2);
-		border-radius: 20px;
-		padding: 32px;
+		border-radius: 16px;
+		padding: 24px 32px;
 		margin-bottom: 24px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 	}
 
 	.header-content {
 		display: flex;
 		align-items: center;
-		gap: 20px;
+		justify-content: space-between;
 	}
 
-	.header-icon {
-		font-size: 48px;
-		width: 80px;
-		height: 80px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-		border-radius: 20px;
-		color: white;
-		box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+	.header-text h1 {
+		margin: 0 0 4px 0;
+	}
+
+	.header-text p {
+		margin: 0;
 	}
 
 	.section-nav {

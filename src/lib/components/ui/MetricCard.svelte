@@ -81,7 +81,7 @@
 </script>
 
 <div 
-	class="metric-card" 
+	class="metric-card dashboard-card-hover" 
 	class:clickable
 	style="--primary-color: {colors.primary}; --accent-bg: {colors.accent}; --gradient-bg: {colors.bg}; --border-color: {colors.border}"
 	on:click={handleClick}

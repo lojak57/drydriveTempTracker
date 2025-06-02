@@ -46,7 +46,7 @@
 
 	<!-- Fleet KPI Dashboard -->
 	<div class="kpi-grid">
-		<div class="kpi-card primary">
+		<div class="kpi-card primary dashboard-card-hover">
 			<div class="kpi-icon">
 				<Truck class="w-6 h-6" />
 			</div>
@@ -57,7 +57,7 @@
 			</div>
 		</div>
 
-		<div class="kpi-card success">
+		<div class="kpi-card success dashboard-card-hover">
 			<div class="kpi-icon">
 				<DollarSign class="w-6 h-6" />
 			</div>
@@ -68,7 +68,7 @@
 			</div>
 		</div>
 
-		<div class="kpi-card {demoFleet.efficiency >= 92 ? 'success' : 'warning'}">
+		<div class="kpi-card {demoFleet.efficiency >= 92 ? 'success' : 'warning'} dashboard-card-hover">
 			<div class="kpi-icon">
 				{#if demoFleet.efficiency >= 92}
 					<TrendingUp class="w-6 h-6" />
@@ -83,7 +83,7 @@
 			</div>
 		</div>
 
-		<div class="kpi-card {demoFleet.avgVolumeLoss <= 2.0 ? 'success' : 'danger'}">
+		<div class="kpi-card {demoFleet.avgVolumeLoss <= 2.0 ? 'success' : 'danger'} dashboard-card-hover">
 			<div class="kpi-icon">
 				<BarChart3 class="w-6 h-6" />
 			</div>
@@ -94,7 +94,7 @@
 			</div>
 		</div>
 
-		<div class="kpi-card info">
+		<div class="kpi-card info dashboard-card-hover">
 			<div class="kpi-icon">
 				<Building2 class="w-6 h-6" />
 			</div>
@@ -105,7 +105,7 @@
 			</div>
 		</div>
 
-		<div class="kpi-card {demoFleet.safetyScore >= 95 ? 'success' : 'warning'}">
+		<div class="kpi-card {demoFleet.safetyScore >= 95 ? 'success' : 'warning'} dashboard-card-hover">
 			<div class="kpi-icon">
 				<Users class="w-6 h-6" />
 			</div>

@@ -409,6 +409,11 @@
 
 	.tab-meta {
 		@apply text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2;
+		white-space: normal;
+		word-wrap: break-word;
+		line-height: 1.2;
+		overflow: visible;
+		text-overflow: unset;
 	}
 
 	.main-tab.active .tab-label {
@@ -446,7 +451,7 @@
 		}
 
 		.tab-meta {
-			@apply hidden;
+			@apply text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1;
 		}
 	}
 </style> 

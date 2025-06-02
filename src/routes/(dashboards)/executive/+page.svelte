@@ -2,11 +2,21 @@
 	import MetricCard from '$lib/components/ui/MetricCard.svelte';
 	import RealtimeChart from '$lib/components/charts/RealtimeChart.svelte';
 	import SafetyAnalyticsModal from '$lib/components/executive/SafetyAnalyticsModal.svelte';
+	import ChartDebugControls from '$lib/components/debug/ChartDebugControls.svelte';
 	import { BarChart3, DollarSign, Building2, Target, TrendingUp, Truck, Shield } from 'lucide-svelte';
 
 	// Executive metrics
 	let activeTab = 'overview';
 	let showSafetyModal = false;
+	
+	// Chart debug controls
+	let showDebugControls = false;
+	let chartPadding = {
+		paddingLeft: 15,
+		paddingRight: 15,
+		paddingTop: 15,
+		paddingBottom: 50
+	};
 
 	const tabs = [
 		{ id: 'overview', label: 'Executive Overview', icon: BarChart3 },
@@ -18,24 +28,37 @@
 	function handleSafetyClick() {
 		showSafetyModal = true;
 	}
+	
+	function handlePaddingUpdate(event: CustomEvent) {
+		chartPadding = event.detail;
+	}
+	
+	function handleDebugClose() {
+		showDebugControls = false;
+	}
+	
+	// Toggle debug controls with keyboard shortcut
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.ctrlKey && event.shiftKey && event.code === 'KeyD') {
+			event.preventDefault();
+			showDebugControls = !showDebugControls;
+		}
+	}
 </script>
 
 <svelte:head>
 	<title>Executive Dashboard - Oil Field Temp Tracker</title>
 </svelte:head>
 
+<svelte:window on:keydown={handleKeydown} />
+
 <div class="executive-dashboard">
 	<!-- Header -->
-	<div class="dashboard-header">
+	<div class="dashboard-header bg-slate-800 text-white">
 		<div class="header-content">
-			<div class="header-left">
-				<div class="header-icon">
-					<TrendingUp size={24} />
-				</div>
-				<div class="header-text">
-					<h1 class="header-title">Executive Dashboard</h1>
-					<p class="header-subtitle">Strategic insights for PAA leadership</p>
-				</div>
+			<div class="header-text">
+				<h1 class="header-title text-xl font-semibold">Executive Dashboard</h1>
+				<p class="header-subtitle text-slate-300">Strategic insights for PAA leadership</p>
 			</div>
 			<div class="header-actions">
 				<button class="action-button outline" type="button">
@@ -45,6 +68,14 @@
 				<button class="action-button outline" type="button">
 					<TrendingUp size={16} />
 					<span>Refresh Data</span>
+				</button>
+				<button 
+					class="action-button {showDebugControls ? 'active' : 'outline'}" 
+					type="button"
+					on:click={() => showDebugControls = !showDebugControls}
+				>
+					<span>🛠️</span>
+					<span>Debug Charts</span>
 				</button>
 			</div>
 		</div>
@@ -120,18 +151,26 @@
 						<RealtimeChart 
 							title="Company Performance Overview (Adjusted EBITDA)"
 							color="#10B981"
-							height={400}
+							height={450}
 							unit="$M"
 							animated={true}
+							paddingLeft={chartPadding.paddingLeft}
+							paddingRight={chartPadding.paddingRight}
+							paddingTop={chartPadding.paddingTop}
+							paddingBottom={chartPadding.paddingBottom}
 						/>
 					</div>
 					<div class="chart-container">
 						<RealtimeChart 
 							title="Regional Revenue Distribution"
 							color="#3B82F6"
-							height={400}
+							height={450}
 							unit="%"
 							animated={true}
+							paddingLeft={chartPadding.paddingLeft}
+							paddingRight={chartPadding.paddingRight}
+							paddingTop={chartPadding.paddingTop}
+							paddingBottom={chartPadding.paddingBottom}
 						/>
 					</div>
 				</div>
@@ -177,18 +216,26 @@
 						<RealtimeChart 
 							title="Revenue Trends (12 Months)"
 							color="#10B981"
-							height={400}
+							height={450}
 							unit="$M"
 							animated={true}
+							paddingLeft={chartPadding.paddingLeft}
+							paddingRight={chartPadding.paddingRight}
+							paddingTop={chartPadding.paddingTop}
+							paddingBottom={chartPadding.paddingBottom}
 						/>
 					</div>
 					<div class="chart-container">
 						<RealtimeChart 
 							title="Cost Analysis & Margins"
 							color="#3B82F6"
-							height={400}
+							height={450}
 							unit="$"
 							animated={true}
+							paddingLeft={chartPadding.paddingLeft}
+							paddingRight={chartPadding.paddingRight}
+							paddingTop={chartPadding.paddingTop}
+							paddingBottom={chartPadding.paddingBottom}
 						/>
 					</div>
 				</div>
@@ -260,10 +307,24 @@
 </div>
 
 <!-- Safety Analytics Modal -->
-<SafetyAnalyticsModal 
-	isOpen={showSafetyModal} 
-	on:close={() => showSafetyModal = false}
-/>
+{#if showSafetyModal}
+	<SafetyAnalyticsModal 
+		isOpen={showSafetyModal} 
+		on:close={() => showSafetyModal = false} 
+	/>
+{/if}
+
+<!-- Debug Controls -->
+{#if showDebugControls}
+	<ChartDebugControls 
+		paddingLeft={chartPadding.paddingLeft}
+		paddingRight={chartPadding.paddingRight}
+		paddingTop={chartPadding.paddingTop}
+		paddingBottom={chartPadding.paddingBottom}
+		on:update={handlePaddingUpdate}
+		on:close={handleDebugClose}
+	/>
+{/if}
 
 <style>
 	.executive-dashboard {
@@ -273,13 +334,10 @@
 	}
 
 	.dashboard-header {
-		background: rgba(255, 255, 255, 0.8);
-		backdrop-filter: blur(20px);
-		border: 1px solid rgba(226, 232, 240, 0.8);
-		border-radius: 12px;
-		padding: 16px 24px;
+		border-radius: 16px;
+		padding: 24px 32px;
 		margin-bottom: 24px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 	}
 
 	.header-content {
@@ -290,42 +348,12 @@
 		flex-wrap: wrap;
 	}
 
-	.header-left {
-		display: flex;
-		align-items: center;
-		gap: 16px;
-		flex: 1;
-		min-width: 0;
-	}
-
-	.header-icon {
-		font-size: 32px;
-		width: 56px;
-		height: 56px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
-		border-radius: 16px;
-		color: white;
-		box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
-		flex-shrink: 0;
-	}
-
 	.header-text h1 {
-		font-size: 24px;
-		font-weight: 700;
-		color: #1e293b;
 		margin: 0 0 4px 0;
-		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-		white-space: nowrap;
 	}
 
 	.header-text p {
-		font-size: 14px;
-		color: #64748b;
 		margin: 0;
-		white-space: nowrap;
 	}
 
 	.header-actions {
@@ -339,10 +367,10 @@
 		align-items: center;
 		gap: 6px;
 		padding: 8px 16px;
-		background: transparent;
-		border: 1px solid #e2e8f0;
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 8px;
-		color: #64748b;
+		color: white;
 		font-size: 14px;
 		font-weight: 500;
 		cursor: pointer;
@@ -351,9 +379,9 @@
 	}
 
 	.action-button:hover {
-		background: #f8fafc;
-		border-color: #cbd5e1;
-		color: #1e293b;
+		background: rgba(255, 255, 255, 0.2);
+		border-color: rgba(255, 255, 255, 0.3);
+		color: white;
 	}
 
 	.nav-tabs {
@@ -418,7 +446,25 @@
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 		gap: 20px;
 		margin-bottom: 32px;
-		justify-items: center;
+	}
+
+	/* Ensure equal card sizing */
+	.operations-metrics {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 20px;
+		margin-bottom: 32px;
+	}
+
+	/* Force consistent card heights across all metric containers */
+	.hero-metrics > :global(*),
+	.financial-metrics > :global(*),
+	.operations-metrics > :global(*),
+	.strategic-metrics > :global(*) {
+		min-height: 140px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
 	}
 
 	/* Special styling for hero metrics to ensure proper alignment */
@@ -434,19 +480,22 @@
 		flex: 1;
 		min-width: 280px;
 		max-width: 300px;
+		min-height: 140px;
 	}
 
 	/* Charts */
 	.charts-section {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+		display: flex;
+		flex-wrap: wrap;
 		gap: 24px;
+		align-items: flex-start;
 	}
 
 	.financial-charts {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+		display: flex;
+		flex-wrap: wrap;
 		gap: 24px;
+		align-items: flex-start;
 	}
 
 	.chart-container {
@@ -455,9 +504,18 @@
 		border-radius: 12px;
 		padding: 20px;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		flex: 1;
+		min-width: 500px;
+		vertical-align: top;
 	}
 
 	/* Mobile Responsiveness */
+	@media (max-width: 1024px) {
+		.operations-metrics {
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+		}
+	}
+
 	@media (max-width: 768px) {
 		.executive-dashboard {
 			padding: 16px;
@@ -524,6 +582,11 @@
 			margin-bottom: 24px;
 		}
 
+		/* Override operations metrics for mobile */
+		.operations-metrics {
+			grid-template-columns: 1fr;
+		}
+
 		.charts-section,
 		.financial-charts {
 			grid-template-columns: 1fr;
@@ -552,5 +615,22 @@
 		.tab-icon {
 			font-size: 18px;
 		}
+	}
+
+	.action-button.outline:hover {
+		background: rgba(255, 255, 255, 0.15);
+		border-color: rgba(255, 255, 255, 0.6);
+		transform: translateY(-1px);
+	}
+
+	.action-button.active {
+		background: #10b981;
+		border-color: #10b981;
+		color: white;
+	}
+
+	.action-button.active:hover {
+		background: #059669;
+		border-color: #059669;
 	}
 </style> 

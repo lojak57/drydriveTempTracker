@@ -22,7 +22,7 @@
 
 <a 
 	{href} 
-	class="role-card group"
+	class="role-card group dashboard-card-hover"
 	data-sveltekit-preload-data="hover"
 >
 	<div class="role-icon">

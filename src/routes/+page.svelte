@@ -47,36 +47,46 @@
 </svelte:head>
 
 <div class="dashboard-landing">
-<!-- Header -->
+	<!-- Header -->
 	<div class="landing-header">
 		<div class="header-content">
 			<DryDriveLogo />
 			<div class="header-text">
-				<h1 class="main-title">Oil Field Temp Tracker</h1>
-				<p class="main-subtitle">Select your role to access your dashboard</p>
+				<h1 class="main-title">DryDrive Nexus</h1>
+				<p class="main-subtitle">AI-Driven Logistics for Oilfield Excellence</p>
+			</div>
+		</div>
 	</div>
-</div>
-</div>
 
 	<!-- Role Selection -->
 	<div class="role-selection">
 		<div class="roles-container">
-			{#each roles as role}
+			{#each roles.slice(0, 4) as role}
 				<RoleCard
 					role={role.title}
 					icon={role.icon}
 					description={role.description}
 					href={role.href}
 				/>
-					{/each}
-				</div>
-			</div>
+			{/each}
+		</div>
+		
+		<!-- Dispatch card in separate centered container -->
+		<div class="dispatch-container">
+			<RoleCard
+				role={roles[4].title}
+				icon={roles[4].icon}
+				description={roles[4].description}
+				href={roles[4].href}
+			/>
+		</div>
+	</div>
 
 	<!-- Footer Info -->
 	<div class="landing-footer">
 		<p>Secure access to real-time haul monitoring and fleet management</p>
-						</div>
-					</div>
+	</div>
+</div>
 
 <style>
 	.dashboard-landing {
@@ -127,6 +137,7 @@
 		flex: 1;
 		padding: 40px 20px;
 		display: flex;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 	}
@@ -136,7 +147,16 @@
 		max-width: 800px;
 		display: grid;
 		grid-template-columns: 1fr;
-			gap: 20px;
+		gap: 20px;
+		margin-bottom: 20px;
+	}
+
+	.dispatch-container {
+		width: 100%;
+		max-width: 400px;
+		margin: 0 auto;
+		display: flex;
+		justify-content: center;
 	}
 
 	@media (min-width: 768px) {
