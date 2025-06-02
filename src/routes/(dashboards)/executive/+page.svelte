@@ -69,14 +69,6 @@
 					<TrendingUp size={16} />
 					<span>Refresh Data</span>
 				</button>
-				<button 
-					class="action-button {showDebugControls ? 'active' : 'outline'}" 
-					type="button"
-					on:click={() => showDebugControls = !showDebugControls}
-				>
-					<span>🛠️</span>
-					<span>Debug Charts</span>
-				</button>
 			</div>
 		</div>
 	</div>
@@ -311,18 +303,6 @@
 	<SafetyAnalyticsModal 
 		isOpen={showSafetyModal} 
 		on:close={() => showSafetyModal = false} 
-	/>
-{/if}
-
-<!-- Debug Controls -->
-{#if showDebugControls}
-	<ChartDebugControls 
-		paddingLeft={chartPadding.paddingLeft}
-		paddingRight={chartPadding.paddingRight}
-		paddingTop={chartPadding.paddingTop}
-		paddingBottom={chartPadding.paddingBottom}
-		on:update={handlePaddingUpdate}
-		on:close={handleDebugClose}
 	/>
 {/if}
 
