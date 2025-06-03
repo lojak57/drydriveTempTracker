@@ -241,34 +241,33 @@
 
 <style>
 	.truck-diagram-container {
-		background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+		background: rgba(255, 255, 255, 0.9);
+		border: 1px solid rgba(226, 232, 240, 0.8);
 		border-radius: 12px;
-		padding: 24px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-		margin-bottom: 24px;
-		min-height: 500px;
+		overflow: hidden;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 	}
 
 	.diagram-header {
-		background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+		background: #f8fafc;
 		padding: 16px 20px;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		border-bottom: 1px solid #e2e8f0;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 	}
 
 	.diagram-title {
-		font-size: 18px;
+		font-size: 16px;
 		font-weight: 600;
-		color: #0f172a;
+		color: #1e293b;
 		margin: 0;
 	}
 
 	.connection-status {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 6px;
 		font-size: 12px;
 		font-weight: 500;
 	}
@@ -291,10 +290,7 @@
 	}
 
 	.diagram-content {
-		display: flex;
-		flex-direction: column;
-		gap: 24px;
-		height: 100%;
+		padding: 20px;
 	}
 
 	.truck-wireframe-container {
@@ -302,8 +298,9 @@
 		background: white;
 		border-radius: 8px;
 		padding: 16px;
-		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-		min-height: 500px;
+		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+		border: 1px solid #f1f5f9;
+		min-height: 400px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -316,14 +313,13 @@
 		max-width: 700px;
 		height: auto;
 		opacity: 0;
-		transition: opacity 0.5s ease-in-out;
+		transition: opacity 0.3s ease-in-out;
 	}
 
 	.truck-wireframe.loaded {
 		opacity: 1;
 	}
 
-	/* Image wrapper that provides positioning context for valve overlays */
 	.truck-image-wrapper {
 		position: relative;
 		display: inline-block;
@@ -338,7 +334,7 @@
 		justify-content: center;
 		min-height: 300px;
 		background: #f8fafc;
-		border: 2px dashed #cbd5e1;
+		border: 2px dashed #e2e8f0;
 		border-radius: 8px;
 		color: #64748b;
 		text-align: center;
@@ -351,10 +347,10 @@
 	}
 
 	.spinner {
-		width: 32px;
-		height: 32px;
-		border: 3px solid #e2e8f0;
-		border-top: 3px solid #3b82f6;
+		width: 24px;
+		height: 24px;
+		border: 2px solid #e2e8f0;
+		border-top: 2px solid #3b82f6;
 		border-radius: 50%;
 		animation: spin 1s linear infinite;
 		margin-bottom: 12px;
@@ -365,7 +361,6 @@
 		100% { transform: rotate(360deg); }
 	}
 
-	/* Compass Labels */
 	.compass-labels {
 		position: absolute;
 		top: 10px;
@@ -381,11 +376,11 @@
 	.compass-label {
 		padding: 2px 6px;
 		background: rgba(255, 255, 255, 0.9);
-		border-radius: 3px;
+		border-radius: 4px;
 		text-align: center;
+		border: 1px solid #f1f5f9;
 	}
 
-	/* Sensors */
 	.sensor-indicator {
 		position: absolute;
 		width: 8px;
@@ -403,25 +398,10 @@
 		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 	}
 
-	.sensor-1 {
-		top: 25%;
-		left: 15%;
-	}
-
-	.sensor-2 {
-		top: 25%;
-		right: 20%;
-	}
-
-	.sensor-3 {
-		bottom: 25%;
-		left: 20%;
-	}
-
-	.sensor-4 {
-		bottom: 25%;
-		right: 15%;
-	}
+	.sensor-1 { top: 25%; left: 15%; }
+	.sensor-2 { top: 25%; right: 20%; }
+	.sensor-3 { bottom: 25%; left: 20%; }
+	.sensor-4 { bottom: 25%; right: 15%; }
 
 	.logo-overlay {
 		position: absolute;
@@ -435,17 +415,28 @@
 	/* Mobile Responsive */
 	@media (max-width: 768px) {
 		.truck-wireframe-container {
-			min-height: 400px;
+			min-height: 350px;
+			padding: 12px;
+		}
+
+		.diagram-header {
+			padding: 12px 16px;
+		}
+
+		.diagram-title {
+			font-size: 14px;
+		}
+
+		.diagram-content {
+			padding: 16px;
 		}
 	}
 
 	@media (max-width: 480px) {
-		.truck-diagram-container {
-			padding: 16px;
-		}
-
-		.diagram-title {
-			font-size: 16px;
+		.diagram-header {
+			flex-direction: column;
+			gap: 8px;
+			align-items: flex-start;
 		}
 
 		.sensor-indicator {
