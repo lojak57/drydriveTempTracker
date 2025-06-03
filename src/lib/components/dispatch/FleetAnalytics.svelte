@@ -222,11 +222,55 @@
 	}
 
 	.kpi-grid {
-		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6;
+		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6;
+	}
+
+	/* Mobile-specific adjustments */
+	@media (max-width: 768px) {
+		.kpi-grid {
+			@apply gap-4;
+		}
+		
+		.kpi-card {
+			@apply p-4;
+		}
+		
+		.kpi-value {
+			@apply text-2xl;
+		}
+	}
+
+	/* Large screen adjustments for better layout */
+	@media (min-width: 1280px) {
+		.kpi-grid {
+			@apply grid-cols-3 gap-8;
+		}
+	}
+
+	@media (min-width: 1536px) {
+		.kpi-grid {
+			@apply grid-cols-6 gap-6;
+		}
+		
+		.kpi-card {
+			@apply p-5;
+		}
+		
+		.kpi-value {
+			@apply text-2xl;
+		}
+		
+		.kpi-label {
+			@apply text-xs;
+		}
+		
+		.kpi-sub {
+			@apply text-xs;
+		}
 	}
 
 	.kpi-card {
-		@apply bg-white dark:bg-gray-800 rounded-lg border p-4 flex items-center gap-4 min-w-0;
+		@apply bg-white dark:bg-gray-800 rounded-xl border p-6 flex flex-col gap-3 min-w-0 shadow-sm hover:shadow-md transition-all duration-200;
 	}
 
 	.kpi-card.primary {
@@ -250,23 +294,23 @@
 	}
 
 	.kpi-icon {
-		@apply flex-shrink-0 p-2 rounded-lg bg-white dark:bg-gray-700;
+		@apply flex-shrink-0 p-3 rounded-xl bg-white dark:bg-gray-700 self-start;
 	}
 
 	.kpi-content {
-		@apply flex-1 min-w-0 overflow-hidden;
+		@apply flex-1 min-w-0;
 	}
 
 	.kpi-value {
-		@apply text-2xl font-bold text-gray-900 dark:text-white truncate;
+		@apply text-3xl font-bold text-gray-900 dark:text-white mb-1 break-words;
 	}
 
 	.kpi-label {
-		@apply text-sm font-medium text-gray-600 dark:text-gray-300 truncate;
+		@apply text-sm font-semibold text-gray-600 dark:text-gray-300 mb-1 break-words;
 	}
 
 	.kpi-sub {
-		@apply text-xs text-gray-500 dark:text-gray-400 truncate;
+		@apply text-sm text-gray-500 dark:text-gray-400 break-words;
 	}
 
 	.insights-banner {
