@@ -79,21 +79,24 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 20px 24px;
-		background: white;
-		border-bottom: 1px solid #e2e8f0;
+		background: #1e293b;
+		border-bottom: 1px solid #334155;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		position: sticky;
+		top: 0;
+		z-index: 50;
 	}
 
 	.driver-info h2 {
 		font-size: 24px;
 		font-weight: 700;
-		color: #1e293b;
+		color: white;
 		margin: 0;
 	}
 
 	.driver-label {
 		font-size: 14px;
-		color: #64748b;
+		color: #94a3b8;
 		font-weight: 500;
 	}
 
@@ -115,7 +118,7 @@
 		box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
 	}
 
-	/* Progress Steps */
+	/* Progress Steps - Make sticky to stay visible while scrolling */
 	.progress-container {
 		display: flex;
 		align-items: center;
@@ -125,6 +128,10 @@
 		border-bottom: 1px solid #e2e8f0;
 		gap: 16px;
 		flex-wrap: wrap;
+		position: sticky;
+		top: 80px;
+		z-index: 40;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 	}
 
 	.step-container {

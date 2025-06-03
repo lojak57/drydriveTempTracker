@@ -42,6 +42,16 @@
       "source": "/dashboard",
       "destination": "/",
       "permanent": false
+    },
+    {
+      "source": "/system-admin",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/systemadmin",
+      "destination": "/admin",
+      "permanent": true
     }
   ],
   "env": {

@@ -14,7 +14,7 @@
   
   // Props from parent
   export let currentWorkflowView: WorkflowStep;
-  export let pickupSubStep: string;
+  export let pickupSubStep: string = 'job-selection';
   export let deliverySubStep: string = 'delivery-schedule';
   export let sharedState: {
     activeJob: any;
@@ -24,15 +24,12 @@
     [key: string]: any;
   };
   
-  // Event handlers object
+  // Event handlers object - SIMPLIFIED
   export let eventHandlers: {
     navigateToStep: (step: WorkflowStep) => void;
     markStepComplete: (step: WorkflowStep) => void;
     handleJobSelected: (event: CustomEvent) => void;
     handleInspectionComplete: (event: CustomEvent) => void;
-    handleStartNavigation: () => void;
-    handleStartTransitToPickup: () => void;
-    handleArriveAtPickup: () => void;
     [key: string]: any;
   };
 </script>

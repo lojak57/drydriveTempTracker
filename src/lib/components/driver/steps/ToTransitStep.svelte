@@ -5,12 +5,12 @@
   
   const dispatch = createEventDispatcher();
   export let transitType: 'pickup' | 'delivery' = 'pickup';
-  export let pickupSubStep: string = '';
-  export let deliverySubStep: string = '';
+  export let pickupSubStep: string = 'job-selection';
+  export let deliverySubStep: string = 'delivery-schedule';
   export let sharedState: any;
   export let eventHandlers: any;
   
-  // Get the correct substep based on transitType
+  // SIMPLIFIED: Get the correct substep based on transitType
   $: currentSubStep = transitType === 'pickup' ? pickupSubStep : deliverySubStep;
   
   onMount(() => {

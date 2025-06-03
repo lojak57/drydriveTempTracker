@@ -12,6 +12,13 @@
 	export let maxDataPoints: number = 20;
 	export let updateInterval: number = 4000; // milliseconds
 	
+	// Chart styling options
+	export let lineWeight: number = 2;
+	export let gridContrast: 'normal' | 'subtle' | 'strong' = 'normal';
+	export let axisTextColor: string = '#ffffff';
+	export let axisTextSize: number = 12;
+	export let axisTextWeight: number = 500;
+	
 	// External positioning controls
 	export let paddingLeft: number = 15;
 	export let paddingRight: number = 15;
@@ -114,7 +121,7 @@
 				data: dataPoints,
 				borderColor: color,
 				backgroundColor: `${color}20`,
-				borderWidth: 2,
+				borderWidth: lineWeight,
 				fill: true,
 				tension: 0.4,
 				pointRadius: 0,
@@ -163,6 +170,11 @@
 	}
 
 	function createChartOptions() {
+		// Calculate grid color based on contrast setting
+		const gridColor = gridContrast === 'subtle' ? 'rgba(255, 255, 255, 0.05)' : 
+						  gridContrast === 'strong' ? 'rgba(255, 255, 255, 0.2)' : 
+						  'rgba(255, 255, 255, 0.1)';
+		
 		return {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -201,16 +213,16 @@
 					position: 'bottom',
 					grid: {
 						display: showGrid,
-						color: 'rgba(0, 0, 0, 0.1)',
+						color: gridColor,
 						lineWidth: 1
 					},
 					ticks: {
 						display: true, // Force display
 						maxTicksLimit: screenWidth > 768 ? 5 : 3,
-						color: '#ffffff',
+						color: axisTextColor,
 						font: {
-							size: 12,
-							weight: 500,
+							size: axisTextSize,
+							weight: axisTextWeight,
 							family: 'SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif'
 						},
 						padding: 10, // More padding
@@ -227,16 +239,16 @@
 					position: 'left',
 					grid: {
 						display: showGrid,
-						color: 'rgba(0, 0, 0, 0.1)',
+						color: gridColor,
 						lineWidth: 1
 					},
 					ticks: {
 						display: true,
 						maxTicksLimit: 5,
-						color: '#ffffff',
+						color: axisTextColor,
 						font: {
-							size: 12,
-							weight: 500,
+							size: axisTextSize,
+							weight: axisTextWeight,
 							family: 'SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif'
 						},
 						callback: function(value: any) {

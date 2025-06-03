@@ -160,7 +160,7 @@
 
 <div class="truck-diagram-container">
 	<div class="diagram-header">
-		<h3 class="diagram-title">🚛 Live Truck Monitoring - PLN-014 - TEST UPDATE WORKING</h3>
+		<h3 class="diagram-title">🚛 Live Truck Monitoring - PLN-014</h3>
 		<div class="connection-status connected">
 			<div class="status-dot"></div>
 			<span>LOVISVision Connected</span>

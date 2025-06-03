@@ -23,10 +23,16 @@
 	};
 
 	function formatVolume(volume: number) {
+		if (volume >= 1000000) {
+			return (volume / 1000000).toFixed(1) + 'M BBL';
+		}
+		if (volume >= 1000) {
+			return (volume / 1000).toFixed(1) + 'K BBL';
+		}
 		return new Intl.NumberFormat('en-US', {
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2
-		}).format(volume);
+			minimumFractionDigits: 0,
+			maximumFractionDigits: 0
+		}).format(volume) + ' BBL';
 	}
 
 	function formatCurrency(amount: number) {
@@ -604,11 +610,11 @@
 	}
 
 	.kpi-grid {
-		@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4;
+		@apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3;
 	}
 
 	.kpi-card {
-		@apply bg-white dark:bg-gray-800 p-6 rounded-xl border shadow-sm hover:shadow-md transition-shadow;
+		@apply bg-white dark:bg-gray-800 p-4 rounded-lg border shadow-sm hover:shadow-md transition-shadow;
 	}
 
 	.kpi-card.primary {
@@ -632,7 +638,7 @@
 	}
 
 	.kpi-icon {
-		@apply flex items-center justify-center w-12 h-12 rounded-lg bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 mb-4;
+		@apply flex items-center justify-center w-10 h-10 rounded-lg bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 mb-3;
 	}
 
 	.kpi-content {
@@ -640,11 +646,11 @@
 	}
 
 	.kpi-value {
-		@apply text-2xl font-bold text-gray-900 dark:text-white;
+		@apply text-lg font-bold text-gray-900 dark:text-white break-words leading-tight;
 	}
 
 	.kpi-label {
-		@apply text-sm font-medium text-gray-600 dark:text-gray-300;
+		@apply text-xs font-medium text-gray-600 dark:text-gray-300;
 	}
 
 	.kpi-sub {

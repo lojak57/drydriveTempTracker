@@ -261,7 +261,14 @@
 				<table class="comparison-table">
 					<thead>
 						<tr>
-							<th>Rank</th>
+							<th>
+								<button on:click={() => sortData('rank')} class="sort-button">
+									Rank
+									{#if sortColumn === 'rank'}
+										{#if sortDirection === 'asc'}<ChevronUp size={16} />{:else}<ChevronDown size={16} />{/if}
+									{/if}
+								</button>
+							</th>
 							<th>
 								<button on:click={() => sortData('yardName')} class="sort-button">
 									Yard Name
@@ -318,9 +325,46 @@
 									{/if}
 								</button>
 							</th>
-							<th>Status</th>
-							<th>Trend</th>
-							<th>Notes</th>
+							<th>
+								<button on:click={() => sortData('efficiency')} class="sort-button">
+									Efficiency
+									{#if sortColumn === 'efficiency'}
+										{#if sortDirection === 'asc'}<ChevronUp size={16} />{:else}<ChevronDown size={16} />{/if}
+									{/if}
+								</button>
+							</th>
+							<th>
+								<button on:click={() => sortData('utilizationRate')} class="sort-button">
+									Utilization
+									{#if sortColumn === 'utilizationRate'}
+										{#if sortDirection === 'asc'}<ChevronUp size={16} />{:else}<ChevronDown size={16} />{/if}
+									{/if}
+								</button>
+							</th>
+							<th>
+								<button on:click={() => sortData('status')} class="sort-button">
+									Status
+									{#if sortColumn === 'status'}
+										{#if sortDirection === 'asc'}<ChevronUp size={16} />{:else}<ChevronDown size={16} />{/if}
+									{/if}
+								</button>
+							</th>
+							<th>
+								<button on:click={() => sortData('trend')} class="sort-button">
+									Trend
+									{#if sortColumn === 'trend'}
+										{#if sortDirection === 'asc'}<ChevronUp size={16} />{:else}<ChevronDown size={16} />{/if}
+									{/if}
+								</button>
+							</th>
+							<th>
+								<button on:click={() => sortData('notes')} class="sort-button">
+									Notes
+									{#if sortColumn === 'notes'}
+										{#if sortDirection === 'asc'}<ChevronUp size={16} />{:else}<ChevronDown size={16} />{/if}
+									{/if}
+								</button>
+							</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -350,6 +394,12 @@
 								</td>
 								<td class="metric-cell {getPerformanceColor(yard.barrelsPerHour, 'bph')}">
 									{yard.barrelsPerHour}
+								</td>
+								<td class="metric-cell {getPerformanceColor(yard.efficiency, 'efficiency')}">
+									{yard.efficiency}%
+								</td>
+								<td class="metric-cell {getPerformanceColor(yard.utilizationRate, 'utilization')}">
+									{yard.utilizationRate}%
 								</td>
 								<td class="status-cell">
 									<div class="status-container {getStatusInfo(yard.status).bgColor}">

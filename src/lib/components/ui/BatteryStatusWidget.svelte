@@ -63,7 +63,7 @@
 	{#if viewMode === '3-card'}
 		<div class="card-grid grid grid-cols-1 md:grid-cols-3 gap-4">
 			{#each displayItems as item}
-				<div class="status-card bg-white rounded-xl p-4 border shadow-sm hover:shadow-md transition-shadow">
+				<div class="status-card bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-lg hover:shadow-xl transition-all duration-300">
 					<div class="card-header flex items-center justify-between mb-3">
 						<div class="status-badge px-2 py-1 rounded-full text-xs font-semibold {getStatusColor(item.status)}">
 							{item.status.toUpperCase()}
@@ -77,9 +77,9 @@
 					</div>
 					
 					<div class="card-content">
-						<h3 class="text-sm font-semibold text-slate-800 mb-1">{item.label}</h3>
+						<h3 class="text-sm font-semibold text-white mb-1">{item.label}</h3>
 						<div class="metric-row flex items-center justify-between">
-							<span class="text-lg font-bold font-mono text-slate-900">{item.value}</span>
+							<span class="text-lg font-bold font-mono text-white">{item.value}</span>
 							{#if item.sparklineData}
 								<div class="sparkline-container {getStatusColor(item.status).split(' ')[0]}">
 									{@html generateSparkline(item.sparklineData)}
@@ -88,15 +88,15 @@
 						</div>
 						
 						{#if item.location || item.lastUpdated}
-							<div class="card-footer mt-2 pt-2 border-t border-slate-100">
+							<div class="card-footer mt-2 pt-2 border-t border-slate-600">
 								{#if item.location}
-									<div class="location flex items-center gap-1 text-xs text-slate-500">
+									<div class="location flex items-center gap-1 text-xs text-slate-300">
 										<MapPin size={12} />
 										{item.location}
 									</div>
 								{/if}
 								{#if item.lastUpdated}
-									<div class="timestamp flex items-center gap-1 text-xs text-slate-500">
+									<div class="timestamp flex items-center gap-1 text-xs text-slate-300">
 										<Clock size={12} />
 										{item.lastUpdated}
 									</div>

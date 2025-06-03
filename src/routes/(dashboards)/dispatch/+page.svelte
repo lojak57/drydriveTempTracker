@@ -282,9 +282,8 @@
 
 	<!-- Main Content: Two-Pane Layout -->
 	<div class="dispatch-layout">
-		<!-- Left Pane: Dispatch Snapshot -->
+		<!-- Left Pane: Dispatch Snapshot - Hidden to give map full width -->
 		<div class="dispatch-snapshot">
-			
 			<!-- 🚨 PENDING ASSIGNMENTS - Moved to Top -->
 			<CollapsibleSection 
 				title="🚨 Pending Assignments"
@@ -422,7 +421,7 @@
 		<!-- Right Pane: Interactive Map -->
 		<div class="map-container">
 			<div class="map-header">
-				<h3>Live Fleet Tracking</h3>
+				<h3>Live Fleet Tracking - Full View</h3>
 				<div class="map-status">
 					<div class="status-indicator">
 						<span class="status-dot active"></span>
@@ -547,14 +546,23 @@
 		overflow: hidden;
 	}
 
-	/* Left Pane: Dispatch Snapshot */
+	/* Left Pane: Dispatch Snapshot - Hidden to give map full width */
 	.dispatch-snapshot {
+		display: none; /* Hide sidebar to give map full width */
 		width: 400px;
-		display: flex;
 		flex-direction: column;
 		gap: 16px;
 		overflow-y: auto;
 		max-height: calc(100vh - 140px);
+	}
+
+	/* Show dispatch snapshot only on mobile for collapsible access */
+	@media (max-width: 1024px) {
+		.dispatch-snapshot {
+			display: flex; /* Show on mobile for better UX */
+			width: 100%;
+			max-height: 300px; /* Reduce height on mobile */
+		}
 	}
 
 	/* Priority Badge Styles */
@@ -606,6 +614,7 @@
 		border-radius: 16px;
 		overflow: hidden;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		min-height: calc(100vh - 180px); /* Ensure good height */
 	}
 
 	.map-header {
@@ -655,7 +664,8 @@
 		flex: 1;
 		position: relative;
 		overflow: hidden;
-		height: 100%;
+		height: calc(100vh - 240px); /* Give map more breathing room */
+		min-height: 500px; /* Minimum height for usability */
 	}
 
 	/* MapLibre GL Popup Styling */
@@ -826,11 +836,22 @@
 	@media (max-width: 1024px) {
 		.dispatch-layout {
 			flex-direction: column;
+			gap: 16px;
 		}
 
 		.dispatch-snapshot {
+			display: flex; /* Show on mobile for better UX */
 			width: 100%;
-			max-height: 400px;
+			max-height: 300px; /* Reduce height on mobile */
+		}
+
+		.map-container {
+			min-height: calc(100vh - 400px); /* Adjust for mobile layout */
+		}
+
+		.map-view {
+			height: calc(100vh - 460px); /* Adjust for mobile header and controls */
+			min-height: 400px;
 		}
 
 		.truck-status {
@@ -860,6 +881,11 @@
 
 		.dispatch-layout {
 			padding: 0 12px 12px 12px;
+		}
+
+		.map-view {
+			height: calc(100vh - 480px); /* Further adjust for smaller screens */
+			min-height: 350px;
 		}
 
 		.assignment-modal {

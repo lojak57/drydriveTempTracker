@@ -215,7 +215,7 @@
 	<div class="jobs-section">
 		<div class="section-header">
 			<h2 class="section-title">Scheduled Jobs</h2>
-			<p class="section-subtitle">Tap a job to view details and start</p>
+			<p class="section-subtitle">Open Tickets</p>
 		</div>
 
 		<div class="job-list">

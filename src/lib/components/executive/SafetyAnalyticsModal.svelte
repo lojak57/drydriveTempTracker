@@ -208,6 +208,11 @@
 								height={350}
 								unit="incidents"
 								animated={true}
+								lineWeight={3}
+								gridContrast="subtle"
+								axisTextColor="#ffffff"
+								axisTextSize={13}
+								axisTextWeight={600}
 							/>
 						</div>
 					</div>

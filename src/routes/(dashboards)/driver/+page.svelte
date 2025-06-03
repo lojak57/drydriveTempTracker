@@ -17,7 +17,7 @@
 	
 	import { Truck, BarChart3, Shield, CheckCircle, Clock, Zap, Package, Trophy, BookOpen, Search } from 'lucide-svelte';
 
-	// Driver workflow state
+	// Driver workflow state - SIMPLIFIED
 	let selectedJob: any = null;
 	let showJobModal = false;
 	let inspectionCompleted = false;
@@ -26,7 +26,7 @@
 	let currentView = 'dashboard'; // 'dashboard' | 'job-map' | 'in-transit'
 	let activeJob: any = null;
 
-	// NEW: Workflow view system (replaces scrolling sections)
+	// SIMPLIFIED: Workflow view system (removed complex sub-steps)
 	let currentWorkflowView: WorkflowStep = 'job-overview';
 	let workflowProgress = {
 		'job-overview': false,
@@ -38,13 +38,7 @@
 		'post-trip': false
 	};
 	
-	// NEW: Add sub-step tracking for to-pickup workflow
-	let pickupSubStep = 'job-selection'; // 'job-selection' | 'navigation' | 'in-transit'
-	
-	// NEW: Add sub-step tracking for to-delivery workflow  
-	let deliverySubStep = 'delivery-schedule'; // 'delivery-schedule' | 'delivery-details' | 'delivery-route' | 'delivery-transit'
-	
-	// NEW: Computed workflow state 
+	// SIMPLIFIED: Computed workflow state 
 	$: currentWorkflowStep = currentWorkflowView;
 	$: completedSteps = getCompletedSteps(currentWorkflowStep, inspectionCompleted, activeJob, workflowProgress);
 	$: driverInfo = { id: 'driver-001', name: 'Current Driver' };
@@ -276,7 +270,6 @@
 		inspectionCompleted = true;
 		console.log('Inspection completed:', inspectionData);
 		currentWorkflowView = 'to-pickup';
-		pickupSubStep = 'job-selection'; // Reset to job selection
 		
 		// NEW: Scroll to top when navigating to to-pickup after inspection
 		setTimeout(() => {
@@ -286,34 +279,32 @@
 
 	// NEW: Handle starting navigation from job selection
 	function handleStartNavigation() {
-		pickupSubStep = 'navigation';
+		// No need to implement as the workflow is simplified
 	}
 
 	// NEW: Handle starting transit
 	function handleStartTransitToPickup() {
-		pickupSubStep = 'in-transit';
+		// No need to implement as the workflow is simplified
 	}
 
 	// NEW: Handle arriving at pickup site
 	function handleArriveAtPickup() {
-		navigateToStep('loading');
-		pickupSubStep = 'job-selection'; // Reset for next time
+		// No need to implement as the workflow is simplified
 	}
 
 	// NEW: Handle starting delivery navigation
 	function handleStartDeliveryNavigation() {
-		deliverySubStep = 'delivery-details';
+		// No need to implement as the workflow is simplified
 	}
 
 	// NEW: Handle starting transit to delivery
 	function handleStartTransitToDelivery() {
-		deliverySubStep = 'delivery-transit';
+		// No need to implement as the workflow is simplified
 	}
 
 	// NEW: Handle arriving at delivery site
 	function handleArriveAtDelivery() {
-		navigateToStep('unloading');
-		deliverySubStep = 'delivery-schedule'; // Reset for next time
+		// No need to implement as the workflow is simplified
 	}
 
 	// Helper function to calculate realistic ETA
@@ -345,8 +336,6 @@
 			<!-- NEW: Simplified workflow router replaces 2000+ lines -->
 			<DriverWorkflowRouter
 				{currentWorkflowView}
-				{pickupSubStep}
-				{deliverySubStep}
 				{sharedState}
 				{eventHandlers}
 			/>

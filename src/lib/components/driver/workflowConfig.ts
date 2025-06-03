@@ -1,21 +1,21 @@
 import { 
   ClipboardList, 
   ListChecks, 
-  ArrowUpRight, 
+  MapPin, 
   Truck, 
   Navigation, 
-  PackageOpen, 
+  PackageCheck, 
   CheckCircle2 
 } from 'lucide-svelte';
 
 export type WorkflowStep = 
-  | 'job-overview'   // Job Overview (clipboard icon)
-  | 'pre-trip'         // Pre-Trip (checklist icon)  
-  | 'to-pickup'        // To Pickup (arrow up-right icon)
-  | 'loading'          // Loading (truck icon)
-  | 'to-delivery'      // To Delivery (navigation icon)
-  | 'unloading'        // Unloading (package icon)
-  | 'post-trip';       // Post-Trip (checkmark icon)
+  | 'job-overview'   // Job Overview & Selection
+  | 'pre-trip'       // Pre-Trip Inspection  
+  | 'to-pickup'      // Navigate & Load
+  | 'loading'        // Loading at Site
+  | 'to-delivery'    // Navigate to Delivery
+  | 'unloading'      // Unloading at Site
+  | 'post-trip';     // Post-Trip & Complete
 
 export const WORKFLOW_STEPS: WorkflowStep[] = [
   'job-overview',
@@ -28,23 +28,23 @@ export const WORKFLOW_STEPS: WorkflowStep[] = [
 ];
 
 export const STEP_CONFIG = {
-  'job-overview': { icon: ClipboardList, label: 'Job Overview' },
+  'job-overview': { icon: ClipboardList, label: 'Jobs' },
   'pre-trip': { icon: ListChecks, label: 'Pre-Trip' },
-  'to-pickup': { icon: ArrowUpRight, label: 'To Pickup' },
-  'loading': { icon: Truck, label: 'Loading' },
-  'to-delivery': { icon: Navigation, label: 'To Delivery' },
-  'unloading': { icon: PackageOpen, label: 'Unloading' },
-  'post-trip': { icon: CheckCircle2, label: 'Post-Trip' }
+  'to-pickup': { icon: MapPin, label: 'Navigate' },
+  'loading': { icon: Truck, label: 'Load' },
+  'to-delivery': { icon: Navigation, label: 'Deliver' },
+  'unloading': { icon: PackageCheck, label: 'Unload' },
+  'post-trip': { icon: CheckCircle2, label: 'Complete' }
 };
 
 export const WORKFLOW_STEP_LABELS: Record<WorkflowStep, string> = {
-  'job-overview': 'Job Overview',
-  'pre-trip': 'Pre-Trip',
-  'to-pickup': 'To Pickup',
+  'job-overview': 'Job Selection',
+  'pre-trip': 'Pre-Trip Inspection',
+  'to-pickup': 'Navigate & Load',
   'loading': 'Loading',
-  'to-delivery': 'To Delivery',
+  'to-delivery': 'Navigate to Delivery',
   'unloading': 'Unloading',
-  'post-trip': 'Post-Trip'
+  'post-trip': 'Trip Complete'
 };
 
 // State mapping function (preserves existing logic)

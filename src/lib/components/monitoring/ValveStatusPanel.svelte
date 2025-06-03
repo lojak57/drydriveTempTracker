@@ -149,116 +149,132 @@
 <style>
 	.valve-panel-container {
 		background: rgba(255, 255, 255, 0.98);
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		border-radius: 12px;
+		border: 1px solid rgba(148, 163, 184, 0.2);
+		border-radius: 16px;
 		overflow: hidden;
-		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 	}
 
 	.panel-header {
 		background: linear-gradient(135deg, #f8fafc, #e2e8f0);
-		padding: 16px 20px;
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		padding: 20px 24px;
+		border-bottom: 1px solid rgba(148, 163, 184, 0.2);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 	}
 
 	.panel-title {
-		font-size: 18px;
-		font-weight: 600;
-		color: #0f172a;
+		font-size: 20px;
+		font-weight: 700;
+		color: #1e293b;
 		margin: 0;
+		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 	}
 
 	.valve-count {
 		background: rgba(59, 130, 246, 0.1);
 		color: #3b82f6;
-		padding: 4px 8px;
-		border-radius: 12px;
-		font-size: 12px;
+		padding: 6px 12px;
+		border-radius: 16px;
+		font-size: 13px;
 		font-weight: 600;
+		border: 1px solid rgba(59, 130, 246, 0.2);
 	}
 
 	.valve-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-		gap: 16px;
-		padding: 20px;
+		grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+		gap: 20px;
+		padding: 24px;
 	}
 
 	.valve-card {
-		background: rgba(248, 250, 252, 0.8);
-		border: 1px solid rgba(0, 0, 0, 0.05);
-		border-radius: 8px;
-		padding: 16px;
-		transition: all 0.2s ease;
+		background: rgba(248, 250, 252, 0.9);
+		border: 1px solid rgba(148, 163, 184, 0.15);
+		border-radius: 12px;
+		padding: 20px;
+		transition: all 0.3s ease;
+		backdrop-filter: blur(5px);
 	}
 
 	.valve-card:hover {
 		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+		border-color: rgba(148, 163, 184, 0.25);
 	}
 
 	.valve-card.critical {
 		border-color: #f59e0b;
 		background: rgba(245, 158, 11, 0.05);
+		box-shadow: 0 4px 16px rgba(245, 158, 11, 0.2);
 	}
 
 	.valve-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 12px;
+		margin-bottom: 16px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 	}
 
 	.valve-icon-name {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 10px;
 	}
 
 	.valve-icon {
-		font-size: 18px;
+		font-size: 20px;
 	}
 
 	.valve-name {
-		font-size: 14px;
+		font-size: 16px;
 		font-weight: 600;
-		color: #0f172a;
+		color: #1e293b;
+		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 	}
 
 	.valve-status-indicator {
-		font-size: 16px;
+		font-size: 18px;
+		font-weight: 600;
 	}
 
 	.valve-details {
-		margin-bottom: 12px;
+		margin-bottom: 16px;
 	}
 
 	.status-text {
 		font-size: 16px;
 		font-weight: 700;
-		font-family: 'JetBrains Mono', monospace;
 		margin-bottom: 4px;
+		font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+		letter-spacing: 0.5px;
 	}
 
 	.location-text {
-		font-size: 12px;
+		font-size: 14px;
 		color: #64748b;
-		font-style: italic;
+		font-weight: 500;
 	}
 
 	.valve-info {
-		margin-bottom: 12px;
+		margin-bottom: 20px;
 	}
 
 	.info-row {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		font-size: 11px;
-		margin-bottom: 4px;
+		font-size: 13px;
+		margin-bottom: 6px;
+		font-weight: 500;
+	}
+
+	.info-row:last-child {
+		margin-bottom: 0;
 	}
 
 	.info-label {
@@ -267,7 +283,7 @@
 
 	.info-value {
 		color: #374151;
-		font-weight: 500;
+		font-weight: 600;
 	}
 
 	.valve-actions {
@@ -277,93 +293,147 @@
 	}
 
 	.toggle-btn {
-		padding: 8px 12px;
-		border: 1px solid rgba(0, 0, 0, 0.1);
-		border-radius: 6px;
-		font-size: 12px;
-		font-weight: 500;
+		width: 100%;
+		padding: 12px 16px;
+		border: 2px solid transparent;
+		border-radius: 10px;
+		font-size: 14px;
+		font-weight: 600;
 		cursor: pointer;
-		transition: all 0.2s ease;
+		transition: all 0.3s ease;
+		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
 	.toggle-btn.open {
-		background: #22c55e;
+		background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
 		color: white;
-		border-color: #22c55e;
+		border-color: rgba(220, 38, 38, 0.3);
+		box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
 	}
 
 	.toggle-btn.closed {
-		background: #ef4444;
+		background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
 		color: white;
-		border-color: #ef4444;
+		border-color: rgba(22, 163, 74, 0.3);
+		box-shadow: 0 4px 16px rgba(22, 163, 74, 0.3);
 	}
 
 	.toggle-btn:disabled {
-		background: #f59e0b;
+		background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
 		color: white;
-		border-color: #f59e0b;
 		cursor: not-allowed;
+		opacity: 0.7;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
-	.toggle-btn:hover:not(:disabled) {
+	.toggle-btn:not(:disabled):hover {
 		transform: translateY(-1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 	}
 
 	.confirmation-notice {
-		font-size: 10px;
-		color: #f59e0b;
+		background: rgba(245, 158, 11, 0.1);
+		color: #d97706;
+		padding: 8px 12px;
+		border-radius: 8px;
+		font-size: 12px;
+		font-weight: 600;
 		text-align: center;
-		font-weight: 500;
+		border: 1px solid rgba(245, 158, 11, 0.2);
 	}
 
 	.panel-footer {
-		background: rgba(248, 250, 252, 0.8);
-		border-top: 1px solid rgba(0, 0, 0, 0.05);
-		padding: 16px 20px;
+		background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+		padding: 20px 24px;
+		border-top: 1px solid rgba(148, 163, 184, 0.2);
 	}
 
 	.status-summary {
-		display: flex;
-		justify-content: center;
-		gap: 24px;
-	}
-
-	.summary-item {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 16px;
 		text-align: center;
 	}
 
+	.summary-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+
 	.summary-count {
-		display: block;
-		font-size: 18px;
+		font-size: 24px;
 		font-weight: 700;
-		color: #0f172a;
-		font-family: 'JetBrains Mono', monospace;
+		color: #1e293b;
+		font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
 	}
 
 	.summary-label {
-		display: block;
-		font-size: 11px;
+		font-size: 12px;
 		color: #64748b;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
-		margin-top: 2px;
+		font-weight: 600;
 	}
 
 	/* Mobile responsive */
 	@media (max-width: 768px) {
 		.valve-grid {
 			grid-template-columns: 1fr;
+			padding: 20px;
+			gap: 16px;
+		}
+
+		.valve-card {
+			padding: 16px;
 		}
 
 		.panel-header {
+			padding: 16px 20px;
+		}
+
+		.panel-title {
+			font-size: 18px;
+		}
+
+		.valve-name {
+			font-size: 15px;
+		}
+
+		.status-text {
+			font-size: 15px;
+		}
+
+		.panel-footer {
+			padding: 16px 20px;
+		}
+
+		.summary-count {
+			font-size: 20px;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.valve-grid {
+			padding: 16px;
+		}
+
+		.valve-card {
+			padding: 12px;
+		}
+
+		.panel-header {
+			padding: 12px 16px;
 			flex-direction: column;
 			gap: 8px;
 			align-items: flex-start;
 		}
 
-		.status-summary {
-			justify-content: space-around;
+		.valve-count {
+			align-self: stretch;
+			text-align: center;
 		}
 	}
 </style> 

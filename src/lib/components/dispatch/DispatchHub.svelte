@@ -165,7 +165,7 @@
 		<div class="header-content">
 			<div class="title-section">
 				<h1 class="analytics-title">
-					<Activity class="w-6 h-6 text-orange-500" />
+					<Activity class="w-5 h-5 text-orange-500" />
 					Fleet Intelligence Nexus
 				</h1>
 				<p class="analytics-subtitle">
@@ -336,15 +336,15 @@
 	}
 
 	.analytics-title {
-		@apply flex items-center gap-3 text-2xl font-bold text-gray-900 dark:text-white;
+		@apply flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white;
 	}
 
 	.analytics-subtitle {
-		@apply text-sm text-gray-500 dark:text-gray-400 font-medium;
+		@apply text-xs text-gray-500 dark:text-gray-400 font-medium;
 	}
 
 	.quick-stats {
-		@apply flex items-center gap-8;
+		@apply flex items-center gap-6;
 	}
 
 	.stat-item {
@@ -352,7 +352,7 @@
 	}
 
 	.stat-value {
-		@apply text-xl font-bold text-gray-900 dark:text-white;
+		@apply text-lg font-bold text-gray-900 dark:text-white;
 	}
 
 	.stat-label {
@@ -384,11 +384,11 @@
 	}
 
 	.tab-list {
-		@apply flex items-center px-6 overflow-x-auto;
+		@apply flex items-center px-4 overflow-x-hidden;
 	}
 
 	.main-tab {
-		@apply flex items-center gap-3 px-6 py-4 text-left border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors min-w-0 flex-shrink-0;
+		@apply flex items-center gap-2 px-4 py-3 text-left border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors min-w-0 flex-shrink-0;
 		min-width: max-content;
 	}
 
@@ -397,8 +397,8 @@
 	}
 
 	.main-tab.raw-data-tab {
-		@apply border-l border-gray-200 dark:border-gray-600 ml-4 pl-6;
-		min-width: 140px; /* Ensure enough space for "Raw Data" text */
+		@apply border-l border-gray-200 dark:border-gray-600 ml-3 pl-4;
+		min-width: 120px; /* Reduced space for "Raw Data" text */
 	}
 
 	.tab-content {

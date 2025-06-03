@@ -268,58 +268,43 @@
 				
 				<!-- Summary Performance Cards -->
 				<div class="performance-summary grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-					<div class="perf-card excellent">
+					<div class="perf-card excellent" on:click={openAnalyticsTable}>
 						<div class="perf-header">
 							<div class="perf-icon">
 								<TrendingUp size={24} />
 							</div>
 							<div class="perf-status text-sm font-semibold tracking-tight">EXCELLENT</div>
 						</div>
-						<h3 class="text-base font-semibold tracking-tight text-slate-800">Daily Throughput</h3>
-						<div class="perf-value font-mono text-slate-900">2,847 BBL</div>
+						<h3 class="text-lg font-semibold tracking-tight text-slate-800">Daily Throughput</h3>
+						<div class="perf-value text-2xl font-bold font-mono text-slate-900">2,847 BBL</div>
 						<div class="perf-trend">
 							<TrendCell value={312} type="absolute" size="sm" />
-							<span class="text-slate-600 text-sm">vs yesterday</span>
+							<span class="text-slate-600 text-sm font-medium">vs yesterday</span>
 						</div>
-						<ClickToExplore 
-							label="View Details"
-							variant="subtle"
-							on:click={openAnalyticsTable}
-						/>
 					</div>
 
-					<div class="perf-card good">
+					<div class="perf-card good" on:click={openAnalyticsTable}>
 						<div class="perf-header">
 							<div class="perf-icon">
 								<BarChart3 size={24} />
 							</div>
 							<div class="perf-status text-sm font-semibold tracking-tight">GOOD</div>
 						</div>
-						<h3 class="text-base font-semibold tracking-tight text-slate-800">Barrels per Drive Hour</h3>
-						<div class="perf-value font-mono text-slate-900">185.3</div>
-						<p class="text-slate-600 text-sm">Above target efficiency</p>
-						<ClickToExplore 
-							label="View Details"
-							variant="subtle"
-							on:click={openAnalyticsTable}
-						/>
+						<h3 class="text-lg font-semibold tracking-tight text-slate-800">Barrels per Drive Hour</h3>
+						<div class="perf-value text-2xl font-bold font-mono text-slate-900">185.3</div>
+						<p class="text-slate-600 text-sm font-medium">Above target efficiency</p>
 					</div>
 
-					<div class="perf-card warning">
+					<div class="perf-card warning" on:click={openAnalyticsTable}>
 						<div class="perf-header">
 							<div class="perf-icon">
 								<AlertTriangle size={24} />
 							</div>
 							<div class="perf-status text-sm font-semibold tracking-tight">REVIEW</div>
 						</div>
-						<h3 class="text-base font-semibold tracking-tight text-slate-800">Load Efficiency Index</h3>
-						<div class="perf-value font-mono text-slate-900">4.2</div>
-						<p class="text-slate-600 text-sm">3 trucks in maintenance</p>
-						<ClickToExplore 
-							label="View Details"
-							variant="subtle"
-							on:click={openAnalyticsTable}
-						/>
+						<h3 class="text-lg font-semibold tracking-tight text-slate-800">Load Efficiency Index</h3>
+						<div class="perf-value text-2xl font-bold font-mono text-slate-900">4.2</div>
+						<p class="text-slate-600 text-sm font-medium">3 trucks in maintenance</p>
 					</div>
 				</div>
 
@@ -470,8 +455,14 @@
 	}
 
 	.perf-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+		transform: translateY(-3px);
+		box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+		border-color: rgba(59, 130, 246, 0.3);
+	}
+
+	.perf-card:active {
+		transform: translateY(-1px);
+		transition: transform 0.1s ease;
 	}
 
 	.perf-card.excellent {
@@ -479,14 +470,29 @@
 		background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
 	}
 
+	.perf-card.excellent:hover {
+		border-left-color: #10b981;
+		box-shadow: 0 12px 35px rgba(5, 150, 105, 0.2);
+	}
+
 	.perf-card.good {
 		border-left: 4px solid #3b82f6;
 		background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
 	}
 
+	.perf-card.good:hover {
+		border-left-color: #60a5fa;
+		box-shadow: 0 12px 35px rgba(59, 130, 246, 0.2);
+	}
+
 	.perf-card.warning {
 		border-left: 4px solid #f59e0b;
 		background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+	}
+
+	.perf-card.warning:hover {
+		border-left-color: #fbbf24;
+		box-shadow: 0 12px 35px rgba(245, 158, 11, 0.2);
 	}
 
 	.perf-header {
@@ -506,17 +512,17 @@
 		letter-spacing: 0.5px;
 	}
 
-	.perf-value {
-		font-size: 28px;
-		font-weight: 700;
-		margin: 12px 0;
-	}
-
 	.perf-trend {
 		display: flex;
 		align-items: center;
 		gap: 8px;
 		margin-bottom: 12px;
+	}
+
+	.perf-value {
+		font-size: 28px;
+		font-weight: 700;
+		margin: 12px 0;
 	}
 
 	.stat-item {
