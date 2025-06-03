@@ -282,7 +282,7 @@
 
 	<!-- Main Content: Two-Pane Layout -->
 	<div class="dispatch-layout">
-		<!-- Left Pane: Dispatch Snapshot - Hidden to give map full width -->
+		<!-- Left Pane: Dispatch Snapshot -->
 		<div class="dispatch-snapshot">
 			<!-- 🚨 PENDING ASSIGNMENTS - Moved to Top -->
 			<CollapsibleSection 
@@ -546,10 +546,10 @@
 		overflow: hidden;
 	}
 
-	/* Left Pane: Dispatch Snapshot - Hidden to give map full width */
+	/* Left Pane: Dispatch Snapshot */
 	.dispatch-snapshot {
-		display: none; /* Hide sidebar to give map full width */
-		width: 400px;
+		display: flex;
+		width: 380px;
 		flex-direction: column;
 		gap: 16px;
 		overflow-y: auto;
@@ -559,7 +559,7 @@
 	/* Show dispatch snapshot only on mobile for collapsible access */
 	@media (max-width: 1024px) {
 		.dispatch-snapshot {
-			display: flex; /* Show on mobile for better UX */
+			display: flex;
 			width: 100%;
 			max-height: 300px; /* Reduce height on mobile */
 		}
