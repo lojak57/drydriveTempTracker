@@ -56,7 +56,7 @@
           lineWidth: 1
         },
         ticks: {
-          color: '#6b7280',
+          color: '#ffffff',
           font: {
             family: "'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif",
             size: 11
@@ -69,7 +69,7 @@
           lineWidth: 1
         },
         ticks: {
-          color: '#6b7280',
+          color: '#ffffff',
           font: {
             family: "'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif",
             size: 11

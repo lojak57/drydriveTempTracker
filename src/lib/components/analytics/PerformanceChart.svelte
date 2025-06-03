@@ -179,7 +179,7 @@
 							color: 'rgba(0, 78, 137, 0.1)'
 						},
 						ticks: {
-							color: '#6b7280'
+							color: '#ffffff'
 						}
 					},
 					y: {
@@ -195,7 +195,7 @@
 							color: 'rgba(0, 78, 137, 0.1)'
 						},
 						ticks: {
-							color: '#10b981'
+							color: '#ffffff'
 						}
 					},
 					y1: {

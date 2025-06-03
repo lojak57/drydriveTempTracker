@@ -207,7 +207,7 @@
 					ticks: {
 						display: true, // Force display
 						maxTicksLimit: screenWidth > 768 ? 5 : 3,
-						color: '#374151',
+						color: '#ffffff',
 						font: {
 							size: 12,
 							weight: 500,
@@ -233,7 +233,7 @@
 					ticks: {
 						display: true,
 						maxTicksLimit: 5,
-						color: '#374151',
+						color: '#ffffff',
 						font: {
 							size: 12,
 							weight: 500,

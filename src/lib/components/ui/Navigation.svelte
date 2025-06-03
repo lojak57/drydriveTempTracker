@@ -10,11 +10,11 @@
 		{
 			title: 'Role Dashboards',
 			items: [
-				{ href: '/', label: 'Dashboard', icon: Home, description: 'Role selection and main dashboard' }
+				{ href: '/', label: 'Dashboards', icon: Home, description: 'Role selection and main dashboards' }
 			]
 		},
 		{
-			title: 'Operations',
+			title: 'Analytics',
 			items: [
 				{ href: '/master-dispatch', label: 'Fleet Intelligence Nexus', icon: BarChart3, description: 'Executive fleet intelligence and analytics' }
 			]
