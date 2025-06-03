@@ -389,6 +389,7 @@
 
 	.main-tab {
 		@apply flex items-center gap-3 px-6 py-4 text-left border-b-2 border-transparent hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors min-w-0 flex-shrink-0;
+		min-width: max-content;
 	}
 
 	.main-tab.active {
@@ -397,23 +398,26 @@
 
 	.main-tab.raw-data-tab {
 		@apply border-l border-gray-200 dark:border-gray-600 ml-4 pl-6;
+		min-width: 140px; /* Ensure enough space for "Raw Data" text */
 	}
 
 	.tab-content {
-		@apply flex flex-col gap-0.5 min-w-0;
+		@apply flex flex-col gap-0.5;
+		min-width: max-content;
+		overflow: visible;
 	}
 
 	.tab-label {
 		@apply text-sm font-semibold text-gray-900 dark:text-white;
+		white-space: nowrap;
+		overflow: visible;
 	}
 
 	.tab-meta {
 		@apply text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2;
-		white-space: normal;
-		word-wrap: break-word;
-		line-height: 1.2;
+		white-space: nowrap;
 		overflow: visible;
-		text-overflow: unset;
+		line-height: 1.2;
 	}
 
 	.main-tab.active .tab-label {
