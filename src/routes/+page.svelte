@@ -42,8 +42,8 @@
 </script>
 
 <svelte:head>
-	<title>Oil Field Temp Tracker - Dashboard</title>
-	<meta name="description" content="Oil field temperature tracking and haul management system" />
+	<title>VeriHaul - Oil Field Temperature Tracker</title>
+	<meta name="description" content="VeriHaul - Advanced oil field temperature tracking and haul management system" />
 </svelte:head>
 
 <div class="dashboard-landing">
@@ -52,8 +52,9 @@
 		<div class="header-content">
 			<DryDriveLogo />
 			<div class="header-text">
-				<h1 class="main-title">DryDrive Nexus</h1>
+				<h1 class="main-title">VeriHaul</h1>
 				<p class="main-subtitle">AI-Driven Logistics for Oilfield Excellence</p>
+				<p class="powered-by">Powered by DryDrive</p>
 			</div>
 		</div>
 	</div>
@@ -98,11 +99,11 @@
 	}
 
 	.landing-header {
-		padding: 40px 20px;
+		padding: 32px 20px;
 		text-align: center;
-		background: rgba(255, 255, 255, 0.8);
-		backdrop-filter: blur(20px);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+		background: rgba(255, 255, 255, 0.6);
+		backdrop-filter: blur(15px);
+		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 	}
 
 	.header-content {
@@ -111,7 +112,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 20px;
+		gap: 16px;
 	}
 
 	.header-text {
@@ -129,8 +130,16 @@
 	.main-subtitle {
 		font-size: 16px;
 		color: #64748b;
-		margin: 0;
+		margin: 0 0 4px 0;
 		line-height: 1.4;
+	}
+
+	.powered-by {
+		font-size: 12px;
+		color: #94a3b8;
+		margin: 0;
+		font-weight: 500;
+		letter-spacing: 0.5px;
 	}
 
 	.role-selection {
@@ -173,6 +182,10 @@
 		.main-subtitle {
 			font-size: 18px;
 		}
+
+		.powered-by {
+			font-size: 13px;
+		}
 	}
 
 	.landing-footer {
@@ -187,7 +200,7 @@
 
 	@media (max-width: 640px) {
 		.landing-header {
-			padding: 30px 16px;
+			padding: 24px 16px;
 		}
 
 		.role-selection {

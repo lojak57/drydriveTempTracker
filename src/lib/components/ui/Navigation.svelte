@@ -75,8 +75,8 @@
 			<a href="/" class="logo-container">
 				<DryDriveLogo size={120} />
 				<div class="logo-text">
-					<span class="brand-name">DryDrive</span>
-					<span class="brand-tagline">Oil Transport Operations</span>
+					<span class="brand-name">VeriHaul</span>
+					<span class="brand-tagline">Powered by DryDrive</span>
 				</div>
 			</a>
 		</div>
@@ -121,7 +121,7 @@
 		<div class="mobile-header">
 			<a href="/" class="mobile-logo">
 				<DryDriveLogo size={80} />
-				<span class="mobile-brand">DryDrive</span>
+				<span class="mobile-brand">VeriHaul</span>
 			</a>
 			<button 
 				class="mobile-menu-toggle"
@@ -196,10 +196,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 6px 16px;
-		height: 48px;
-		background: linear-gradient(135deg, rgb(15, 23, 42) 0%, rgb(30, 41, 59) 100%);
-		border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+		padding: 4px 16px;
+		height: 40px;
+		background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.2);
 	}
 
 	.mobile-logo {
@@ -232,7 +232,7 @@
 
 	.mobile-backdrop {
 		position: fixed;
-		top: 56px;
+		top: 40px;
 		left: 0;
 		right: 0;
 		bottom: 0;
@@ -250,7 +250,7 @@
 
 	.mobile-menu {
 		position: fixed;
-		top: 56px;
+		top: 40px;
 		left: 0;
 		right: 0;
 		bottom: 0;

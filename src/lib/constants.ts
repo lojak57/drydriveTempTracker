@@ -3,8 +3,8 @@ export const LABELS = {
   FLEET_INTELLIGENCE: 'Fleet Intelligence Nexus',
   STATUS_POSITIVE: '+2.1%',
   STATUS_NEGATIVE: '-1.3%',
-  APP_NAME: 'DryDrive',
-  APP_TAGLINE: 'Oil Field Temperature Tracker',
+  APP_NAME: 'VeriHaul',
+  APP_TAGLINE: 'Powered by DryDrive',
 } as const;
 
 // Semantic Color Classes for Consistent Usage
