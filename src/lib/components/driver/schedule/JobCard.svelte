@@ -44,6 +44,11 @@
 	export let index: number;
 	export let isHighlighted: boolean = false;
 
+	// DEBUG: Log highlighting status
+	$: if (isHighlighted) {
+		console.log('🟡 JobCard highlighted:', job.id, 'index:', index);
+	}
+
 	// Utility functions
 	function getPriorityColor(priority: ScheduledJob['priority']) {
 		switch (priority) {
@@ -208,15 +213,18 @@
 
 	/* Highlighted job card with yellow background */
 	.job-card.highlighted {
-		background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
-		border-color: #f59e0b;
-		box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+		background: linear-gradient(135deg, #fef3c7 0%, #fde047 80%);
+		border: 2px solid #f59e0b;
+		box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+		transform: translateY(-2px);
+		border-left: 6px solid #f59e0b !important;
 	}
 
 	.job-card.highlighted:hover {
-		background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
-		border-color: #f59e0b;
-		box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+		background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+		border-color: #d97706;
+		box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+		transform: translateY(-3px);
 	}
 
 	/* Priority Bar */

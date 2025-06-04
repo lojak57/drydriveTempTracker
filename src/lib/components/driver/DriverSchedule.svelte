@@ -183,11 +183,17 @@
 
 	// NEW: Determine if a job should be highlighted based on workflow step
 	function shouldHighlightJob(jobIndex: number): boolean {
+		console.log('🟡 Checking highlight for job index:', jobIndex, 'currentStep:', currentWorkflowStep);
+		
 		if (currentWorkflowStep === 'to-pickup') {
-			return jobIndex === 0; // Highlight FIRST job (index 0)
+			const highlight = jobIndex === 0; // Highlight FIRST job (index 0)
+			console.log('🟡 to-pickup step - highlight first job:', highlight);
+			return highlight;
 		}
 		if (currentWorkflowStep === 'to-delivery') {
-			return jobIndex === 1; // Highlight SECOND job (index 1)
+			const highlight = jobIndex === 1; // Highlight SECOND job (index 1)
+			console.log('🟡 to-delivery step - highlight second job:', highlight);
+			return highlight;
 		}
 		return false;
 	}

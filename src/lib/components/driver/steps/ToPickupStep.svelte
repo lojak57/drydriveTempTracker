@@ -44,15 +44,6 @@
         trailerTare={8000}
         on:calculation-complete={(e) => console.log('Load calculation:', e.detail)}
       />
-      
-      <!-- REMOVED: Start navigation button as requested -->
-      <!-- 
-      <div class="start-navigation-action">
-        <button class="start-nav-btn" on:click={eventHandlers.handleStartNavigation}>
-          🗺️ Start Navigation to Pickup
-        </button>
-      </div>
-      -->
     </div>
   {:else if pickupSubStep === 'navigation'}
     <div class="navigation-planning-content">
@@ -195,29 +186,6 @@
   .pickup-header p, .navigation-header p {
     color: #6b7280;
     font-size: 1.1rem;
-  }
-  
-  .start-navigation-action {
-    text-align: center;
-    margin-top: 32px;
-  }
-  
-  .start-nav-btn {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: white;
-    border: none;
-    padding: 16px 32px;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  }
-  
-  .start-nav-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
   }
   
   .route-overview {
