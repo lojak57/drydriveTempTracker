@@ -7,6 +7,9 @@
 
 	const dispatch = createEventDispatcher();
 
+	// NEW: Accept current workflow step to control highlighting
+	export let currentWorkflowStep: string = 'job-overview';
+
 	// Job/Haul data structure
 	interface ScheduledJob {
 		id: string;
@@ -178,6 +181,17 @@
 		dispatch('job-selected', { job });
 	}
 
+	// NEW: Determine if a job should be highlighted based on workflow step
+	function shouldHighlightJob(jobIndex: number): boolean {
+		if (currentWorkflowStep === 'to-pickup') {
+			return jobIndex === 0; // Highlight FIRST job (index 0)
+		}
+		if (currentWorkflowStep === 'to-delivery') {
+			return jobIndex === 1; // Highlight SECOND job (index 1)
+		}
+		return false;
+	}
+
 	function handleEmergencyContact() {
 		console.log('Emergency contact initiated');
 		// Handle emergency contact logic
@@ -223,6 +237,7 @@
 				<JobCard 
 					{job} 
 					{index}
+					isHighlighted={shouldHighlightJob(index)}
 					on:job-selected={handleJobSelected}
 				/>
 			{/each}

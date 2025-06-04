@@ -38,7 +38,8 @@
 			<h2>{headerTitle}</h2>
 			<span class="driver-label">Driver: {driverInfo.id}</span>
 		</div>
-		<button class="reset-btn" on:click={handleReset}>Reset Workflow</button>
+		<!-- HIDDEN: Reset workflow button as requested (keeping code) -->
+		<!-- <button class="reset-btn" on:click={handleReset}>Reset Workflow</button> -->
 	</div>
 	
 	<!-- Progress Steps -->

@@ -42,6 +42,7 @@
 	// Props
 	export let job: ScheduledJob;
 	export let index: number;
+	export let isHighlighted: boolean = false;
 
 	// Utility functions
 	function getPriorityColor(priority: ScheduledJob['priority']) {
@@ -100,7 +101,7 @@
 </script>
 
 <div 
-	class="job-card tap-target {isJobOverdue(job.scheduledTime) ? 'overdue' : ''} {isJobSoon(job.scheduledTime) ? 'soon' : ''}"
+	class="job-card tap-target {isJobOverdue(job.scheduledTime) ? 'overdue' : ''} {isJobSoon(job.scheduledTime) ? 'soon' : ''} {isHighlighted ? 'highlighted' : ''}"
 	on:click={selectJob}
 	role="button"
 	tabindex="0"
@@ -203,6 +204,19 @@
 		transform: translateY(-1px);
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 		border-color: #cbd5e1;
+	}
+
+	/* Highlighted job card with yellow background */
+	.job-card.highlighted {
+		background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+		border-color: #f59e0b;
+		box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+	}
+
+	.job-card.highlighted:hover {
+		background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+		border-color: #f59e0b;
+		box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
 	}
 
 	/* Priority Bar */

@@ -75,18 +75,15 @@
         </div>
       </div>
       
-      <DriverSchedule on:job-selected={eventHandlers.handleJobSelected} />
+      <DriverSchedule 
+        currentWorkflowStep="to-delivery"
+        on:job-selected={eventHandlers.handleJobSelected} 
+      />
       <LoadCalculator 
         truckTare={15000}
         trailerTare={8000}
         on:calculation-complete={(e) => console.log('Load calculation:', e.detail)}
       />
-      
-      <div class="start-navigation-action">
-        <button class="start-nav-btn" on:click={eventHandlers.handleStartDeliveryNavigation}>
-          🗺️ Start Navigation to Delivery
-        </button>
-      </div>
     </div>
   {:else if deliverySubStep === 'delivery-details'}
     <div class="navigation-planning-content">

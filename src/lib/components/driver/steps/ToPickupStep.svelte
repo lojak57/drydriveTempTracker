@@ -35,18 +35,24 @@
         <p>Select your job and plan your route to the pickup location</p>
       </div>
       
-      <DriverSchedule on:job-selected={eventHandlers.handleJobSelected} />
+      <DriverSchedule 
+        currentWorkflowStep="to-pickup"
+        on:job-selected={eventHandlers.handleJobSelected} 
+      />
       <LoadCalculator 
         truckTare={15000}
         trailerTare={8000}
         on:calculation-complete={(e) => console.log('Load calculation:', e.detail)}
       />
       
+      <!-- REMOVED: Start navigation button as requested -->
+      <!-- 
       <div class="start-navigation-action">
         <button class="start-nav-btn" on:click={eventHandlers.handleStartNavigation}>
           🗺️ Start Navigation to Pickup
         </button>
       </div>
+      -->
     </div>
   {:else if pickupSubStep === 'navigation'}
     <div class="navigation-planning-content">
