@@ -106,23 +106,9 @@
       </div>
       
       <DriverSchedule 
+        currentWorkflowStep={transitType === 'pickup' ? 'to-pickup' : 'to-delivery'}
         on:job-selected={eventHandlers.handleJobSelected}
       />
-      
-      <div class="primary-actions">
-        <button 
-          class="action-btn primary" 
-          on:click={() => {
-            if (transitType === 'pickup') {
-              eventHandlers.handleStartNavigation && eventHandlers.handleStartNavigation();
-            } else {
-              eventHandlers.handleStartDeliveryNavigation && eventHandlers.handleStartDeliveryNavigation();
-            }
-          }}
-        >
-          Start {transitType === 'pickup' ? 'Navigation' : 'Delivery Route'}
-        </button>
-      </div>
     </div>
     
   {:else if currentSubStep === (transitType + '-details') || currentSubStep === 'navigation'}
@@ -529,14 +515,6 @@
     gap: 16px;
     max-width: 400px;
     margin: 0 auto;
-  }
-  
-  /* Primary Actions */
-  .primary-actions {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 32px;
   }
   
   .action-btn {
