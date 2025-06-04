@@ -13,6 +13,8 @@
 	// Map container and instance
 	let mapContainer: HTMLDivElement;
 	let map: maplibregl.Map;
+	let mapInitialized = false;
+	let boundsTimeout: number;
 
 	// Current location and transit state
 	let currentLocation = {
@@ -31,10 +33,24 @@
 	let alertLevel = 'normal'; // 'normal' | 'caution' | 'warning'
 	let maxSpeedAlert = 65; // Speed limit for hazmat transport
 
-	// Map initialization for in-transit view
+	// Map initialization for in-transit view - STABILIZED
 	onMount(() => {
-		if (mapContainer && job) {
-			// Initialize map with focused view on current route
+		// Prevent multiple initializations
+		if (mapInitialized || !mapContainer || !job) {
+			return;
+		}
+
+		// Small delay to ensure container is ready
+		setTimeout(() => {
+			initializeMapSafely();
+		}, 200);
+	});
+
+	function initializeMapSafely() {
+		if (mapInitialized || !mapContainer) return;
+
+		try {
+			// Initialize map with stable view
 			map = new maplibregl.Map({
 				container: mapContainer,
 				style: {
@@ -43,9 +59,7 @@
 						"carto-light": {
 							"type": "raster",
 							"tiles": [
-								"https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-								"https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-								"https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+								"https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
 							],
 							"tileSize": 256,
 							"attribution": "© CartoDB © OpenStreetMap contributors"
@@ -62,100 +76,127 @@
 					]
 				},
 				center: [currentLocation.lng, currentLocation.lat],
-				zoom: 12,
+				zoom: 10, // Start with stable zoom level
 				attributionControl: false
 			});
+
+			// Mark as initialized immediately
+			mapInitialized = true;
 
 			// Add navigation controls
 			map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-			// Add route and markers when map loads
+			// Wait for map to fully load before adding route
 			map.on('load', () => {
-				addInTransitRoute();
+				// Debounced route addition to prevent multiple bounds calculations
+				clearTimeout(boundsTimeout);
+				boundsTimeout = setTimeout(() => {
+					addInTransitRouteStable();
+				}, 300);
 			});
+
+			// Prevent zoom animation conflicts
+			map.on('zoomstart', () => {
+				clearTimeout(boundsTimeout);
+			});
+
+		} catch (error) {
+			console.error('Map initialization error:', error);
+			mapInitialized = false;
 		}
-	});
+	}
+
+	function addInTransitRouteStable() {
+		if (!map || !job || !mapInitialized) return;
+
+		try {
+			// Current location marker (moving truck)
+			const currentMarker = new maplibregl.Marker({
+				color: '#3b82f6',
+				scale: 1.3
+			})
+			.setLngLat([currentLocation.lng, currentLocation.lat])
+			.setPopup(new maplibregl.Popup().setHTML(`
+				<div style="text-align: center; padding: 8px;">
+					<strong style="color: #3b82f6;">In Transit</strong><br>
+					<span style="font-size: 12px; color: #666;">${currentLocation.address}</span><br>
+					<span style="font-size: 11px; color: #999;">${transitSpeed} mph</span>
+				</div>
+			`))
+			.addTo(map);
+
+			// Delivery location marker
+			const deliveryMarker = new maplibregl.Marker({
+				color: '#059669',
+				scale: 1.1
+			})
+			.setLngLat([job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat])
+			.setPopup(new maplibregl.Popup().setHTML(`
+				<div style="text-align: center; padding: 8px;">
+					<strong style="color: #059669;">Destination</strong><br>
+					<span style="font-size: 12px; color: #666;">${job.deliveryLocation.name}</span><br>
+					<span style="font-size: 11px; color: #999;">${distanceToDelivery} mi remaining</span>
+				</div>
+			`))
+			.addTo(map);
+
+			// Route line to delivery
+			map.addSource('transit-route', {
+				'type': 'geojson',
+				'data': {
+					'type': 'Feature',
+					'properties': {},
+					'geometry': {
+						'type': 'LineString',
+						'coordinates': [
+							[currentLocation.lng, currentLocation.lat],
+							[job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat]
+						]
+					}
+				}
+			});
+
+			map.addLayer({
+				'id': 'active-transit-route',
+				'type': 'line',
+				'source': 'transit-route',
+				'layout': {
+					'line-join': 'round',
+					'line-cap': 'round'
+				},
+				'paint': {
+					'line-color': '#3b82f6',
+					'line-width': 5,
+					'line-opacity': 0.8
+				}
+			});
+
+			// STABLE bounds calculation - prevent erratic zooming
+			const bounds = new maplibregl.LngLatBounds();
+			bounds.extend([currentLocation.lng, currentLocation.lat]);
+			bounds.extend([job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat]);
+
+			// Use gentle, stable bounds fitting
+			map.fitBounds(bounds, {
+				padding: 60,
+				maxZoom: 11,
+				duration: 1000, // Smooth transition
+				essential: true // Don't interrupt for other animations
+			});
+
+		} catch (error) {
+			console.error('Error adding route:', error);
+		}
+	}
 
 	onDestroy(() => {
-		if (map) {
+		// Clean up properly
+		clearTimeout(boundsTimeout);
+		if (map && mapInitialized) {
 			map.remove();
+			mapInitialized = false;
 		}
 	});
-
-	function addInTransitRoute() {
-		if (!map || !job) return;
-
-		// Current location marker (moving truck)
-		const currentMarker = new maplibregl.Marker({
-			color: '#3b82f6',
-			scale: 1.3
-		})
-		.setLngLat([currentLocation.lng, currentLocation.lat])
-		.setPopup(new maplibregl.Popup().setHTML(`
-			<div style="text-align: center; padding: 8px;">
-				<strong style="color: #3b82f6;">In Transit</strong><br>
-				<span style="font-size: 12px; color: #666;">${currentLocation.address}</span><br>
-				<span style="font-size: 11px; color: #999;">${transitSpeed} mph</span>
-			</div>
-		`))
-		.addTo(map);
-
-		// Delivery location marker
-		const deliveryMarker = new maplibregl.Marker({
-			color: '#059669',
-			scale: 1.1
-		})
-		.setLngLat([job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat])
-		.setPopup(new maplibregl.Popup().setHTML(`
-			<div style="text-align: center; padding: 8px;">
-				<strong style="color: #059669;">Destination</strong><br>
-				<span style="font-size: 12px; color: #666;">${job.deliveryLocation.name}</span><br>
-				<span style="font-size: 11px; color: #999;">${distanceToDelivery} mi remaining</span>
-			</div>
-		`))
-		.addTo(map);
-
-		// Route line to delivery
-		map.addSource('transit-route', {
-			'type': 'geojson',
-			'data': {
-				'type': 'Feature',
-				'properties': {},
-				'geometry': {
-					'type': 'LineString',
-					'coordinates': [
-						[currentLocation.lng, currentLocation.lat],
-						[job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat]
-					]
-				}
-			}
-		});
-
-		map.addLayer({
-			'id': 'active-transit-route',
-			'type': 'line',
-			'source': 'transit-route',
-			'layout': {
-				'line-join': 'round',
-				'line-cap': 'round'
-			},
-			'paint': {
-				'line-color': '#3b82f6',
-				'line-width': 5,
-				'line-opacity': 0.8
-			}
-		});
-
-		// Center map on route
-		const bounds = new maplibregl.LngLatBounds();
-		bounds.extend([currentLocation.lng, currentLocation.lat]);
-		bounds.extend([job.deliveryLocation.coordinates.lng, job.deliveryLocation.coordinates.lat]);
-
-		map.fitBounds(bounds, {
-			padding: 80,
-			maxZoom: 10
-		});
-	}
 
 	// Event handlers for child components
 	function handleExitTransit() {

@@ -9,19 +9,36 @@
 	export let currentLocation: { lat: number; lng: number; address?: string };
 
 	let mapContainer: HTMLDivElement;
+	let mapInitialized = false;
+	let initTimeout: number;
 
 	onMount(() => {
-		if (mapContainer && job) {
-			initializeMap();
+		// Prevent multiple initializations and add delay for stability
+		if (mapInitialized || !mapContainer || !job) {
+			return;
 		}
+
+		// Small delay to ensure container is ready and prevent conflicts
+		initTimeout = setTimeout(() => {
+			if (mapContainer && job && !mapInitialized) {
+				initializeMap();
+			}
+		}, 300);
 	});
 
 	onDestroy(() => {
-		mapStore.destroy();
+		clearTimeout(initTimeout);
+		if (mapInitialized) {
+			mapStore.destroy();
+			mapInitialized = false;
+		}
 	});
 
 	function initializeMap() {
+		if (mapInitialized) return;
+		
 		mapStore.setLoading(true);
+		mapInitialized = true;
 
 		// Initialize map with light styling suitable for oil field operations
 		const map = new maplibregl.Map({
@@ -32,9 +49,7 @@
 					"carto-light": {
 						"type": "raster",
 						"tiles": [
-							"https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-							"https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-							"https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+							"https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
 						],
 						"tileSize": 256,
 						"attribution": "© CartoDB © OpenStreetMap contributors"
@@ -51,7 +66,7 @@
 				]
 			},
 			center: [currentLocation.lng, currentLocation.lat],
-			zoom: 10,
+			zoom: 10, // Start with stable zoom level
 			attributionControl: false
 		});
 
@@ -63,8 +78,10 @@
 
 		// Add markers and route when map loads
 		map.on('load', () => {
-			addMarkersAndRoute(map);
-			dispatch('map-loaded', { map });
+			setTimeout(() => {
+				addMarkersAndRoute(map);
+				dispatch('map-loaded', { map });
+			}, 200); // Small delay to prevent bounds conflicts
 		});
 
 		// Handle map errors
@@ -203,9 +220,12 @@
 		const bounds = new maplibregl.LngLatBounds();
 		coordinates.forEach(coord => bounds.extend(coord));
 
+		// Use gentler, stable bounds fitting to prevent erratic zoom
 		map.fitBounds(bounds, {
 			padding: 50,
-			maxZoom: 12
+			maxZoom: 11, // Slightly reduced max zoom for stability
+			duration: 800, // Smooth transition
+			essential: true // Don't interrupt for other animations
 		});
 	}
 </script>
