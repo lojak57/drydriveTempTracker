@@ -106,7 +106,7 @@
 		<div class="header-content">
 			<div class="header-text">
 				<h1 class="header-title text-xl font-semibold">Yard Manager Dashboard</h1>
-				<p class="header-subtitle text-slate-300">Fleet overview, driver management, and yard operations</p>
+				<p class="header-subtitle text-sm text-slate-300">Fleet overview, driver management, and yard operations</p>
 			</div>
 		</div>
 	</div>
@@ -144,7 +144,7 @@
 			<!-- Driver Management (Moved to Top) -->
 			<div class="content-section">
 				<div class="section-header mb-6">
-					<h2 class="text-lg font-semibold tracking-tight text-slate-800">Driver Management</h2>
+					<h2 class="text-lg font-semibold text-slate-800">Driver Management</h2>
 					<p class="text-sm text-slate-600">Critical driver KPIs with real-time monitoring</p>
 				</div>
 				
@@ -229,7 +229,7 @@
 
 			<!-- Fleet Status with Accordion -->
 			<div class="content-section">
-				<h2 class="text-lg font-semibold tracking-tight text-slate-800 mb-6">Fleet Status Overview</h2>
+				<h2 class="text-lg font-semibold text-slate-800 mb-6">Fleet Status Overview</h2>
 				<div class="fleet-status-sections space-y-4">
 					<FleetStatusSection 
 						title="Active Trucks"
@@ -262,8 +262,8 @@
 			<!-- Enhanced Performance Analytics Section -->
 			<div class="content-section performance-analytics-section">
 				<div class="section-header mb-6">
-					<h2 class="text-lg font-semibold tracking-tight text-slate-800">Performance Analytics</h2>
-					<p class="text-sm text-slate-600 tracking-normal">Defend your numbers with complete operational context</p>
+					<h2 class="text-lg font-semibold text-slate-800">Performance Analytics</h2>
+					<p class="text-sm text-slate-600">Defend your numbers with complete operational context</p>
 				</div>
 				
 				<!-- Summary Performance Cards -->
@@ -273,13 +273,13 @@
 							<div class="perf-icon">
 								<TrendingUp size={24} />
 							</div>
-							<div class="perf-status text-sm font-semibold tracking-tight">EXCELLENT</div>
+							<div class="perf-status text-xs font-semibold text-slate-500 uppercase">EXCELLENT</div>
 						</div>
-						<h3 class="text-lg font-semibold tracking-tight text-slate-800">Daily Throughput</h3>
-						<div class="perf-value text-2xl font-bold font-mono text-slate-900">2,847 BBL</div>
+						<h3 class="text-base font-semibold text-slate-800">Daily Throughput</h3>
+						<div class="perf-value text-2xl font-semibold text-slate-900">2,847 BBL</div>
 						<div class="perf-trend">
 							<TrendCell value={312} type="absolute" size="sm" />
-							<span class="text-slate-600 text-sm font-medium">vs yesterday</span>
+							<span class="text-sm font-medium text-slate-600">vs yesterday</span>
 						</div>
 					</div>
 
@@ -288,11 +288,11 @@
 							<div class="perf-icon">
 								<BarChart3 size={24} />
 							</div>
-							<div class="perf-status text-sm font-semibold tracking-tight">GOOD</div>
+							<div class="perf-status text-xs font-semibold text-slate-500 uppercase">GOOD</div>
 						</div>
-						<h3 class="text-lg font-semibold tracking-tight text-slate-800">Barrels per Drive Hour</h3>
-						<div class="perf-value text-2xl font-bold font-mono text-slate-900">185.3</div>
-						<p class="text-slate-600 text-sm font-medium">Above target efficiency</p>
+						<h3 class="text-base font-semibold text-slate-800">Barrels per Drive Hour</h3>
+						<div class="perf-value text-2xl font-semibold text-slate-900">185.3</div>
+						<p class="text-sm font-medium text-slate-600">Above target efficiency</p>
 					</div>
 
 					<div class="perf-card warning" on:click={openAnalyticsTable}>
@@ -300,32 +300,32 @@
 							<div class="perf-icon">
 								<AlertTriangle size={24} />
 							</div>
-							<div class="perf-status text-sm font-semibold tracking-tight">REVIEW</div>
+							<div class="perf-status text-xs font-semibold text-slate-500 uppercase">REVIEW</div>
 						</div>
-						<h3 class="text-lg font-semibold tracking-tight text-slate-800">Load Efficiency Index</h3>
-						<div class="perf-value text-2xl font-bold font-mono text-slate-900">4.2</div>
-						<p class="text-slate-600 text-sm font-medium">3 trucks in maintenance</p>
+						<h3 class="text-base font-semibold text-slate-800">Load Efficiency Index</h3>
+						<div class="perf-value text-2xl font-semibold text-slate-900">4.2</div>
+						<p class="text-sm font-medium text-slate-600">3 trucks in maintenance</p>
 					</div>
 				</div>
 
 				<!-- Quick Stats with Standardized Fonts -->
 				<div class="quick-stats grid grid-cols-2 md:grid-cols-4 gap-6">
 					<div class="stat-item">
-						<span class="stat-label text-xs uppercase text-slate-500 tracking-wide">Active Trucks</span>
-						<span class="stat-value text-lg font-semibold text-slate-800 font-mono">75.3%</span>
+						<span class="stat-label text-xs font-semibold text-slate-500 uppercase">Active Trucks</span>
+						<span class="stat-value text-lg font-semibold text-slate-800">75.3%</span>
 					</div>
 					<div class="stat-item">
-						<span class="stat-label text-xs uppercase text-slate-500 tracking-wide">Drivers En Route</span>
-						<span class="stat-value text-lg font-semibold text-slate-800 font-mono">68.2%</span>
+						<span class="stat-label text-xs font-semibold text-slate-500 uppercase">Drivers En Route</span>
+						<span class="stat-value text-lg font-semibold text-slate-800">68.2%</span>
 					</div>
 					<div class="stat-item">
-						<span class="stat-label text-xs uppercase text-slate-500 tracking-wide">7-Day Average</span>
-						<span class="stat-value text-lg font-semibold text-slate-800 font-mono">2,701 BBL</span>
+						<span class="stat-label text-xs font-semibold text-slate-500 uppercase">7-Day Average</span>
+						<span class="stat-value text-lg font-semibold text-slate-800">2,701 BBL</span>
 					</div>
 					<div class="stat-item">
-						<span class="stat-label text-xs uppercase text-slate-500 tracking-wide">Efficiency Rating</span>
+						<span class="stat-label text-xs font-semibold text-slate-500 uppercase">Efficiency Rating</span>
 						<div class="stat-value-with-trend flex items-center gap-2">
-							<span class="text-lg font-semibold text-slate-800 font-mono">92.3%</span>
+							<span class="text-lg font-semibold text-slate-800">92.3%</span>
 							<TrendCell value={2.1} size="sm" />
 						</div>
 					</div>
@@ -334,20 +334,20 @@
 
 			<!-- Operations Summary -->
 			<div class="content-section mt-8">
-				<h2 class="text-lg font-semibold tracking-tight text-slate-800 mb-6">Operations Summary</h2>
+				<h2 class="text-lg font-semibold text-slate-800 mb-6">Operations Summary</h2>
 				<div class="operations-grid grid grid-cols-1 md:grid-cols-2 gap-6">
 					<div class="operation-card">
-						<h3 class="text-sm font-semibold uppercase text-slate-500 tracking-wide">Loading Efficiency</h3>
-						<div class="metric-value font-mono text-slate-900">94.7%</div>
+						<h3 class="text-xs font-semibold text-slate-500 uppercase">Loading Efficiency</h3>
+						<div class="metric-value text-2xl font-semibold text-slate-900">94.7%</div>
 						<div class="trend-container">
 							<TrendCell value={2.1} size="sm" />
-							<span class="text-slate-600 text-sm">improvement</span>
+							<span class="text-sm font-medium text-slate-600">improvement</span>
 						</div>
 					</div>
 					<div class="operation-card">
-						<h3 class="text-sm font-semibold uppercase text-slate-500 tracking-wide">Safety Incidents</h3>
-						<div class="metric-value font-mono text-slate-900">0</div>
-						<p class="text-slate-600 text-sm">247 days incident-free</p>
+						<h3 class="text-xs font-semibold text-slate-500 uppercase">Safety Incidents</h3>
+						<div class="metric-value text-2xl font-semibold text-slate-900">0</div>
+						<p class="text-sm font-medium text-slate-600">247 days incident-free</p>
 					</div>
 				</div>
 			</div>
@@ -521,7 +521,7 @@
 
 	.perf-value {
 		font-size: 28px;
-		font-weight: 700;
+		font-weight: 600;
 		margin: 12px 0;
 	}
 
@@ -558,7 +558,7 @@
 
 	.operation-card .metric-value {
 		font-size: 32px;
-		font-weight: 700;
+		font-weight: 600;
 		margin: 12px 0 8px 0;
 	}
 

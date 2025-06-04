@@ -73,7 +73,7 @@
 	<div class="desktop-nav">
 		<div class="nav-header">
 			<a href="/" class="logo-container">
-				<DryDriveLogo size={120} />
+				<DryDriveLogo size={90} />
 				<div class="logo-text">
 					<span class="brand-name">VeriHaul</span>
 					<span class="brand-tagline">Powered by DryDrive</span>
@@ -120,7 +120,7 @@
 	<div class="mobile-nav">
 		<div class="mobile-header">
 			<a href="/" class="mobile-logo">
-				<DryDriveLogo size={80} />
+				<DryDriveLogo size={60} />
 				<span class="mobile-brand">VeriHaul</span>
 			</a>
 			<button 
@@ -177,10 +177,17 @@
 		right: 0;
 		z-index: 1000;
 		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-		background: rgba(15, 23, 42, 0.95);
+		background: linear-gradient(135deg, 
+			rgba(30, 58, 138, 0.95) 0%,  /* Deep industrial blue */
+			rgba(15, 23, 42, 0.95) 25%,  /* Dark slate */
+			rgba(55, 65, 81, 0.95) 75%,  /* Warm gray */
+			rgba(17, 24, 39, 0.98) 100%  /* Almost black */
+		);
 		backdrop-filter: blur(24px);
-		border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+		border-bottom: 2px solid rgba(251, 191, 36, 0.2);
+		box-shadow: 
+			0 4px 20px rgba(0, 0, 0, 0.25),
+			0 2px 8px rgba(251, 191, 36, 0.1);
 	}
 
 	/* Mobile Navigation (Default) */
@@ -196,10 +203,16 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 4px 16px;
-		height: 40px;
-		background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 100%);
-		border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+		padding: 8px 16px;
+		height: 56px;
+		background: linear-gradient(135deg, 
+			rgb(30, 58, 138) 0%,    /* Deep industrial blue */
+			rgb(15, 23, 42) 25%,    /* Dark slate */
+			rgb(55, 65, 81) 75%,    /* Warm gray */
+			rgb(17, 24, 39) 100%    /* Almost black */
+		);
+		border-bottom: 2px solid rgba(251, 191, 36, 0.3); /* Amber accent */
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	}
 
 	.mobile-logo {
@@ -213,6 +226,7 @@
 		font-size: 16px;
 		font-weight: 700;
 		color: #ffffff;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 	}
 
 	.mobile-menu-toggle {
@@ -232,11 +246,11 @@
 
 	.mobile-backdrop {
 		position: fixed;
-		top: 40px;
+		top: 56px;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background: rgba(0, 0, 0, 0.5);
+		background: rgba(0, 0, 0, 0.6);
 		z-index: 998;
 		opacity: 0;
 		animation: fadeIn 0.3s ease forwards;
@@ -250,11 +264,15 @@
 
 	.mobile-menu {
 		position: fixed;
-		top: 40px;
+		top: 56px;
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background: rgba(15, 23, 42, 0.98);
+		background: linear-gradient(135deg, 
+			rgba(30, 58, 138, 0.98) 0%,  /* Deep industrial blue */
+			rgba(15, 23, 42, 0.98) 50%,  /* Dark slate */
+			rgba(17, 24, 39, 0.98) 100%  /* Almost black */
+		);
 		backdrop-filter: blur(24px);
 		overflow-y: auto;
 		z-index: 999;
@@ -363,9 +381,15 @@
 		}
 
 		.nav-header {
-			padding: 12px 16px;
-			border-bottom: 1px solid rgba(148, 163, 184, 0.3);
-			background: linear-gradient(135deg, rgb(15, 23, 42) 0%, rgb(30, 41, 59) 100%);
+			padding: 16px 20px;
+			border-bottom: 2px solid rgba(251, 191, 36, 0.3);
+			background: linear-gradient(135deg, 
+				rgb(30, 58, 138) 0%,    /* Deep industrial blue */
+				rgb(15, 23, 42) 25%,    /* Dark slate */
+				rgb(55, 65, 81) 75%,    /* Warm gray */
+				rgb(17, 24, 39) 100%    /* Almost black */
+			);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		}
 
 		.logo-container {
@@ -390,13 +414,15 @@
 			font-weight: 700;
 			color: #ffffff;
 			line-height: 1.2;
+			text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 		}
 
 		.brand-tagline {
 			font-size: 11px;
 			font-weight: 500;
-			color: #7CB342;
+			color: #fbbf24; /* Warm amber/gold for oil field theme */
 			line-height: 1.2;
+			text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 		}
 
 		.nav-sections {

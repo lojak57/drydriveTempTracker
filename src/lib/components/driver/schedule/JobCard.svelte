@@ -211,20 +211,19 @@
 		border-color: #cbd5e1;
 	}
 
-	/* Highlighted job card with yellow background */
+	/* Highlighted job card with subtle blue tint */
 	.job-card.highlighted {
-		background: linear-gradient(135deg, #fed7aa 0%, #fb923c 80%);
-		border: 3px solid #ea580c;
-		box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5);
-		transform: translateY(-3px);
-		border-left: 8px solid #ea580c !important;
+		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+		border: 1px solid #3b82f6;
+		box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+		border-left: 4px solid #3b82f6 !important;
 	}
 
 	.job-card.highlighted:hover {
-		background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
-		border-color: #c2410c;
-		box-shadow: 0 8px 25px rgba(234, 88, 12, 0.6);
-		transform: translateY(-4px);
+		background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+		border-color: #2563eb;
+		box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
+		transform: translateY(-1px);
 	}
 
 	/* Priority Bar */

@@ -92,18 +92,24 @@
 <style>
 	.dashboard-landing {
 		min-height: 100vh;
-		background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 50%, #e8f5e8 100%);
+		/* Remove background so layout gradient shows through */
+		background: transparent;
 		display: flex;
 		flex-direction: column;
 		font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 	}
 
 	.landing-header {
-		padding: 32px 20px;
+		padding: 20px 20px;
 		text-align: center;
-		background: rgba(255, 255, 255, 0.6);
-		backdrop-filter: blur(15px);
-		border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+		background: linear-gradient(135deg, 
+			rgba(248, 250, 252, 0.70) 0%,   /* Semi-transparent blue-gray */
+			rgba(241, 245, 249, 0.75) 50%,  /* Semi-transparent slate */
+			rgba(249, 250, 251, 0.70) 100%  /* Semi-transparent cool white */
+		);
+		backdrop-filter: blur(20px);
+		border-bottom: 1px solid rgba(148, 163, 184, 0.2); /* Neutral gray border */
+		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 	}
 
 	.header-content {
@@ -112,7 +118,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 16px;
+		gap: 12px;
 	}
 
 	.header-text {
@@ -120,26 +126,29 @@
 	}
 
 	.main-title {
-		font-size: 32px;
+		font-size: 28px;
 		font-weight: 700;
-		color: #0f172a;
-		margin: 0 0 8px 0;
+		color: #1e3a8a;
+		margin: 0 0 6px 0;
 		line-height: 1.2;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 	}
 
 	.main-subtitle {
-		font-size: 16px;
-		color: #64748b;
-		margin: 0 0 4px 0;
+		font-size: 15px;
+		color: #475569;
+		margin: 0 0 3px 0;
 		line-height: 1.4;
+		font-weight: 500;
 	}
 
 	.powered-by {
-		font-size: 12px;
-		color: #94a3b8;
+		font-size: 11px;
+		color: #64748b;
 		margin: 0;
-		font-weight: 500;
+		font-weight: 600;
 		letter-spacing: 0.5px;
+		text-transform: uppercase;
 	}
 
 	.role-selection {
@@ -176,31 +185,34 @@
 
 	@media (min-width: 1024px) {
 		.main-title {
-			font-size: 40px;
+			font-size: 32px;
 		}
 
 		.main-subtitle {
-			font-size: 18px;
+			font-size: 16px;
 		}
 
 		.powered-by {
-			font-size: 13px;
+			font-size: 12px;
 		}
 	}
 
 	.landing-footer {
-		padding: 20px;
+		padding: 16px 20px;
 		text-align: center;
 		color: #64748b;
-		font-size: 14px;
-		background: rgba(255, 255, 255, 0.6);
-		backdrop-filter: blur(10px);
-		border-top: 1px solid rgba(0, 0, 0, 0.05);
+		font-size: 13px;
+		background: linear-gradient(135deg,
+			rgba(248, 250, 252, 0.80) 0%,   /* Clean blue-gray */
+			rgba(249, 250, 251, 0.85) 100%  /* Cool white */
+		);
+		backdrop-filter: blur(15px);
+		border-top: 1px solid rgba(148, 163, 184, 0.15); /* Neutral gray border */
 	}
 
 	@media (max-width: 640px) {
 		.landing-header {
-			padding: 24px 16px;
+			padding: 16px 16px;
 		}
 
 		.role-selection {
@@ -208,11 +220,15 @@
 		}
 
 		.main-title {
-			font-size: 28px;
+			font-size: 24px;
 		}
 
 		.main-subtitle {
-			font-size: 15px;
+			font-size: 14px;
+		}
+		
+		.header-content {
+			gap: 10px;
 		}
 	}
 </style>

@@ -2,6 +2,7 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import DriverSchedule from '../DriverSchedule.svelte';
   import LoadCalculator from '../LoadCalculator.svelte';
+  import DriverTransitMap from '../DriverTransitMap.svelte';
   
   const dispatch = createEventDispatcher();
   export let transitType: 'pickup' | 'delivery' = 'pickup';
@@ -15,11 +16,18 @@
   
   onMount(() => {
     console.log(`📍 ToTransitStep mounted, type: ${transitType}, substep: ${currentSubStep}`);
-    // Ensure scroll to top with longer delay to avoid conflicts
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 200);
+    // Only scroll to top if we're mounting on the job selection screen (step 3 entry)
+    if (transitType === 'pickup' && (currentSubStep === 'job-selection' || currentSubStep === 'pickup-schedule')) {
+      console.log('🔄 Mounting step 3 job selection - scrolling to top');
+      scrollToTop();
+    }
   });
+  
+  // Robust scroll to top function (less aggressive)
+  function scrollToTop() {
+    // Only do immediate scroll, remove the repeated timeouts that were causing issues
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
   
   // Dynamic data based on transitType
   $: currentLocation = {
@@ -32,13 +40,39 @@
     ? {
         name: sharedState.activeJob?.pickupSiteName || 'Johnson Tank Battery #3',
         address: sharedState.activeJob?.pickupAddress || '2847 County Road 1250, Midland, TX 79701',
-        coordinates: { lat: 31.8457, lng: -102.3676 }
+        lat: 31.8457,
+        lng: -102.3676
       }
     : {
         name: sharedState.activeJob?.deliverySiteName || 'Permian Basin Refinery',
         address: sharedState.activeJob?.deliveryAddress || '1425 Industrial Blvd, Odessa, TX 79761',
-        coordinates: { lat: 31.8457, lng: -102.2676 }
+        lat: 31.8457,
+        lng: -102.2676
       };
+  
+  // Transform current driver data for FleetTrackingMap
+  $: driverAsFleetAsset = [{
+    id: 'TX-TRL-445', // Current driver's truck
+    driver: 'Current Driver',
+    lat: currentLocation.lat,
+    lng: currentLocation.lng,
+    status: transitType === 'pickup' ? 'transit' : 'delivery',
+    currentJob: sharedState.activeJob?.id || 'JOB-001',
+    eta: getCurrentETA(),
+    route: {
+      origin: transitType === 'pickup' 
+        ? { lat: 29.7604, lng: -95.3698, name: 'Dispatch Yard' }
+        : { lat: 31.8457, lng: -102.3676, name: sharedState.activeJob?.pickupSiteName || 'Pickup Site' },
+      destination: { 
+        lat: destination.lat, 
+        lng: destination.lng, 
+        name: destination.name 
+      }
+    },
+    speed: 58,
+    bearing: transitType === 'pickup' ? 270 : 90, // West for pickup, East for delivery
+    lastUpdate: new Date()
+  }];
   
   // Dynamic headers and content
   $: headerTitle = transitType === 'pickup' 
@@ -214,24 +248,73 @@
         </p>
       </div>
       
-      <div class="transit-status">
-        <div class="current-location">
-          <span class="location-label">Current Location</span>
-          <span class="location-value">{currentLocation.address}</span>
+      <!-- Enhanced Map Section with FleetTrackingMap -->
+      <div class="transit-map-section">
+        <div class="map-header">
+          <h3>Live Tracking - {transitType === 'pickup' ? 'To Pickup Site' : 'To Delivery Site'}</h3>
+          <div class="eta-display">
+            <span class="eta-label">ETA:</span>
+            <span class="eta-time">{getCurrentETA()}</span>
+          </div>
         </div>
         
-        <div class="navigation-instruction">
-          <span class="instruction-text">
-            In 8.2 mi — Take Exit 118 toward {transitType === 'pickup' ? 'Well Pad Access Rd' : 'Industrial Blvd'}
-          </span>
-        </div>
-        
-        <div class="arrival-eta">
-          <span class="eta-label">Estimated Arrival</span>
-          <span class="eta-time">{getCurrentETA()}</span>
+        <!-- Clean DriverTransitMap -->
+        <div class="map-container-wrapper">
+          <DriverTransitMap 
+            {currentLocation}
+            {destination}
+            {transitType}
+            origin={transitType === 'delivery' ? { lat: 31.8457, lng: -102.3676, name: 'Pickup Site' } : null}
+            on:map-ready={(e) => console.log('Transit map ready:', e.detail)}
+            on:map-error={(e) => console.error('Map error:', e.detail)}
+          />
         </div>
       </div>
       
+      <!-- Transit Status Cards -->
+      <div class="transit-status-cards">
+        <div class="status-card speed">
+          <div class="status-icon">🚛</div>
+          <div class="status-info">
+            <span class="status-value">58 MPH</span>
+            <span class="status-label">Current Speed</span>
+          </div>
+        </div>
+        
+        <div class="status-card pressure">
+          <div class="status-icon">⚡</div>
+          <div class="status-info">
+            <span class="status-value">145 PSI</span>
+            <span class="status-label">Tank Pressure</span>
+          </div>
+        </div>
+        
+        <div class="status-card temp">
+          <div class="status-icon">🌡️</div>
+          <div class="status-info">
+            <span class="status-value">78°F</span>
+            <span class="status-label">Load Temp</span>
+          </div>
+        </div>
+        
+        <div class="status-card distance">
+          <div class="status-icon">📍</div>
+          <div class="status-info">
+            <span class="status-value">{routeStats.distance}</span>
+            <span class="status-label">Remaining</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Navigation Instruction Banner -->
+      <div class="navigation-instruction">
+        <span class="instruction-icon">🧭</span>
+        <span class="instruction-text">
+          In 5.4 mi — Exit Loop 250 toward {transitType === 'pickup' ? 'Well Pad Access Rd' : 'Industrial Blvd'}
+        </span>
+      </div>
+      
+      <!-- Transit Actions -->
       <div class="transit-actions">
         <button 
           class="action-btn primary large" 
@@ -243,12 +326,17 @@
             }
           }}
         >
-          {arriveButtonText}
+          🎯 {arriveButtonText}
         </button>
         
-        <button class="action-btn secondary" on:click={() => eventHandlers.handleEmergencyCall && eventHandlers.handleEmergencyCall()}>
-          Emergency Call
-        </button>
+        <div class="secondary-actions">
+          <button class="action-btn secondary" on:click={() => eventHandlers.handleEmergencyCall && eventHandlers.handleEmergencyCall()}>
+            📞 Dispatch
+          </button>
+          <button class="action-btn secondary" on:click={() => eventHandlers.handleEmergencyCall && eventHandlers.handleEmergencyCall()}>
+            🚨 Emergency
+          </button>
+        </div>
       </div>
     </div>
   {/if}
@@ -468,46 +556,118 @@
     color: #9ca3af;
   }
   
-  .transit-status {
-    flex: 1;
-    padding: 48px 24px;
+  /* Enhanced Map Section */
+  .transit-map-section {
+    background: #374151;
+    margin: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .map-header {
     display: flex;
-    flex-direction: column;
-    gap: 32px;
-    max-width: 600px;
-    margin: 0 auto;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #4b5563;
+    border-bottom: 1px solid #6b7280;
   }
   
-  .current-location, .arrival-eta {
-    text-align: center;
+  .map-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
   }
   
-  .location-label, .eta-label {
-    display: block;
+  .eta-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .eta-label {
     font-size: 0.875rem;
-    color: #9ca3af;
+    color: #d1d5db;
+  }
+  
+  .eta-time {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #10b981;
+  }
+  
+  .map-container-wrapper {
+    height: 300px;
+    position: relative;
+  }
+  
+  /* Transit Status Cards */
+  .transit-status-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 16px;
+    background: #374151;
+    margin: 0 16px;
+    border-radius: 8px;
+  }
+  
+  .status-card {
+    background: #4b5563;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid #6b7280;
+  }
+  
+  .status-icon {
+    font-size: 1.5rem;
     margin-bottom: 8px;
   }
   
-  .location-value, .eta-time {
+  .status-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .status-value {
     font-size: 1.25rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #ffffff;
   }
   
+  .status-label {
+    font-size: 0.75rem;
+    color: #d1d5db;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  /* Navigation Instruction */
   .navigation-instruction {
-    background: #374151;
-    border-radius: 12px;
-    padding: 24px;
-    text-align: center;
+    background: #3b82f6;
+    margin: 16px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .instruction-icon {
+    font-size: 1.25rem;
   }
   
   .instruction-text {
-    font-size: 1.125rem;
+    font-size: 1rem;
+    font-weight: 500;
     color: #ffffff;
-    line-height: 1.6;
+    line-height: 1.5;
   }
   
+  /* Transit Actions */
   .transit-actions {
     padding: 24px;
     display: flex;
@@ -515,6 +675,15 @@
     gap: 16px;
     max-width: 400px;
     margin: 0 auto;
+  }
+  
+  .secondary-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .secondary-actions .action-btn {
+    flex: 1;
   }
   
   .action-btn {
@@ -532,12 +701,13 @@
   }
   
   .action-btn.primary {
-    background: #3b82f6;
+    background: #10b981;
     color: #ffffff;
   }
   
   .action-btn.primary:hover {
-    background: #2563eb;
+    background: #059669;
+    transform: translateY(-2px);
   }
   
   .action-btn.secondary {
@@ -574,6 +744,48 @@
     
     .info-value {
       text-align: left;
+    }
+
+    /* Mobile adjustments for in-transit view */
+    .transit-status-cards {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 12px;
+      margin: 0 12px;
+    }
+
+    .status-card {
+      padding: 12px;
+    }
+
+    .status-value {
+      font-size: 1.125rem;
+    }
+
+    .map-container-wrapper {
+      height: 250px;
+    }
+
+    .transit-map-section {
+      margin: 12px;
+    }
+
+    .secondary-actions {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .transit-actions {
+      padding: 16px;
+    }
+
+    .navigation-instruction {
+      margin: 12px;
+      padding: 12px 16px;
+    }
+
+    .instruction-text {
+      font-size: 0.875rem;
     }
   }
 </style> 

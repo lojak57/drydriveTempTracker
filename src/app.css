@@ -32,7 +32,12 @@
 
 body {
 	font-family: 'SF Pro Text', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-	background: linear-gradient(135deg, #f8fafc 0%, #f0f9f0 50%, #e8f5e8 100%);
+	background: linear-gradient(135deg, 
+		#fbfbfb 0%,           /* Clean white */
+		#f8fafc 30%,          /* Soft blue-gray */
+		#f1f5f9 60%,          /* Light slate */
+		#f9fafb 100%          /* Cool gray */
+	);
 	min-height: 100vh;
 	min-height: var(--vh-mobile);
 	-webkit-font-smoothing: antialiased;

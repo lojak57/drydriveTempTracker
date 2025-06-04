@@ -16,9 +16,11 @@
 		flex-direction: column;
 		min-height: 100vh;
 		background: linear-gradient(135deg, 
-			rgba(252, 254, 255, 0.9) 0%, 
-			rgba(248, 250, 252, 0.7) 50%,
-			rgba(241, 248, 255, 0.9) 100%);
+			#fbfbfb 0%,           /* Clean white */
+			#f8fafc 30%,          /* Soft blue-gray */
+			#f1f5f9 60%,          /* Light slate */
+			#f9fafb 100%          /* Cool gray */
+		);
 	}
 
 	.main-content {
@@ -28,6 +30,8 @@
 		min-height: 100vh;
 		overflow-x: auto;
 		overflow-y: auto;
+		/* Remove any background so layout gradient shows through */
+		background: transparent;
 	}
 
 	/* Desktop styles - enhance for larger screens */
